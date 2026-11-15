@@ -6,6 +6,8 @@
 'use strict';
 if(window.NOUX_VENUES)return;
 const V={
+ awoke:{name:"Awoke Vintage · Williamsburg",area:"Williamsburg",address:"132 N 5th St, Brooklyn, NY 11249, USA",lat:40.7179,lng:-73.9601,kind:"vintage",url:"https://www.awokevintage.com/pages/visit-us"},
+ stella:{name:"10 ft Single by Stella Dallas",area:"Williamsburg",address:"285 N 6th St, Brooklyn, NY 11211, USA",lat:40.7183,lng:-73.9581,kind:"vintage"},
  langans:{name:"Langan's · Irish-American dinner",area:"Theater District",address:"114 W 47th St, New York, NY 10036, USA",lat:40.7592,lng:-73.9825,kind:"restaurant",url:"https://www.langansnyc.com/location/langans/"},
  tacos43:{name:"Los Tacos No. 1 · Times Square",area:"Times Square",address:"229 W 43rd St, New York, NY 10036, USA",lat:40.7573,lng:-73.9872,kind:"restaurant",url:"https://www.lostacos1.com/location/los-tacos-times-square/"},
  tacosChelsea:{name:"Los Tacos No. 1 · Chelsea Market",area:"Chelsea",address:"75 9th Ave, New York, NY 10011, USA",lat:40.7423,lng:-74.0061,kind:"restaurant",url:"https://www.lostacos1.com/locations/"},
@@ -57,6 +59,7 @@ function restyleOptions(D){
  c4:{rest:["Thanksgiving dining → Bryant Park Winter Village","Named holiday restaurant and Midtown evening lights"]},
  c5:{rest:["Brooklyn Bridge Park + Brooklyn Heights","DUMBO waterfront and promenade, not free time"],highline:["High Line + Chelsea Market + Edge","Named lunch stop at Chelsea Market; holiday opening must be checked"],mercer:["Mercer Labs → Cecconi's DUMBO → waterfront","Lunch at 55 Water St; holiday booking still required"]},
  c7:{standard:["Named Thanksgiving dinner near our evening venue","Ci Siamo $155 / KRU $55 / The Smith $88 depending on chosen night"],river:["The River Café · Thanksgiving $255 pp","1 Water St, Brooklyn · dress code, 1–8pm service; table not booked"]},
+ c6:{chelsea:["Yoshitomo Nara @ David Zwirner + Pace Gallery","Tuesday 24: 537 W 20th St and 540 W 25th St; real exhibitions, both with published opening hours"]},
  c8:{rest:["St. Patrick's Cathedral & Fifth Avenue","A real Midtown walk before returning for the JFK transfer"]}
  };
  for(const card of D.CHOICES||[]){
@@ -114,6 +117,9 @@ function resolve(day,events,selections,D){
    if(id==='late'||id==='breakfast')return assign(e,'culture38','Culture Espresso · coffee and cookies','72 W 38th St, then walk to the two libraries on Fifth Avenue. Weekday opening 7am–7pm.','food','proposed');
    if(id==='hotel'||/return .? dinner .? get ready/i.test(text))return Object.assign(assign(e,'maisonpremiere','Maison Premiere · oysters and cocktails','298 Bedford Ave, Williamsburg. A true oyster bar, not a return to the hotel. Table not booked.','food','unverified'),{start:'18:05',end:'19:20'});
    if(id==='night'&&c.c3==='rest')return Object.assign(assign(e,'westlight','Westlight · Manhattan skyline cocktails','111 N 12th St, Williamsburg. A panoramic drinks option, not a house DJ booking.','cocktail','hours-to-check'),{start:'21:40',end:'23:00'});
+   if(id==='vintage')return Object.assign(assign(e,'awoke','Awoke Vintage · Williamsburg thrift shop','132 North 5th Street; official shop open 10am–9pm daily. Shop carefully rather than wandering an unmarked neighbourhood.','shopping','proposed'),{start:'14:30',end:'15:10'});
+   if(id.startsWith('explore_wed_bamharvey'))return assign(e,'bamharvey','BAM: La Distance · 19:30 performance','BAM Harvey Theater, 651 Fulton Street. Programme advertised on Wednesday 25 November; buy the ticket before relying on this stop.','theatre','ticket-to-check');
+   if(id.startsWith('explore_wed_maisonpremiere'))return assign(e,'maisonpremiere','Maison Premiere · oysters and cocktails','298 Bedford Avenue; an actual oyster bar visit, not a generic dinner stop. Table still unbooked.','food','unverified');
    if(id.startsWith('explore_walk_'))return assign(e,'domino','Domino Park · Williamsburg waterfront circuit','Follow the East River waterfront to see Manhattan from a different perspective.','walk','proposed');
   }
   if(day==='thu'){
@@ -147,7 +153,7 @@ function resolve(day,events,selections,D){
    }
   }
   if(day==='fri'){
-   if(id==='breakfast')return assign(e,'breads','Breads Bakery · Rockefeller Center breakfast','1230 Sixth Avenue. Pack before leaving the room, then grab coffee and pastries near the hotel. Check out and store bags afterwards.','logistics',e.status);
+   if(id==='breakfast')return Object.assign(assign(e,'breads','Breads Bakery · Rockefeller Center breakfast','1230 Sixth Avenue. Pack before leaving the room, then grab coffee and pastries near the hotel. Check out and store bags afterwards.','logistics',e.status),{end:('10:15'===e.end?'10:05':e.end==='09:35'?'09:25':e.end)});
    if(id==='pickup')return Object.assign({},e,{title:'Return to hotel · JFK pickup time unconfirmed',detail:'Meet the shared transfer at the confirmed hotel pickup point. The displayed window is provisional, NOT a confirmed collection time; voucher/operator instructions override this.',status:'verify'});
    if(id==='walk'&&c.c8==='rest')return assign(e,'stpatrick',"St. Patrick's Cathedral · Fifth Avenue","Specific Midtown cathedral stop before returning for luggage and the JFK transfer.",'culture','proposed');
   }
@@ -163,9 +169,20 @@ function resolve(day,events,selections,D){
  if(day==='tue'&&c.c2==='bluenote'){
   if(!p.some(e=>e.place==='joespizza'))add('venue_tue_pizza','17:15','18:00','joespizza',"Joe's Pizza · Carmine Street","7 Carmine St; a proper New York slice before the 20:00 Blue Note performance.",'food','proposed');
  }
+ if(day==='wed'){
+  add('venue_wed_stella','15:20','16:05','stella','10 ft Single by Stella Dallas · vintage hunt','285 N 6th St, Williamsburg, a second real shop near Awoke, then walk to Domino Park.','shopping','proposed');
+ }
  if(day==='thu'&&c.c5==='rest'){
   add('venue_thu_dumbo','12:30','14:10','brooklynpark','Brooklyn Bridge Park · DUMBO panorama','A defined public waterfront route after the parade.','walk','proposed');
   add('venue_thu_heights','14:15','16:00','bkheights','Brooklyn Heights Promenade · Manhattan views','Walk the promenade before Thanksgiving dinner and the night programme.','walk','proposed');
+ }
+ if(day==='mon'){
+  const rt=p.find(e=>e.id==='explore_mon_roughtrade');
+  if(rt&&!fixed(rt)){rt.start='18:35';rt.end='19:05';rt.detail='30 Rockefeller Plaza, concourse level. Arrive after disembarking the cruise; the listed pier and disembarkation time are still voucher-dependent.'}
+ }
+ if(day==='fri'){
+  const r=p.find(e=>e.id==='walk');
+  if(r&&c.c8==='rockefeller')Object.assign(r,{title:'Rockefeller Center · Radio City & Fifth Avenue facades',detail:'Explore the plaza, Radio City Music Hall exterior and iconic Fifth Avenue holiday displays; return to the hotel for luggage.'});
  }
  if(day==='thu'&&c.c4==='rest')add('venue_thu_lights','20:45','22:00','bryantwinter','Bryant Park Winter Village · festive lights','Named evening destination with rink and festive lights.','walk','proposed');
  if(day==='fri'&&c.c8==='rest')add('venue_fri_cathedral','10:40','11:30','stpatrick',"St. Patrick's Cathedral · Fifth Avenue",'Close to the hotel; return for luggage and the operator-confirmed transfer.','culture','proposed');
