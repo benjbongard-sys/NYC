@@ -47,6 +47,7 @@ jobs:
         run: |
           node scripts/test_routeplanner.js
           node scripts/test_gtfsrt.js
+          node scripts/test_explorer.js
           python - <<'PY_CHECK'
           import json,pathlib
           p=pathlib.Path('assets/subway')
