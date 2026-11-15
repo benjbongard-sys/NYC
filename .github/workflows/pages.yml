@@ -44,13 +44,19 @@ jobs:
           print('Bundled and validated photo IDs:',', '.join(ok))
           assert len(ok)>=8,'Less than 8 usable photos; no pictureless publication'
           PY
-      - uses: actions/configure-pages@v5
       - name: Collect only public website assets (never publish Git metadata or development scripts)
         run: |
           mkdir -p _site
           cp index.html styles.css app.js data.js itinerary.js mta.js photo-sources.js manifest.webmanifest .nojekyll _site/
           cp -a lib assets _site/
           echo "Contents of the deployed website:" && find _site -maxdepth 3 -type f | sort | head -60
+      - name: Preserve complete photo-built website even when Pages is not yet enabled
+        uses: actions/upload-artifact@v4
+        with:
+          name: nyc-lyna-photographic-website
+          path: _site
+          retention-days: 14
+      - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
           path: _site
