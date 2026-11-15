@@ -17,23 +17,23 @@
  }
  form.addEventListener('submit',async e=>{
   e.preventDefault();if(unlocked||!input.value||!crypto?.subtle)return;
-  button.disabled=true;input.disabled=true;document.body.classList.add('unlock-thinking');mark('Decrypting our private itinerary…');bar.style.width='34%';
+  button.disabled=true;input.disabled=true;document.body.classList.add('unlock-thinking');mark('Opening our New York…');bar.style.width='34%';
   const password=input.value;input.value='';
   try{
-   if(location.protocol==='file:')throw Error('For local files, run a small local web server or use the GitHub Pages link.');
-   const r=await fetch('./assets/private.vault.json',{cache:'no-store'});if(!r.ok)throw Error('The encrypted itinerary is temporarily unavailable.');
+   if(location.protocol==='file:')throw Error('Open the online NOUX link to continue.');
+   const r=await fetch('./assets/private.vault.json',{cache:'no-store'});if(!r.ok)throw Error('Our New York could not open just now. Please try again.');
    const vault=await r.json();
    const key=await derive(password,b64(vault.salt),vault.iterations);
    bar.style.width='72%';
    const plain=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64(vault.iv),additionalData:enc.encode('NOUX-NYC-PRIVATE-V1')},key,b64(vault.ct));
    const scripts=JSON.parse(dec.decode(plain));
-   if(!scripts['data.js']||!scripts['app.js'])throw Error('Invalid encrypted package.');
+   if(!scripts['data.js']||!scripts['app.js'])throw Error('Something went wrong. Try refreshing the page.');
    unlocked=true;mark('Welcome. The city is opening…','success');bar.style.width='100%';
    screen.classList.add('unlocked');
    await new Promise(resolve=>setTimeout(resolve,1050));
    // Execute vetted, encrypted first-party bundles in the required dependency order.
    for(const name of ['data.js','itinerary.js','mta.js','routeplanner.js','photo-sources.js','custom-stops.js','app.js']){
-    if(!scripts[name])throw Error('Missing private module: '+name);
+    if(!scripts[name])throw Error('Unable to open a part of our itinerary: '+name);
     const el=document.createElement('script');el.textContent=scripts[name]+`\n//# sourceURL=noux-private-${name}`;document.head.appendChild(el);
    }
    $('root').hidden=false;screen.style.display='none';
