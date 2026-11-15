@@ -68,11 +68,11 @@
    return Object.assign({},c,{score:c.weight+(core?35:0)+(pref?20:0)});
   }).sort(function(a,b){return b.score-a.score});
  }
- function pack(day,original){
+ function pack(day,original,globalUsed){
   if(!Array.isArray(original))return original;
   var events=original.filter(function(e){return !removable(e)}).map(function(e){return Object.assign({},e)});
   events.sort(function(a,b){return minute(a.start)-minute(b.start)});
-  var used=new Set();
+  var used=new Set(globalUsed||[]);
   events.forEach(function(e){catalog.forEach(function(c){if(eventHas(e,c))used.add(c.id)})});
   var picks=candidates(day,used);
   var startOfDay=day==='thu'?360:day==='fri'?480:day==='mon'?600:480;
@@ -248,8 +248,17 @@
   baseDay=PLAN.day.bind(PLAN);
   PLAN.day=function(day,choices){
    if(choices&&typeof choices==='object')lastChoices=Object.assign({},choices);
-   var original=baseDay(day,choices);
-   return getMode()==='full'?pack(day,original):original;
+   if(getMode()!=='full'||!days.includes(day))return baseDay(day,choices);
+   // Optimise all five days together so the same wish is not added on multiple days.
+   // Preserve places already in the private baseline on any other day.
+   var original={},globalUsed=new Set(),result={};
+   days.forEach(function(d){original[d]=baseDay(d,choices)});
+   days.forEach(function(d){original[d].forEach(function(e){catalog.forEach(function(c){if(eventHas(e,c))globalUsed.add(c.id)})})});
+   ['tue','wed','fri','mon','thu'].forEach(function(d){
+    result[d]=pack(d,original[d],globalUsed);
+    result[d].forEach(function(e){catalog.forEach(function(c){if(eventHas(e,c))globalUsed.add(c.id)})});
+   });
+   return result[day];
   };
   READY=true;
   if(!(options&&options.headless)){
