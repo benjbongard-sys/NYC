@@ -58,7 +58,7 @@ async function main(){
  const ben=nodes(a.document.body).find(n=>n.tagName==='input'&&n.attrs['aria-label']==='Benjamin · Passport, ESTA and entry papers');
  assert(lyna&&ben,'Separate labelled traveller tickboxes exist');
  ben.checked=true;ben.listeners.change();
- await new Promise(resolve=>setTimeout(resolve,30));
+ await a.window.NOUX_DEPARTURE.whenSaved();
  let updated=await plaintext(key);
  assert.equal(updated.check['Benjamin:documents'],true,'Benjamin completion persists');
  assert.equal(Boolean(updated.check['Lyna:documents']),false,'Lyna remains independent');
@@ -76,7 +76,7 @@ async function main(){
  finder.click();
  assert(a.window.openedLinks.some(x=>x.startsWith('https://www.google.com/maps/search/?api=1&query=')&&x.includes('Unique%20New%20York%20souvenir')),'Shop search opens a live Google Maps query');
  form.listeners.submit({preventDefault(){}});
- await new Promise(resolve=>setTimeout(resolve,5));
+ await a.window.NOUX_DEPARTURE.whenSaved();
  updated=await plaintext(key);
  assert(updated.items.some(x=>x.name==='Unique New York souvenir'&&x.custom),'New gift added and saved encrypted');
  assert(!saved.noux_departure_checklists_aes_v1.includes('Unique New York souvenir'),'Custom gift text encrypted');
