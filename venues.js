@@ -16,6 +16,7 @@
    zabars:loc("Zabar's Café",'2245 Broadway, New York, NY 10024, USA',40.7843,-73.9784,'breakfast','https://www.zabars.com/zabars-cafe-pickup.html','Upper West Side'),
    dailyProvisions:loc('Daily Provisions · Upper West Side','375 Amsterdam Ave, New York, NY 10024, USA',40.7800,-73.9800,'food','https://www.dailyprovisions.co/location/daily-provisions-upper-west-side/','Upper West Side'),
    santAmbroeus:loc('Sant Ambroeus Madison','1000 Madison Ave, New York, NY 10075, USA',40.7752,-73.9617,'restaurant','https://www.santambroeus.com/en-eu/pages/locations','Upper East Side'),
+   viaQuadronno:loc('Via Quadronno · Upper East Side','25 E 73rd St, New York, NY 10021, USA',40.7716,-73.9645,'restaurant','https://www.viaquadronno.com/contact','Upper East Side'),
    cultureEspresso:loc('Culture Espresso · Bryant Park','72 W 38th St, New York, NY 10018, USA',40.7519,-73.9854,'coffee','https://www.cultureespresso.com/locations-feed','Bryant Park'),
    nines:loc('The Nines · piano supper club','9 Great Jones St, New York, NY 10012, USA',40.7267,-73.9929,'restaurant','https://www.ninesnyc.com/welcome','NoHo'),
    luhring:loc('Luhring Augustine · Jason Moran: STACKS','531 W 24th St, New York, NY 10011, USA',40.7490,-74.0058,'gallery','https://www.luhringaugustine.com/','Chelsea'),
@@ -28,7 +29,7 @@
    leuca:loc('Leuca · The William Vale','111 N 12th St, Brooklyn, NY 11249, USA',40.7222,-73.9597,'restaurant','https://www.leuca.com/thanksgiving/','Williamsburg'),
    smithNoMad:loc('The Smith · NoMad','1150 Broadway, New York, NY 10001, USA',40.7442,-73.9891,'restaurant','https://thesmithrestaurant.com/location/nomad/','NoMad'),
    cecconi:loc("Cecconi's DUMBO",'55 Water St, Brooklyn, NY 11201, USA',40.7038,-73.9903,'restaurant','https://www.cecconisrestaurants.com/dumbo/','DUMBO'),
-   oculus:loc('World Trade Center Oculus','50 Church St, New York, NY 10007, USA',40.7115,-74.0115,'sight','https://www.officialworldtradecenter.com/','World Trade Center'),
+   oculus:loc('World Trade Center Oculus','50 Church St, New York, NY 10007, USA',40.7115,-74.0115,'sight','https://wtcprod.panynj.gov/en/local/learn-about-wtc/oculus-transportation-hub.html','World Trade Center'),
    seaport:loc('South Street Seaport · Pier 17','89 South St, New York, NY 10038, USA',40.7065,-74.0010,'waterfront','https://www.pier17ny.com/','Seaport'),
    battery:loc('The Battery · waterfront promenade','Battery Place, New York, NY 10004, USA',40.7041,-74.0161,'park','https://www.thebattery.org/','Lower Manhattan'),
    meatpacking:loc('Meatpacking District · Gansevoort Plaza','Gansevoort St & Washington St, New York, NY 10014, USA',40.7397,-74.0082,'walk','https://www.meatpacking-district.com/','Meatpacking'),
@@ -86,6 +87,16 @@
  }
  function fix(day,e,c){
   if(['booked','confirmed'].includes(e.status))return [e];
+  // Make the optimiser's flexible walks navigable and specific too.
+  if(/^explore_walk_/.test(e.id)){
+   if(e.place==='edge')return [assign(e,'hudsonYards','Hudson Yards plaza · Vessel exterior','Walk through the Hudson Yards public square for architecture and views.','walk','proposed')];
+   if(e.place==='lebain'||e.place==='littleisland'||e.place==='meatpacking')return [assign(e,'meatpacking','Gansevoort Plaza · Meatpacking streets','Specific walk around Gansevoort Plaza and the historic Meatpacking District streets.','walk','proposed')];
+   if(e.place==='roughtrade'||e.place==='rockefeller')return [assign(e,'rockefeller','Rockefeller Center · Channel Gardens','Architecture and window displays around Rockefeller Plaza, not a hotel break.','walk','proposed')];
+   if(e.place==='domino'||e.place==='thrift')return [assign(e,'domino','Domino Park · East River promenade','Waterfront skyline and the public Domino Park paths in Williamsburg.','walk','proposed')];
+   if(e.place==='pier')return [assign(e,'hudsonYards','Hudson Yards waterfront corridor','Continue along the public waterfront toward Hudson Yards; adapt to the confirmed cruise terminal.','walk','proposed')];
+   const base=DATA.P[e.place];
+   return [assign(e,e.place,(base&&base.name?base.name+' · short exploration':'Neighbourhood stop'), 'Explore the immediately surrounding streets of this named stop, adjusting to local opening hours.','walk','proposed')];
+  }
   if(day==='mon'){
    if(e.id==='lunch')return [assign(e,'losTacosTimes','Los Tacos No. 1 · Times Square lunch','229 West 43rd Street. Fast tacos before the cruise transfer; skip if airport or traffic delays threaten boarding.','food','proposed')];
    if(e.id==='reset'){
@@ -109,7 +120,7 @@
    }
    if(e.id==='lunch'){
     if(c.c6==='chelsea')return [assign(e,'losTacosChelsea','Los Tacos No. 1 · Chelsea Market','75 Ninth Avenue, inside Chelsea Market. Quick tacos between galleries and the High Line.','food','proposed')];
-    if(c.c6==='guggenheim')return [assign(e,'santAmbroeus','Sant Ambroeus Madison · Italian café lunch','1000 Madison Avenue; café near the Guggenheim and Albertine. Note the park crossing to Oak Bridge afterward.','food','proposed')];
+    if(c.c6==='guggenheim')return [assign(e,'viaQuadronno','Via Quadronno · Italian café lunch','25 East 73rd Street near Central Park. Compact Italian café lunch with panini and pasta; Tuesday service confirmed, seating is walk-in for lunch.','food','proposed')];
     return [assign(e,'dailyProvisions','Daily Provisions · Upper West Side lunch','375 Amsterdam Avenue at West 78th; made-to-order sandwiches or salads near the museum.','food','proposed')];
    }
    if(e.id==='reset'){
@@ -135,7 +146,7 @@
       c.c3==='rest'?'Return to the Domino Park waterfront for skyline views before the piano bar.':'111 North 12th Street; rooftop cocktails and Manhattan views. Thanksgiving-week seating and weather to check.','cocktail','proposed');
     b.id='hotel_view';b.start='19:40';b.end='20:40';return [a,b];
    }
-   if(e.id==='night'&&c.c3==='rest')return [assign(e,'nines','The Nines · late piano bar in NoHo','9 Great Jones Street; a refined, atmospheric alternative to clubbing. Confirm the Wednesday piano programme.','music','proposed')];
+   if(e.id==='night'&&c.c3==='rest'){const v=assign(e,'nines','The Nines · late piano bar in NoHo','9 Great Jones Street; a refined, atmospheric alternative to clubbing. Confirm the Wednesday piano programme.','music','proposed');v.start='21:30';return [v];}
   }
   if(day==='thu'){
    if(e.id==='open'&&c.c5==='rest'){
