@@ -199,3 +199,72 @@ a[class~="photo-credit"] { display:none !important; }
 }
 @media(max-height:490px) and (orientation:landscape){.noux-explorer-drawer{max-height:93dvh;padding-top:12px}.noux-explorer-head h2{font-size:24px}}
 @media(prefers-reduced-motion:reduce){.noux-explorer-drawer{animation:none}.noux-explorer-launch{transition:none}.noux-explorer-bar>span{transition:none}}
+
+/* NOUX SUBWAY COMPANION + SECOND-CHANCE CHOICES · NOV 2026 */
+.noux-second-chances{margin-top:15px;padding:1px 0 9px}
+.noux-second-chances h3{font-size:11px;margin-top:23px!important}
+.noux-second-row{display:flex;gap:9px;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(240,225,205,.11)}
+.noux-second-info{min-width:0;display:flex;flex-direction:column;gap:5px;flex:1}
+.noux-second-info b{font-size:11px;color:#f1e6d7;font-weight:700;line-height:1.4}
+.noux-second-info small{font-size:10px;line-height:1.5;color:#aeb7bd}
+.noux-second-row button{flex:0 0 auto;font-size:10px;font-weight:750;border-radius:8px;border:1px solid rgba(223,195,158,.35);background:rgba(225,190,151,.09);color:#ecd7bb;min-height:42px;padding:9px 11px;max-width:112px}
+.noux-second-row button.noux-second-add{background:#e8cd9e;color:#161e28;border-color:#eed5ae}
+.noux-second-row button.noux-second-added{background:rgba(89,171,123,.12);border-color:rgba(144,208,161,.33);color:#b1e5be}
+.noux-subway-companion{margin:29px 0 54px;padding:25px;background:linear-gradient(145deg,#181e2a,#111923);border:1px solid rgba(216,182,140,.25);border-radius:19px;color:#eff2f5;box-shadow:0 12px 36px rgba(0,0,0,.14)}
+.noux-subway-top .noux-kicker{display:block;color:#dbbb90;letter-spacing:.21em;font-size:10px;font-weight:800;text-transform:uppercase}
+.noux-subway-top h2{font:normal clamp(29px,3.1vw,47px)/1.07 var(--serif,Georgia,serif);margin:12px 0 12px;color:#f4e5d0}
+.noux-subway-muted{font-size:12px;color:#b8c1c9;line-height:1.65;margin:7px 0 12px;max-width:850px}
+.noux-subway-controls{display:grid;grid-template-columns:1.3fr 1.6fr 0.85fr .85fr;gap:12px;margin:24px 0 12px}
+.noux-subway-field{display:flex;flex-direction:column;gap:8px;min-width:0}
+.noux-subway-field span{font-size:10px;color:#c7b193;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.noux-subway-field select,.noux-subway-field input{width:100%;min-width:0;min-height:46px;border:1px solid #5a5c62;border-radius:9px;background:#242b37;color:#fff;padding:10px;font-size:14px}
+.noux-subway-field select:focus,.noux-subway-field input:focus{outline:2px solid #d6b58a;outline-offset:2px}
+.noux-subway-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:13px 0 18px}
+.noux-subway-actions button,.noux-subway-tip button{min-height:44px;border-radius:9px;font-weight:700;font-size:12px;padding:11px 16px}
+.noux-subway-primary{background:#e4c598;color:#141922;border:1px solid #e8cfab}
+.noux-subway-secondary{background:rgba(255,255,255,.07);color:#f2dfc5;border:1px solid rgba(229,204,167,.29)}
+.noux-subway-map-shell{position:relative;overflow:hidden;border-radius:14px;border:1px solid rgba(225,203,176,.27);background:#172533}
+.noux-subway-map{height:clamp(310px,47vh,500px);width:100%;min-height:310px}
+.noux-subway-map-msg{position:absolute;left:12px;bottom:12px;z-index:2;display:block;max-width:calc(100% - 24px);border:1px solid rgba(255,255,255,.15);border-radius:7px;background:rgba(16,22,29,.87);color:#e4e9ed;padding:8px 10px;font-size:10px;pointer-events:none}
+.noux-subway-legend{display:flex;gap:15px;flex-wrap:wrap;padding:12px 2px 17px;color:#aebdc8;font-size:10px}
+.noux-subway-columns{display:grid;grid-template-columns:1fr 1.2fr;gap:16px}
+.noux-subway-card{border:1px solid rgba(204,211,218,.15);background:rgba(255,255,255,.035);padding:19px;border-radius:12px;min-width:0}
+.noux-subway-card h3{font:normal 21px/1.2 var(--serif,Georgia,serif);margin:0 0 16px;color:#f2e3ca}
+.noux-subway-filters{display:flex;gap:7px;flex-wrap:wrap;margin:4px 0 12px}
+.noux-subway-filters button{font-size:11px;min-height:38px;border:1px solid rgba(222,205,180,.28);background:rgba(255,255,255,.035);color:#cbd4d7;padding:8px 10px;border-radius:8px}
+.noux-subway-filters button.active{background:rgba(232,192,136,.22);border-color:#d6b78a;color:#f9e6c8}
+.noux-subway-fresh,.noux-subway-plan-status{display:block;color:#acb8c0;margin:8px 0 15px;font-size:11px;line-height:1.5}
+.noux-subway-list{display:flex;flex-direction:column;gap:8px}
+.noux-subway-train{display:flex;gap:10px;align-items:center;padding:10px;border:1px solid rgba(255,255,255,.1);border-radius:10px;min-width:0}
+.noux-train-pill{display:grid;place-items:center;width:34px;height:34px;flex:0 0 34px;font-size:14px;color:white;text-shadow:0 1px 2px #333;border-radius:50%;font-weight:800}
+.noux-subway-train-text{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0}
+.noux-subway-train-text b{font-size:11px;line-height:1.4}
+.noux-subway-train-text small{font-size:10px;color:#acb7c2}
+.noux-train-eta{font-size:13px;color:#f1cc9b;white-space:nowrap}
+.noux-subway-directions{display:grid;gap:9px}
+.noux-subway-step{display:flex;align-items:start;gap:12px;border-bottom:1px solid rgba(255,255,255,.09);padding:7px 0 13px}
+.noux-subway-step-count{display:grid;place-items:center;flex:0 0 27px;height:27px;border:1px solid #bb9b70;border-radius:50%;font-size:12px;color:#f0ce9b}
+.noux-subway-step-copy{display:grid;gap:5px;min-width:0}
+.noux-subway-step-copy b{font-size:12px;color:#f3e0c3;line-height:1.5}
+.noux-subway-step-copy small{font-size:11px;color:#b6c1c8;line-height:1.55}
+.noux-subway-disclaimer{font-size:11px;color:#c3cdd5;line-height:1.6}
+.noux-subway-guide{font-size:12px;line-height:1.6;color:#e1d2bb}
+.noux-subway-tip{margin-top:18px;padding:15px 18px;border:1px solid rgba(217,179,124,.2);border-radius:10px}
+.noux-subway-tip b{color:#eecf9e;font-size:13px}
+.noux-subway-tip p{font-size:11px;color:#bac4cd;line-height:1.65}
+@media(max-width:1050px){
+ .noux-subway-controls{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .noux-subway-columns{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+ .noux-subway-companion{padding:16px 12px;margin:17px 0 35px;border-radius:14px}
+ .noux-subway-controls{grid-template-columns:1fr 1fr;gap:9px}
+ .noux-subway-field:nth-child(-n+2){grid-column:1/-1}
+ .noux-subway-field select,.noux-subway-field input{font-size:16px;min-height:46px;padding:9px}
+ .noux-subway-top h2{font-size:31px}
+ .noux-subway-map{height:350px;min-height:350px}
+ .noux-subway-card{padding:15px 12px}
+ .noux-subway-actions button{flex:1}
+ .noux-subway-legend{gap:7px}
+}
+@media(prefers-reduced-motion:reduce){.noux-second-row button,.noux-subway-companion *{scroll-behavior:auto}}
