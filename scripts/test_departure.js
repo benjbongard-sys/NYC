@@ -33,7 +33,7 @@ const encode=b=>Buffer.from(b,'binary').toString('base64');
 const decode=s=>new Uint8Array(Buffer.from(s,'base64'));
 const keyPromise=webcrypto.subtle.generateKey({name:'AES-GCM',length:256},false,['encrypt','decrypt']);
 async function instance(key){
- const document=makeDocument(),window={NYC_DATA:{},NYC_PLAN:{}};
+ const document=makeDocument(),window={NYC_DATA:{},NYC_PLAN:{},openedLinks:[],open(url){this.openedLinks.push(url);return {closed:false}}};
  const ctx={window,document,localStorage:storage,crypto:webcrypto,TextEncoder,TextDecoder,btoa:encode,atob:s=>Buffer.from(s,'base64').toString('binary'),Uint8Array,Array,Object,JSON,Math,Date,Number,String,Set,Promise,Blob,URL,setTimeout,requestAnimationFrame:fn=>fn()};
  vm.runInNewContext(source,ctx,{filename:'departure-kit.js'});
  assert(await window.NOUX_DEPARTURE.install({key}),'Checklist installs only with valid AES key');
@@ -65,8 +65,17 @@ async function main(){
  const gifts=nodes(a.document.body).find(n=>n.tagName==='button'&&n.textContent==='Bring home from NYC');assert(gifts);
  gifts.click();
  const form=nodes(a.document.body).find(n=>n.tagName==='form');assert(form,'On-the-fly add form exists');
+ const discovery=nodes(form).find(n=>n.tagName==='button'&&n.textContent==='Suggest best day');
+ const finder=nodes(form).find(n=>n.tagName==='button'&&n.textContent==='Find shops live');
+ assert(discovery&&finder,'New item supports both route-based day recommendation and live shop search');
  const inp=nodes(form).find(n=>n.tagName==='input'&&n.required);assert(inp);
- inp.value='Unique New York souvenir';form.listeners.submit({preventDefault(){}});
+ inp.value='Unique New York souvenir';
+ discovery.click();
+ const assignedDay=nodes(form).find(n=>n.tagName==='select');
+ assert.equal(assignedDay.value,'fri','Midtown souvenir defaults to final shopping day');
+ finder.click();
+ assert(a.window.openedLinks.some(x=>x.startsWith('https://www.google.com/maps/search/?api=1&query=')&&x.includes('Unique%20New%20York%20souvenir')),'Shop search opens a live Google Maps query');
+ form.listeners.submit({preventDefault(){}});
  await new Promise(resolve=>setTimeout(resolve,5));
  updated=await plaintext(key);
  assert(updated.items.some(x=>x.name==='Unique New York souvenir'&&x.custom),'New gift added and saved encrypted');
