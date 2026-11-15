@@ -113,14 +113,17 @@ function planTuesday(orig,wanted,choices){
 function repairBam(rows){
  const hasBAM=rows.some(x=>/bamharvey|theatre|la distance/i.test((x.id||'')+' '+(x.title||''))&&x.start>='19:00'&&x.start<='20:30');
  if(!hasBAM)return sorted(rows);
- const conflict=rows.some(x=>['hotel','hotel_view','explore_wed_maisonpremiere'].includes(x.id));
- if(!conflict)return sorted(rows);
+ const conflictingIds=['hotel','hotel_view','explore_wed_maisonpremiere'];
+ const removable=rows.filter(x=>conflictingIds.includes(x.id)&&!isProtected(x));
+ if(!removable.length)return sorted(rows);
+ // Never discard an independently confirmed booking when repairing a proposed itinerary.
  // A 19:30 curtain in Fort Greene is incompatible with 19:40 cocktails
- // in Williamsburg. Keep oysters but leave an honest subway buffer.
- const out=rows.filter(x=>!['hotel','hotel_view','explore_wed_maisonpremiere'].includes(x.id));
- if(!out.some(x=>x.id==='art_wed_oysters'))
+ // in Williamsburg. Keep oysters only where protected events permit.
+ const out=rows.filter(x=>!removable.includes(x));
+ const available=(start,end)=>!out.some(x=>isProtected(x)&&minutes(x.start)<minutes(end)&&minutes(x.end)>minutes(start));
+ if(!out.some(x=>x.id==='art_wed_oysters')&&available('17:28','18:10'))
   out.push(e('art_wed_oysters','17:28','18:10','Maison Premiere · oysters and cocktails','maisonPremiere','298 Bedford Avenue, Williamsburg. Short oyster stop; reserve ahead if using the dining room.','food'));
- if(!out.some(x=>x.id==='art_wed_bam_transfer'))
+ if(!out.some(x=>x.id==='art_wed_bam_transfer')&&available('18:10','19:17'))
   out.push(e('art_wed_bam_transfer','18:10','19:17','Travel Williamsburg → BAM Fort Greene','bamharvey','Allow subway travel, waiting and theatre check-in. Live directions take priority.','travel'));
  return sorted(out);
 }
