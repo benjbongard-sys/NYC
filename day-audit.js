@@ -48,6 +48,27 @@ function thursday(rows){for(let i=rows.length-1;i>=0;i--){const e=rows[i];if(!ha
   const x=item('audited_parade_walk','09:15','09:40','Walk to Sixth Avenue · Thanksgiving viewing','centennial_parade','Crowds and barriers may require a different walking approach.','travel');x.auditAnchor=true;propose(rows,x)
  }
  return rows}
+function sunrise(day,rows,choices){
+ const requested=(choices&&choices.c11)||((DATA.DEFAULT||{}).c11||'skip');
+ if(requested!==day||!['wed','fri'].includes(day))return rows;
+ // Recommended, never a booking. Respect separately confirmed morning events.
+ const occupied=rows.find(e=>hard(e)&&minute(e.start)<540&&end(e)>360);
+ if(occupied)return rows;
+ addPlace('auditDumboSunrise',{name:'Pebble Beach · DUMBO Brooklyn Bridge Park',address:'Main Street and Plymouth Street, Brooklyn, NY 11201, USA',area:'DUMBO, Brooklyn',lat:40.7038,lng:-73.9891,kind:'waterfront',url:'https://brooklynbridgepark.org/about/'});
+ addPlace('auditBridgeWalk',{name:'Brooklyn Bridge Pedestrian Walkway',address:'Tillary Street and Adams Street, Brooklyn, NY 11201, USA',area:'Brooklyn Bridge',lat:40.6972,lng:-73.9894,kind:'walk',url:'https://www.nyc.gov/html/dot/html/infrastructure/brooklyn-bridge.shtml'});
+ const home=placeForHotel(rows);
+ const sunriseTime=day==='wed'?'06:54':'06:56';
+ const sunriseNote='Actual sunrise '+sunriseTime+' NYC local time; Brooklyn Bridge Park opens at 06:00. Weather, lighting and MTA services may vary.';
+ const tasks=[
+  item('sunrise_'+day+'_out','06:00','06:45','Subway to DUMBO · A/C downtown & Brooklyn-bound','auditDumboSunrise','From Midtown take the A/C towards Brooklyn to High St, then walk to the waterfront. Check the platform signs and live MTA departures. Approximately 45 minutes including the walk.','travel'),
+  item('sunrise_'+day+'_photos','06:45','07:10','Brooklyn Bridge at sunrise · DUMBO photographs','auditDumboSunrise',sunriseNote+' Photograph the bridge, skyline and waterfront; no reservation is required.','walk'),
+  item('sunrise_'+day+'_entrance','07:10','07:30','DUMBO → Brooklyn Bridge pedestrian entrance','auditBridgeWalk','Walk inland to the Brooklyn Bridge pedestrian access, allowing a photo stop at Washington Street.','travel'),
+  item('sunrise_'+day+'_bridge','07:30','08:05','Walk Brooklyn Bridge towards Manhattan · photo stops','auditBridgeWalk','Walk from Brooklyn to Manhattan on the pedestrian deck. Sunrise is over by this point; enjoy the morning light.','walk'),
+  item('sunrise_'+day+'_return','08:05','08:55','Return to Midtown · subway / breakfast',home,'Reach the hotel or selected breakfast venue with enough margin for the day's first timed visit. Check live directions.','travel')
+ ];
+ tasks.forEach(x=>propose(rows,x));
+ return rows;
+}
 function friday(rows){
  const pickup=rows.find(e=>e.id==='pickup'||(/airport transfer|airport pickup|group coach/i.test(e.title||'')&&e.kind==='logistics'));
  // The group coach is arranged by the travel organiser. Departure is around 17:00:
@@ -112,7 +133,7 @@ function resolve(day,list){const pending=[],kept=[];for(const e0 of sorted(list.
  return sorted(kept)}
 function install(){if(installed)return true;DATA=window.NYC_DATA;PLAN=window.NYC_PLAN;if(!DATA||!DATA.P||!PLAN||typeof PLAN.day!=='function')return false;
  BASE=PLAN.day.bind(PLAN);PLAN.day=function(day,choices){const original=BASE(day,choices);if(!Array.isArray(original))return original;
- try{const rows=original.map(x=>({...x}));if(day==='mon')monday(rows);if(day==='thu')thursday(rows);if(day==='fri')friday(rows);return resolve(day,rows)}catch(_){return original}
+ try{const rows=original.map(x=>({...x}));if(day==='mon')monday(rows);if(day==='thu')thursday(rows);if(day==='fri')friday(rows);if(day==='wed'||day==='fri')sunrise(day,rows,choices);return resolve(day,rows)}catch(_){return original}
  };installed=true;return true}
-window.NOUX_DAY_AUDIT={install,version:'2026.11.15-audit-v3',pending:()=>{try{return Object.values(JSON.parse(localStorage.getItem(KEY)||'{}')).flat().filter(Boolean)}catch(_){return []}}};
+window.NOUX_DAY_AUDIT={install,version:'2026.11.15-audit-v4',pending:()=>{try{return Object.values(JSON.parse(localStorage.getItem(KEY)||'{}')).flat().filter(Boolean)}catch(_){return []}}};
 })();
