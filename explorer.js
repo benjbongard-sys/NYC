@@ -5,7 +5,7 @@
  if(window.NOUX_EXPLORER)return;
  var KEY='noux_explore_pace_v1',READY=false,DATA=null,PLAN=null,baseDay=null,lastChoices=null;
  var days=['mon','tue','wed','thu','fri'];
- var labels={mon:'MON 23',tue:'TUE 24',wed:'WED 25',thu:'THU 26',fri:'FRI 27'};
+ var labels={mon:'MON',tue:'TUE',wed:'WED',thu:'THU',fri:'FRI'};
  var catalog=[
   {id:'moma',phrases:['moma','nilima sheikh','brancusi','surrealist book'],kind:'museum',minutes:65,min:42,hours:[630,1050],days:['mon','tue','wed','fri'],weight:88},
   {id:'met',phrases:['the met','metropolitan museum','islamic art','costume art'],kind:'museum',minutes:65,min:42,hours:[600,1020],days:['tue','fri'],weight:85},
@@ -199,7 +199,8 @@
    var dayGrid=element('div','noux-explorer-days');
    days.forEach(function(d){
     var rows=plans[d],count=rows.filter(function(e){return !['travel','logistics','recovery'].includes(e.kind)}).length;
-    var btn=press(selectedDay()===d?'is-selected':'',labels[d],function(){open=false;drawer.hidden=true;trigger.setAttribute('aria-expanded','false');goTo(d)});
+    var dateText=(DATA.DAYS||[]).find(function(item){return item[0]===d});
+    var btn=press(selectedDay()===d?'is-selected':'',dateText?dateText[2]:labels[d],function(){open=false;drawer.hidden=true;trigger.setAttribute('aria-expanded','false');goTo(d)});
     btn.appendChild(element('small',null,count+' experiences'));
     dayGrid.appendChild(btn);
    });
@@ -213,7 +214,7 @@
     live.append(element('small',null,'NEXT STOP · NYC '+parts.hour+':'+parts.minute),element('b',null,upcoming?upcoming.start+' · '+upcoming.title:'All scheduled stops completed'));
     if(upcoming)live.append(press('noux-explorer-link','View today’s plan',function(){open=false;drawer.hidden=true;goTo(key)}));
    }else{
-    var first=new Date('2026-11-23T12:00:00Z').getTime(),diff=Math.ceil((first-Date.now())/86400000);
+    var first=new Date(((DATA.DATES||{}).mon||'')+'T12:00:00Z').getTime(),diff=Number.isFinite(first)?Math.ceil((first-Date.now())/86400000):0;
     live.append(element('small',null,'NEW YORK LOCAL · '+parts.hour+':'+parts.minute),element('b',null,diff>0?diff+' days until our New York adventure':'Our NYC itinerary is ready to explore'));
    }
    var wishHead=element('h3',null,'Still on Lyna’s wish list');
