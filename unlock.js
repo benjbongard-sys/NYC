@@ -51,12 +51,12 @@
      // Replace only conflicting optional early-Thursday plans, never confirmed bookings.
      const retained=events.filter(e=>{
       const start=String(e.start||''), end=String(e.end||'');
-      if(!start || !end || start>='11:30' || end<='06:10')return true;
+      if(!start || !end || start>='11:30' || end<='09:15')return true;
       return ['booked','arranged','confirmed'].includes(String(e.status||'').toLowerCase());
      });
      const parade=[
-      {id:'centennial_parade_walk',start:'06:10',end:'06:35',title:'Walk to Sixth Avenue · get a viewing position',place:'centennial_parade',detail:'Choose a public viewing area around West 52nd Street. Barricades and NYPD directions take precedence. Early arrival is important.',kind:'travel',status:'proposed'},
-      {id:'centennial_parade_2026',start:'06:35',end:'11:20',title:"100th Macy's Thanksgiving Day Parade",place:'centennial_parade',detail:'Thursday 26 November 2026. The parade officially begins at 08:30 on Central Park West, then follows Central Park South and Sixth Avenue towards Herald Square. Free public viewing; exact passage times at this location are not guaranteed.',kind:'highlight',status:'public-event'}
+      {id:'centennial_parade_walk',start:'09:15',end:'09:40',title:'Walk to Sixth Avenue · join the Thanksgiving crowds',place:'centennial_parade',detail:'Aim for public viewing near West 52nd Street from 09:40. Arriving after the first crowds means no kerbside/front-row view is guaranteed. Follow NYPD barriers; walking routes may be restricted.',kind:'travel',status:'proposed'},
+      {id:'centennial_parade_2026',start:'09:40',end:'11:15',title:"100th Macy's Thanksgiving Day Parade",place:'centennial_parade',detail:'The parade starts at 08:30 on the Upper West Side. Near Rockefeller Center the lead floats usually pass after 09:30, with more arriving throughout the morning. Shorter relaxed viewing; sightlines and exact timings are not guaranteed.',kind:'highlight',status:'public-event'}
      ];
      return retained.concat(parade).sort((a,b)=>String(a.start||'').localeCompare(String(b.start||'')));
     };
