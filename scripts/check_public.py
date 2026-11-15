@@ -6,7 +6,7 @@ for f in required:
  assert (root/f).is_file(),f'Missing required offline asset {f}'
 vault=json.loads((root/'assets/private.vault.json').read_text())
 assert vault['algorithm']=='AES-256-GCM' and len(vault['ct'])>40000
-for name in ['data.js','itinerary.js','app.js','mta.js','photo-sources.js','private_source']:
+for name in ['data.js','itinerary.js','app.js','mta.js','photo-sources.js','custom-stops.js','private_source']:
  assert not (root/name).exists(),f'Plaintext/private module published: {name}'
 assert len(list((root/'assets/photos').glob('*.jpg')))>=24,'Photo coverage insufficient'
 for f in [root/'index.html',root/'unlock.js']:

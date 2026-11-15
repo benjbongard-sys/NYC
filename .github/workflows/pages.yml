@@ -27,8 +27,8 @@ jobs:
           mkdir -p lib
           cp node_modules/react/umd/react.production.min.js lib/react.min.js
           cp node_modules/react-dom/umd/react-dom.production.min.js lib/react-dom.min.js
-          cp node_modules/leaflet/dist/leaflet.js lib/leaflet.js
-          cp node_modules/leaflet/dist/leaflet.css lib/leaflet.css
+          cp node_modules/maplibre-gl/dist/maplibre-gl.js lib/maplibre-gl.js
+          cp node_modules/maplibre-gl/dist/maplibre-gl.css lib/maplibre-gl.css
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
