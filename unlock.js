@@ -31,10 +31,42 @@
    unlocked=true;mark('Welcome. The city is opening…','success');bar.style.width='100%';
    screen.classList.add('unlocked');
    await new Promise(resolve=>setTimeout(resolve,1050));
+   // The 100th annual parade is public civic-event data; personal travel remains inside the vault.
+   function attachCentennialParade(){
+    const data=window.NYC_DATA, planner=window.NYC_PLAN;
+    if(!data || !data.P || !planner || typeof planner.day!=='function' || planner.__centennialParade)return;
+    const areaPoint=data.P.rockefeller || data.P.times;
+    if(!areaPoint)return;
+    data.P.centennial_parade={
+     ...areaPoint,
+     name:"100th Macy's Thanksgiving Day Parade",
+     area:'Midtown Manhattan',
+     address:'Sixth Avenue near Rockefeller Center, New York, NY, USA',
+     kind:'event'
+    };
+    const dayBefore=planner.day;
+    planner.day=function(day,choices){
+     const events=dayBefore.call(this,day,choices);
+     if(day!=='thu' || !Array.isArray(events) || events.some(e=>/macy.{0,20}parade|thanksgiving.{0,20}parade/i.test(String(e.title||''))))return events;
+     // Replace only conflicting optional early-Thursday plans, never confirmed bookings.
+     const retained=events.filter(e=>{
+      const start=String(e.start||''), end=String(e.end||'');
+      if(!start || !end || start>='11:30' || end<='06:10')return true;
+      return ['booked','arranged','confirmed'].includes(String(e.status||'').toLowerCase());
+     });
+     const parade=[
+      {id:'centennial_parade_walk',start:'06:10',end:'06:35',title:'Walk to Sixth Avenue · get a viewing position',place:'centennial_parade',detail:'Choose a public viewing area around West 52nd Street. Barricades and NYPD directions take precedence. Early arrival is important.',kind:'travel',status:'proposed'},
+      {id:'centennial_parade_2026',start:'06:35',end:'11:20',title:"100th Macy's Thanksgiving Day Parade",place:'centennial_parade',detail:'Thursday 26 November 2026. The parade officially begins at 08:30 on Central Park West, then follows Central Park South and Sixth Avenue towards Herald Square. Free public viewing; exact passage times at this location are not guaranteed.',kind:'highlight',status:'public-event'}
+     ];
+     return retained.concat(parade).sort((a,b)=>String(a.start||'').localeCompare(String(b.start||'')));
+    };
+    planner.__centennialParade=true;
+   }
    // Execute vetted, encrypted first-party bundles in the required dependency order.
    for(const name of ['data.js','itinerary.js','mta.js','routeplanner.js','photo-sources.js','custom-stops.js','app.js']){
     if(!scripts[name])throw Error('Unable to open a part of our itinerary: '+name);
     const el=document.createElement('script');el.textContent=scripts[name]+`\n//# sourceURL=noux-private-${name}`;document.head.appendChild(el);
+    if(name==='itinerary.js')attachCentennialParade();
    }
    $('root').hidden=false;screen.style.display='none';
    // The password is never persisted, logged or placed in the URL.
