@@ -1,0 +1,37 @@
+name: Validate official MTA visit-date routing data
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - scripts/build_mta_timetable.py
+      - .github/workflows/validate-transit.yml
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download official MTA GTFS and compile schedule for all five visit dates
+        run: python scripts/build_mta_timetable.py
+      - name: Verify output dates and network integrity
+        run: |
+          python - <<'PY'
+          import json,pathlib
+          p=pathlib.Path('assets/subway')
+          n=json.loads((p/'network.json').read_text())
+          assert len(n['stations'])>350
+          for d in range(23,28):
+            f=p/f'2026-11-{d:02d}.json';day=json.loads(f.read_text())
+            assert len(day['connections'])>15000
+            assert all(day['connections'][i][0]<=day['connections'][i+1][0] for i in range(len(day['connections'])-1))
+            print(f.name, len(day['trips']),len(day['connections']),f.stat().st_size)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mta-subway-static-routing-for-nov-2026
+          path: assets/subway/
+          retention-days: 10
