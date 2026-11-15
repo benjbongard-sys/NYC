@@ -6,7 +6,27 @@
  const enc=new TextEncoder(),dec=new TextDecoder();
  const b64=s=>Uint8Array.from(atob(s),x=>x.charCodeAt(0));
  let unlocked=false,attempts=0;
+ // A separate compatibility boot keeps the core encrypted planner available if
+ // a nonessential enrichment crashes React. It never clears saved choices.
+ const basicMode=(()=>{
+  try{return new URLSearchParams(location.search).get('basic')==='1'||sessionStorage.getItem('noux_basic_mode')==='1'}catch(_){return false}
+ })();
  window.NYC_BASE=new URL('./',location.href).href;
+ function recovery(message){
+  if(document.getElementById('noux-recovery'))return;
+  const wrap=document.createElement('section');wrap.id='noux-recovery';
+  wrap.setAttribute('role','alert');wrap.style.cssText='position:fixed;inset:0;z-index:6000;display:grid;place-items:center;background:#101722;padding:20px;color:#f6ecdf;font-family:system-ui,sans-serif';
+  const card=document.createElement('div');card.style.cssText='max-width:520px;width:100%;padding:34px;background:#202938;border:1px solid #987d5d;border-radius:18px;box-shadow:0 25px 65px #0008';
+  const title=document.createElement('h2');title.textContent='Your New York is still here';title.style.cssText='font:400 32px Georgia,serif;margin:0 0 14px';
+  const copy=document.createElement('p');copy.textContent=message||'The encrypted itinerary opened, but the visual planner could not start. Your saved choices have not been cleared.';copy.style.cssText='line-height:1.7;color:#c5c8d0';
+  const action=document.createElement('button');action.textContent='Reopen the basic itinerary';action.style.cssText='margin-top:17px;padding:14px 18px;background:#e2c398;border:0;border-radius:9px;color:#17202b;font-weight:750;cursor:pointer;min-height:48px';
+  action.onclick=()=>{try{sessionStorage.setItem('noux_basic_mode','1')}catch(_){}const u=new URL(location.href);u.searchParams.set('basic','1');location.assign(u.href)};
+  const note=document.createElement('p');note.textContent='You will enter your private passphrase again. No trip data, packing checks or preferences are erased.';note.style.cssText='margin-top:18px;font-size:12px;color:#abb9c3';
+  card.append(title,copy,action,note);wrap.append(card);document.body.append(wrap);
+ }
+ function healthy(){
+  const root=$('root');return !!(root&&!root.hidden&&root.childElementCount>0&&root.textContent.trim().length>40);
+ }
  const stars=$('lock-stars');
  for(let i=0;i<50;i++){const star=document.createElement('i');star.style.setProperty('--x',`${(i*71+13)%98}%`);star.style.setProperty('--y',`${(i*41+19)%84}%`);star.style.setProperty('--delay',`${(i%15)*-.23}s`);star.style.setProperty('--size',`${i%9===0?3:1}px`);stars.appendChild(star)}
  $('toggle-visibility').addEventListener('click',()=>{input.type=input.type==='password'?'text':'password';input.focus()});
@@ -62,23 +82,47 @@
     };
     planner.__centennialParade=true;
    }
+   // Errors in the visual app must never leave an unexplained blue screen.
+   let visualError=false;
+   const onVisualError=()=>{visualError=true};
+   window.addEventListener('error',onVisualError);
+   window.addEventListener('unhandledrejection',onVisualError);
    // Execute vetted, encrypted first-party bundles in the required dependency order.
    for(const name of ['data.js','itinerary.js','mta.js','routeplanner.js','photo-sources.js','custom-stops.js','app.js']){
     if(!scripts[name])throw Error('Unable to open a part of our itinerary: '+name);
     const el=document.createElement('script');el.textContent=scripts[name]+`\n//# sourceURL=noux-private-${name}`;document.head.appendChild(el);
     if(name==='itinerary.js')attachCentennialParade();
-    if(name==='custom-stops.js'){
-     if(window.NOUX_EXPLORER){try{window.NOUX_EXPLORER.install()}catch(_){/* Keep the private trip available. */}}
-     if(window.NOUX_VENUES){try{window.NOUX_VENUES.install()}catch(_){/* Never block decryption on a display enhancement. */}}
-     if(window.NOUX_CHOICES){try{window.NOUX_CHOICES.install()}catch(_){/* Fallback: the existing encrypted schedule stays usable. */}}
-     if(window.NOUX_DAY_AUDIT){try{window.NOUX_DAY_AUDIT.install()}catch(_){/* Keep encrypted planner usable without the route audit. */}}
-     if(window.NOUX_SUBWAY){try{window.NOUX_SUBWAY.install()}catch(_){/* Do not block the itinerary when mapping is unavailable. */}}
+    if(name==='custom-stops.js'&&!basicMode){
+     // The stable venue/explorer layers can initialise here; choices, route
+     // auditing and subway enhancements must not mutate state before React's
+     // initial render. In basic mode, boot the decrypted private app alone.
+     if(window.NOUX_EXPLORER){try{window.NOUX_EXPLORER.install()}catch(_){}}
+     if(window.NOUX_VENUES){try{window.NOUX_VENUES.install()}catch(_){}}
     }
    }
    $('root').hidden=false;screen.style.display='none';
-   // Reuse the same locally derived AES key for encrypted user tickboxes.
-   // The passphrase and key are never persisted or sent to a server.
-   if(window.NOUX_DEPARTURE){try{await window.NOUX_DEPARTURE.install({key});}catch(_){/* The main private itinerary remains available. */}}
+   // First confirm that the unmodified React app has actually painted.
+   await new Promise(resolve=>setTimeout(resolve,250));
+   if(!healthy()||visualError){
+    recovery('The encrypted itinerary unlocked, but the visual planner did not finish opening. Try the basic itinerary; your personal data remains intact.');
+   }else{
+    if(!basicMode){
+     // Progressive enhancement *after* the first React paint. A bad extension
+     // must never prevent the core planner from mounting.
+     try{window.NOUX_CHOICES?.install()}catch(_){}
+     try{window.NOUX_DAY_AUDIT?.install()}catch(_){}
+     try{window.NOUX_SUBWAY?.install()}catch(_){}
+     // React's state stays authoritative; request a regular view refresh only
+     // after the baseline UI is visible, not during component creation.
+     try{document.dispatchEvent(new CustomEvent('noux:replan',{detail:{kind:'unlock-ready'}}))}catch(_){}
+    }
+    // Encrypted checklist is a sibling of React's root, not a child of its nav.
+    if(window.NOUX_DEPARTURE){try{await window.NOUX_DEPARTURE.install({key})}catch(_){}}
+    // Catch a delayed render failure and offer an intact basic fallback.
+    setTimeout(()=>{if(!healthy())recovery('The interactive page stopped rendering. Reopen the basic itinerary; your saved plans and checklist remain intact.')},1200);
+   }
+   window.removeEventListener('error',onVisualError);
+   window.removeEventListener('unhandledrejection',onVisualError);
    // The password is never persisted, logged or placed in the URL.
   }catch(error){
    unlocked=false;attempts++;bar.style.width='0%';button.disabled=false;input.disabled=false;
