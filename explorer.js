@@ -271,6 +271,20 @@
     if(alternatives.length>8)second.append(element('small','noux-help','+'+(alternatives.length-8)+' additional alternatives remain in Lyna’s decisions.'));
     if(!alternatives.length)second.append(element('p','noux-help','All applicable choices have been included.'));
    }
+   // Show deferred stops and routing checks, rather than hiding a displaced choice.
+   var audit=window.NOUX_DAY_AUDIT;
+   if(audit&&typeof audit.pending==='function'){
+    var checks=audit.pending();
+    if(checks.length){
+     second.append(element('h3',null,'Route checks · nothing silently lost'));
+     checks.slice(0,7).forEach(function(issue){
+      var row=element('div','noux-second-row'),copy=element('div','noux-second-info');
+      copy.append(element('b',null,(issue.day||'').toUpperCase()+' · '+issue.title),element('small',null,issue.reason));
+      row.append(copy);second.append(row);
+     });
+     if(checks.length>7)second.append(element('small','noux-help','+'+(checks.length-7)+' more saved routing checks'));
+    }
+   }
    var controls=element('div','noux-explorer-actions');
    controls.append(press('noux-explorer-primary','Open wish list',function(){var b=Array.from(document.querySelectorAll('.topbar .mainnav button')).find(function(x){return /wish list/i.test(x.textContent)});if(b)b.click();open=false;drawer.hidden=true}),press('noux-explorer-secondary','Add a stop',function(){var b=document.querySelector('.top-add-stop');if(b)b.click();open=false;drawer.hidden=true}));
    drawer.replaceChildren(head,intro,live,modes,summary,track,help,daysHead,dayGrid,wishHead,radar,second,controls);
