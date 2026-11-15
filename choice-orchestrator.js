@@ -275,6 +275,11 @@ function planWednesdayExperience(orig,choices){
   }else if(choices.c3==='rest'){
    night=Object.assign({},night,{start:effectiveBAM?'21:50':mode==='manhattan'?'20:30':'20:45',end:effectiveBAM?'23:20':'22:40',
     detail:String(night.detail||'')+' Dinner/piano programme and seating still require confirmation.'});
+  }else{
+   // The selected night may run longer; leaving at 00:45 is optional but
+   // preserves reasonable sleep before the 09:15 Thanksgiving departure.
+   night=Object.assign({},night,{end:'00:45',
+    detail:String(night.detail||'')+' Suggested departure at 00:45 (not the event closing time) before the Thanksgiving parade the next morning. Entry not confirmed.'});
   }
   const lateStart=effectiveBAM?'21:00':mode==='manhattan'?'20:55':'21:10';
   const lateEnd=effectiveBAM?'21:45':mode==='manhattan'?'21:50':'21:50';
