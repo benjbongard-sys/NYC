@@ -33,7 +33,10 @@
    seaport:loc('South Street Seaport · Pier 17','89 South St, New York, NY 10038, USA',40.7065,-74.0010,'waterfront','https://www.pier17ny.com/','Seaport'),
    battery:loc('The Battery · waterfront promenade','Battery Place, New York, NY 10004, USA',40.7041,-74.0161,'park','https://www.thebattery.org/','Lower Manhattan'),
    meatpacking:loc('Meatpacking District · Gansevoort Plaza','Gansevoort St & Washington St, New York, NY 10014, USA',40.7397,-74.0082,'walk','https://www.meatpacking-district.com/','Meatpacking'),
-   friedmans:loc("Friedman's · Edison Hotel",'228 W 47th St, New York, NY 10036, USA',40.7597,-73.9858,'breakfast','https://www.friedmansrestaurant.com/location/edison/','Times Square')
+   friedmans:loc("Friedman's · Edison Hotel",'228 W 47th St, New York, NY 10036, USA',40.7597,-73.9858,'breakfast','https://www.friedmansrestaurant.com/location/edison/','Times Square'),
+   urbanCove:loc('Urban Cove · Seaport','33 Peck Slip, New York, NY 10038, USA',40.7079,-74.0009,'restaurant','https://www.urbancoveseaport.com/','Seaport'),
+   westVillage:loc('West Village · Christopher and Bleecker Streets','Christopher St & 7th Ave S, New York, NY 10014, USA',40.7338,-74.0029,'walk','https://www.nyctourism.com/neighborhoods/west-village/','West Village'),
+   stPatrick:loc("St. Patrick's Cathedral · Fifth Avenue",'5th Ave & E 50th St, New York, NY 10022, USA',40.7586,-73.9759,'sight','https://saintpatrickscathedral.org/','Midtown')
  };
  const OPTIONS={
   c1:{title:'Monday · Which first-night dinner and skyline?',desc:'A named dinner venue for every option, followed by your chosen first-night view.',options:{
@@ -90,7 +93,10 @@
   // Make the optimiser's flexible walks navigable and specific too.
   if(/^explore_walk_/.test(e.id)){
    if(e.place==='edge')return [assign(e,'hudsonYards','Hudson Yards plaza · Vessel exterior','Walk through the Hudson Yards public square for architecture and views.','walk','proposed')];
-   if(e.place==='lebain'||e.place==='littleisland'||e.place==='meatpacking')return [assign(e,'meatpacking','Gansevoort Plaza · Meatpacking streets','Specific walk around Gansevoort Plaza and the historic Meatpacking District streets.','walk','proposed')];
+   if(e.place==='lebain'||e.place==='littleisland'||e.place==='meatpacking'){
+    const v=assign(e,'westVillage','West Village · Christopher Street and Bleecker','A specific walk from Meatpacking through Christopher Street and Bleecker Street.','walk','proposed');
+    return [v];
+   }
    if(e.place==='roughtrade'||e.place==='rockefeller')return [assign(e,'rockefeller','Rockefeller Center · Channel Gardens','Architecture and window displays around Rockefeller Plaza, not a hotel break.','walk','proposed')];
    if(e.place==='domino'||e.place==='thrift')return [assign(e,'domino','Domino Park · East River promenade','Waterfront skyline and the public Domino Park paths in Williamsburg.','walk','proposed')];
    if(e.place==='pier')return [assign(e,'hudsonYards','Hudson Yards waterfront corridor','Continue along the public waterfront toward Hudson Yards; adapt to the confirmed cruise terminal.','walk','proposed')];
@@ -151,11 +157,11 @@
   if(day==='thu'){
    if(e.id==='open'&&c.c5==='rest'){
     let v=assign(e,'oculus','World Trade Center Oculus · architecture walk','50 Church Street. Visit the Calatrava station, Memorial Plaza exteriors and surrounding architecture. Retail holiday hours may vary.','walk','proposed');
-    v.end='13:45';return [v];
+    v.end='13:20';return [v];
    }
    if(e.id==='chill'&&c.c5==='rest'){
     let v=assign(e,'seaport','South Street Seaport · Pier 17 waterfront','89 South Street. East River promenade and views of the Brooklyn Bridge, not an unspecified break.','walk','proposed');
-    v.start='14:10';return [v];
+    v.start='14:35';return [v];
    }
    if(e.id==='lunch'){
     if(c.c5==='mercer')return [assign(e,'cecconi',"Cecconi's DUMBO · waterfront lunch",'55 Water Street, Brooklyn. Named Italian restaurant at the next walking destination; verify Thanksgiving opening and table.','food','hours-to-check')];
@@ -178,7 +184,7 @@
     }
     return [assign(e,'standardGrill','The Standard Grill · Thanksgiving dinner ($125 pp)','848 Washington Street, Meatpacking. Official three-course holiday menu; near Le Bain. Book a table before assuming this plan is secured.','dinner','proposed')];
    }
-   if(e.id==='night'&&c.c4==='rest')return [assign(e,'meatpacking','Gansevoort Plaza → West Village night walk','Walk the Meatpacking cobblestones and West Village streets after dinner. A named open-air evening rather than returning to the hotel.','walk','proposed')];
+   if(e.id==='night'&&c.c4==='rest')return [assign(e,'westVillage','West Village · Bleecker Street evening walk','Explore Christopher Street and the West Village after Thanksgiving dinner, not the hotel.','walk','proposed')];
   }
   if(day==='fri'){
    if(e.id==='breakfast'){
@@ -189,8 +195,11 @@
    if(e.id==='walk'&&c.c8==='rockefeller'){
     const a=assign(e,'rockefeller','Rockefeller Center · the plaza and Channel Gardens','Classic Midtown plaza before leaving; no timed observatory ticket without confirmed airport pickup.','walk','proposed');
     a.end='11:04';
-    const b=assign(e,'roughtrade','Rough Trade Below · final vinyl browse','Concourse level at Rockefeller Center; check shop opening and allow time to retrieve hotel luggage.','shopping','proposed');
-    b.id='walk_roughtrade';b.start='11:10';return [a,b];
+    const alreadyVinyl=!!(window.NOUX_EXPLORER&&window.NOUX_EXPLORER.mode()==='full');
+    const b=alreadyVinyl
+      ?assign(e,'stPatrick',"St. Patrick's Cathedral · Fifth Avenue",'Fifth Avenue cathedral exterior and quick look at the architecture before collecting luggage.','culture','proposed')
+      :assign(e,'roughtrade','Rough Trade Below · final vinyl browse','Concourse level at Rockefeller Center; check shop opening and allow time to retrieve hotel luggage.','shopping','proposed');
+    b.id=alreadyVinyl?'walk_cathedral':'walk_roughtrade';b.start='11:10';return [a,b];
    }
    if(e.id==='pickup'){
     const v=clone(e);v.title='Return for airport transfer · pickup time to confirm';
@@ -218,6 +227,22 @@
     const ch=Object.assign({},DATA.DEFAULT||{},choices||{});
     const out=[];
     orig.forEach(e=>{fix(day,e,ch).forEach(x=>out.push(x))});
+    // The day-option originally called "free day" must stay fully planned in either pace.
+    if(day==='thu'&&ch.c5==='rest'){
+     const kept=out.filter(e=>!(e.id||'').startsWith('explore_thu_littleisland')&&!(e.id||'').startsWith('explore_walk_thu_'));
+     out.length=0;kept.forEach(e=>out.push(e));
+     const add=(id,start,end,place,title,detail,kind)=>{
+      if(!out.some(e=>e.id===id))out.push({id,start,end,place,title,detail,kind,status:'proposed'});
+     };
+     if(!out.some(e=>e.id==='open'))add('urban_oculus','12:30','13:20','oculus','World Trade Center Oculus · architecture','50 Church Street. Calatrava architecture and exterior Memorial Plaza.','walk');
+     add('urban_lunch','13:45','14:25','urbanCove','Urban Cove · Thanksgiving-week lunch','33 Peck Slip. Seasonal Thanksgiving specials published for this week; book or confirm walk-in.','food');
+     if(!out.some(e=>e.id==='chill'))add('urban_pier17','14:35','15:35','seaport','South Street Seaport and Pier 17','89 South Street. East River promenade and Brooklyn Bridge views.','walk');
+     if(!out.some(e=>e.id==='reset'))add('urban_battery','15:55','16:55','battery','The Battery · harbour views','Battery Place. Waterfront walk before heading to the dinner neighbourhood.','walk');
+    }
+    if(day==='thu'&&ch.c4==='rest'&&!out.some(e=>e.id==='night')){
+     out.push({id:'quiet_thu_village',start:'20:40',end:'21:25',place:'westVillage',title:'West Village · Bleecker Street night walk',detail:'Christopher Street and Bleecker Street after the Thanksgiving dinner; open-air and flexible.',kind:'walk',status:'proposed'});
+    }
+    // Avoid repeat walks to the same block during one evening, while keeping all dining and booked events.
     const sorted=sortEvents(out);
     // Actual bookings and fixed journey events are never removed.
     return sorted;
