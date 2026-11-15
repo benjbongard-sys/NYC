@@ -73,7 +73,10 @@ function friday(rows){
  const pickup=rows.find(e=>e.id==='pickup'||(/airport transfer|airport pickup|group coach/i.test(e.title||'')&&e.kind==='logistics'));
  // The group coach is arranged by the travel organiser. Departure is around 17:00:
  // this is an actual constraint, not the earlier provisional noon pickup.
- if(pickup&&!hard(pickup)){
+ // New documented group transfer supersedes the former 12:00 or 15:50
+ // placeholder, even if an older workflow incorrectly labelled it arranged.
+ const stalePickup=pickup&&(['12:00','15:50'].includes(pickup.start)||!hard(pickup));
+ if(stalePickup){
   pickup.start='16:45';pickup.end='17:10';pickup.status='arranged';
   pickup.title='Guided group coach · airport Terminal 1, around 17:00';
   pickup.detail='Organised hotel pickup with a French-speaking guide, around 17:00. Be in the lobby by 16:45. Exact coach boarding time is subject to the group guide. Assistance with airport check-in and boarding.';
