@@ -1,0 +1,8 @@
+name = "nyc-lyna-mta-feed"
+main = "worker.js"
+compatibility_date = "2026-11-01"
+workers_dev = true
+
+# Optional: set ALLOWED_ORIGIN to your exact published GitHub Pages origin to restrict browsers.
+# [vars]
+# ALLOWED_ORIGIN = "https://YOUR-USERNAME.github.io"

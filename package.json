@@ -1,0 +1,8 @@
+{
+  "name": "noux-nyc-lyna-interactive",
+  "version": "1.0.0",
+  "private": true,
+  "description": "GitHub Pages-ready React trip planner with choices and real-time MTA train arrivals",
+  "scripts": {"test": "node scripts/test_logic.js"},
+  "dependencies": {"react": "18.3.1", "react-dom": "18.3.1"}
+}
