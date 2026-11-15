@@ -29,6 +29,7 @@ for key,meta in sources.items():
  else:
   failed.append(key);manifest[key]={"path":None,"source":meta.get('source'),'credit':meta['credit'],'exact':meta.get('exact',False),'label':meta['label']}
 (ROOT/'assets/photo-index.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2))
+(ROOT/'assets/photo-index.js').write_text('window.NYC_PHOTO_INDEX = '+json.dumps(manifest,ensure_ascii=False,indent=2)+';\n')
 print('REAL PHOTOS:',len(success),'FAILED:',len(failed),failed)
 # Fail the build rather than publish the same pictureless product again.
 critical=['hotel','cruise','westlight','watertower','lebain','butterfly','albertine','nypl','bluenote','domino']
