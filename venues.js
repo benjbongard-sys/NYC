@@ -1,0 +1,218 @@
+/* NOUX curated place resolver.
+   Runs after the private itinerary has been decrypted. Public catalogue only:
+   no private booking details, hotel identity, trip dates or passphrase. */
+(function(){
+ 'use strict';
+ if(window.NOUX_VENUES)return;
+ var installed=false,BASE=null,DATA=null,PLAN=null;
+ const loc=(name,address,lat,lng,kind,url,area)=>({name,address,lat,lng,kind,url,area});
+ const P={
+   losTacosTimes:loc('Los Tacos No. 1 · Times Square','229 W 43rd St, New York, NY 10036, USA',40.7576,-73.9878,'food','https://www.lostacos1.com/location/los-tacos-times-square/','Theatre District'),
+   losTacosChelsea:loc('Los Tacos No. 1 · Chelsea Market','75 9th Ave, New York, NY 10011, USA',40.7422,-74.0061,'food','https://www.lostacos1.com/locations/','Chelsea'),
+   modernBar:loc('The Bar Room at The Modern','9 W 53rd St, New York, NY 10019, USA',40.7615,-73.9775,'restaurant','https://www.themodernnyc.com/reservations-11/','Midtown'),
+   osteriaDoge:loc('Osteria al Doge','142 W 44th St, New York, NY 10036, USA',40.7565,-73.9851,'restaurant','https://www.osteriaaldoge.net/','Theatre District'),
+   zaytinya:loc('Zaytinya · NoMad','1185 Broadway, New York, NY 10001, USA',40.7457,-73.9884,'restaurant','https://www.zaytinya.com/location/new-york/','NoMad'),
+   hudsonYards:loc('Hudson Yards public square · Vessel exterior','20 Hudson Yards, New York, NY 10001, USA',40.7538,-74.0018,'sight','https://www.hudsonyardsnewyork.com/','Hudson Yards'),
+   zabars:loc("Zabar's Café",'2245 Broadway, New York, NY 10024, USA',40.7843,-73.9784,'breakfast','https://www.zabars.com/zabars-cafe-pickup.html','Upper West Side'),
+   dailyProvisions:loc('Daily Provisions · Upper West Side','375 Amsterdam Ave, New York, NY 10024, USA',40.7800,-73.9800,'food','https://www.dailyprovisions.co/location/daily-provisions-upper-west-side/','Upper West Side'),
+   santAmbroeus:loc('Sant Ambroeus Madison','1000 Madison Ave, New York, NY 10075, USA',40.7752,-73.9617,'restaurant','https://www.santambroeus.com/en-eu/pages/locations','Upper East Side'),
+   cultureEspresso:loc('Culture Espresso · Bryant Park','72 W 38th St, New York, NY 10018, USA',40.7519,-73.9854,'coffee','https://www.cultureespresso.com/locations-feed','Bryant Park'),
+   nines:loc('The Nines · piano supper club','9 Great Jones St, New York, NY 10012, USA',40.7267,-73.9929,'restaurant','https://www.ninesnyc.com/welcome','NoHo'),
+   luhring:loc('Luhring Augustine · Jason Moran: STACKS','531 W 24th St, New York, NY 10011, USA',40.7490,-74.0058,'gallery','https://www.luhringaugustine.com/','Chelsea'),
+   pace:loc('Pace Gallery · Li Hei Di / Lucas Samaras','540 W 25th St, New York, NY 10001, USA',40.7497,-74.0055,'gallery','https://www.pacegallery.com/galleries/new-york/','Chelsea'),
+   awoke:loc('Awoke Vintage · Williamsburg','132 N 5th St, Brooklyn, NY 11249, USA',40.7172,-73.9591,'vintage','https://www.awokevintage.com/pages/visit-us','Williamsburg'),
+   stella:loc('10 ft Single by Stella Dallas','285 N 6th St, Brooklyn, NY 11211, USA',40.7181,-73.9600,'vintage','https://theshopkeepers.com/shops/10-ft-single-by-stella-dallas/brooklyn-store/','Williamsburg'),
+   maisonPremiere:loc('Maison Premiere · oysters and cocktails','298 Bedford Ave, Brooklyn, NY 11249, USA',40.7142,-73.9610,'restaurant','https://maisonpremiere.com/','Williamsburg'),
+   littleIsland:loc('Little Island · Pier 55','Pier 55 at Hudson River Park, New York, NY 10014, USA',40.7414,-74.0102,'sight','https://littleisland.org/','Meatpacking'),
+   standardGrill:loc('The Standard Grill','848 Washington St, New York, NY 10014, USA',40.7403,-74.0082,'restaurant','https://www.standardhotels.com/new-york/happenings/thanksgiving-TSG-2026','Meatpacking'),
+   leuca:loc('Leuca · The William Vale','111 N 12th St, Brooklyn, NY 11249, USA',40.7222,-73.9597,'restaurant','https://www.leuca.com/thanksgiving/','Williamsburg'),
+   smithNoMad:loc('The Smith · NoMad','1150 Broadway, New York, NY 10001, USA',40.7442,-73.9891,'restaurant','https://thesmithrestaurant.com/location/nomad/','NoMad'),
+   cecconi:loc("Cecconi's DUMBO",'55 Water St, Brooklyn, NY 11201, USA',40.7038,-73.9903,'restaurant','https://www.cecconisrestaurants.com/dumbo/','DUMBO'),
+   oculus:loc('World Trade Center Oculus','50 Church St, New York, NY 10007, USA',40.7115,-74.0115,'sight','https://www.officialworldtradecenter.com/','World Trade Center'),
+   seaport:loc('South Street Seaport · Pier 17','89 South St, New York, NY 10038, USA',40.7065,-74.0010,'waterfront','https://www.pier17ny.com/','Seaport'),
+   battery:loc('The Battery · waterfront promenade','Battery Place, New York, NY 10004, USA',40.7041,-74.0161,'park','https://www.thebattery.org/','Lower Manhattan'),
+   meatpacking:loc('Meatpacking District · Gansevoort Plaza','Gansevoort St & Washington St, New York, NY 10014, USA',40.7397,-74.0082,'walk','https://www.meatpacking-district.com/','Meatpacking'),
+   friedmans:loc("Friedman's · Edison Hotel",'228 W 47th St, New York, NY 10036, USA',40.7597,-73.9858,'breakfast','https://www.friedmansrestaurant.com/location/edison/','Times Square')
+ };
+ const OPTIONS={
+  c1:{title:'Monday · Which first-night dinner and skyline?',desc:'A named dinner venue for every option, followed by your chosen first-night view.',options:{
+   rest:["The Bar Room at The Modern · dinner & Rockefeller Center","Contemporary à-la-carte dining near MoMA, then an illuminated Midtown walk. Table to book."],
+   stcloud:["Osteria al Doge → St. Cloud rooftop","Venetian dinner on West 44th Street, then cocktails at The Knickerbocker."],
+   nubeluz:["Zaytinya → Nubeluz at The Ritz-Carlton","José Andrés mezze on Broadway, then rooftop cocktails in the same hotel."]
+  }},
+  c2:{title:'Tuesday · Which named evening venue?',desc:'The selected music venue remains separate from any meal and its booking.',options:{
+   rest:["The Nines · supper club & live piano","9 Great Jones Street; dinner, cocktails and a refined piano-bar atmosphere. Book independently."]
+  }},
+  c3:{title:'Wednesday · Which Brooklyn night?',desc:'Clubs and rooftop experiences are distinct. None is automatically reserved.',options:{
+   rest:["The Nines · piano, dinner & cocktails","An actual NoHo supper club at 9 Great Jones Street, not a hotel recovery slot."]
+  }},
+  c4:{title:'Thanksgiving · where are we dancing?',desc:'Named Thanksgiving dinner venues are matched to the selected evening location.',options:{
+   rest:["The Standard Grill → Meatpacking night walk","A published Thanksgiving dinner, then Gansevoort Plaza and the neighbourhood."]
+  }},
+  c5:{title:'Thanksgiving · choose a specific daytime route',desc:'Each option now names actual accessible stops; holiday opening hours remain important.',options:{
+   rest:["Oculus → South Street Seaport → The Battery","An active downtown walking route, not an unplanned hotel day."],
+   highline:["High Line → Los Tacos / Chelsea Market → Edge","Chelsea Market is open on Thanksgiving; vendor hours must be checked."],
+   mercer:["Mercer Labs → Cecconi’s DUMBO → Brooklyn Bridge Park","Named restaurant at 55 Water Street; confirm holiday service."]
+  }},
+  c6:{title:'Tuesday · butterflies, Guggenheim or named galleries?',desc:'Chelsea option highlights Jason Moran: STACKS and Pace Gallery, not generic exhibitions.',options:{
+   chelsea:["Luhring Augustine (Jason Moran) → Pace Gallery","Two named Chelsea galleries, both operating on Tuesday of Thanksgiving week."]
+  }},
+  c7:{title:'Thursday · choose the Thanksgiving table',desc:'Every evening route receives a specific restaurant; River Café is an optional splurge.',options:{
+   standard:["Specific dinner beside the chosen evening venue","The Standard Grill (Le Bain), Leuca (Williamsburg), or The Smith NoMad (Flatiron)."],
+   river:["The River Café · Thanksgiving menu ($255 pp)","Official holiday menu published; table and transport must still be arranged."]
+  }},
+  c8:{title:'Friday · a real last stop before the transfer',desc:'Nothing pre-paid without a confirmed airport pickup time.',options:{
+   rest:["Culture Espresso → Bryant Park","72 West 38th Street and Bryant Park, then return for the airport transfer."],
+   rockefeller:["Rockefeller Center → Rough Trade Below","Two named nearby stops before retrieving the bags."]
+  }}
+ };
+ function clone(o){return Object.assign({},o)}
+ function assign(e,place,title,detail,kind,status){
+  const v=clone(e);v.place=place;v.title=title;v.detail=detail;
+  if(kind)v.kind=kind;if(status)v.status=status;
+  return v;
+ }
+ function minutes(s){const a=String(s||'').split(':');return +a[0]*60+(+a[1]||0)}
+ function sortEvents(x){return x.sort((a,b)=>minutes(a.start)-minutes(b.start))}
+ function breakfast(day,e,c){
+  if(day==='mon')return e;
+  if(day==='tue'){
+   if(c.c6==='chelsea')return assign(e,'cultureEspresso','Culture Espresso · quick coffee & breakfast','72 West 38th Street. Coffee and a pastry near Bryant Park before the Chelsea galleries.','food','proposed');
+   if(c.c6==='guggenheim')return assign(e,'santAmbroeus','Sant Ambroeus Madison · café breakfast','1000 Madison Avenue. UES breakfast before Guggenheim; leave time to reach the museum.','food','proposed');
+   return assign(e,'zabars',"Zabar's Café · bagel and smoked fish",'2245 Broadway at West 80th Street. Classic NYC deli near the Butterfly Vivarium; café open from 08:00.','food','proposed');
+  }
+  if(day==='wed')return assign(e,'cultureEspresso','Culture Espresso · Bryant Park breakfast','72 West 38th Street. Coffee and a cookie before the two Fifth Avenue libraries.','food','proposed');
+  return e;
+ }
+ function fix(day,e,c){
+  if(['booked','confirmed'].includes(e.status))return [e];
+  if(day==='mon'){
+   if(e.id==='lunch')return [assign(e,'losTacosTimes','Los Tacos No. 1 · Times Square lunch','229 West 43rd Street. Fast tacos before the cruise transfer; skip if airport or traffic delays threaten boarding.','food','proposed')];
+   if(e.id==='reset'){
+    let v=assign(e,'hudsonYards','Hudson Yards · Vessel exterior and public square','Walk from the waterfront toward Hudson Yards (subject to the actual cruise pier); photographs and illuminated architecture, not hotel downtime.','walk','proposed');
+    v.start='18:05';v.end=c.c1==='nubeluz'?'18:40':'18:55';return [v];
+   }
+   if(e.id==='dinner'){
+    if(c.c1==='stcloud')return [assign(e,'osteriaDoge','Osteria al Doge · Venetian dinner','142 West 44th Street; warm Italian dinner before St. Cloud. Monday evening tables were listed for two; not reserved.','food','proposed')];
+    if(c.c1==='nubeluz')return [assign(e,'zaytinya','Zaytinya · José Andrés mezze dinner','1185 Broadway, in The Ritz-Carlton NoMad; shared Mediterranean plates downstairs from Nubeluz. Reservation not yet made.','food','proposed')];
+    return [assign(e,'modernBar','The Bar Room at The Modern · first-night dinner','9 West 53rd Street. Contemporary seasonal à-la-carte dining; Monday 19:30–20:30 availability was identified for two. Book before relying on the slot.','food','proposed')];
+   }
+   if(e.id==='sleep')return [assign(e,'rockefeller','Rockefeller Center · Fifth Avenue night walk','Explore Rockefeller Plaza and the shopfronts on Fifth Avenue. The Christmas tree lighting is not assumed to have happened.','walk','proposed')];
+  }
+  if(day==='tue'){
+   if(e.id==='breakfast')return [breakfast(day,e,c)];
+   if(e.id==='museum'&&c.c6==='chelsea'){
+    const one=assign(e,'luhring','Luhring Augustine · Jason Moran: STACKS','531 West 24th Street; exhibition runs into December. Jazz, performance and contemporary art, Tuesday opening 10:00.','art','proposed');
+    one.end='11:13';
+    const two=assign(e,'pace','Pace Gallery · Li Hei Di and Lucas Samaras','540 West 25th Street; two exhibitions currently on view, Tuesday opening 10:00.','art','proposed');
+    two.id='museum_pace';two.start='11:24';return [one,two];
+   }
+   if(e.id==='lunch'){
+    if(c.c6==='chelsea')return [assign(e,'losTacosChelsea','Los Tacos No. 1 · Chelsea Market','75 Ninth Avenue, inside Chelsea Market. Quick tacos between galleries and the High Line.','food','proposed')];
+    if(c.c6==='guggenheim')return [assign(e,'santAmbroeus','Sant Ambroeus Madison · Italian café lunch','1000 Madison Avenue; café near the Guggenheim and Albertine. Note the park crossing to Oak Bridge afterward.','food','proposed')];
+    return [assign(e,'dailyProvisions','Daily Provisions · Upper West Side lunch','375 Amsterdam Avenue at West 78th; made-to-order sandwiches or salads near the museum.','food','proposed')];
+   }
+   if(e.id==='reset'){
+    const one=assign(e,'moma','MoMA · focused late-afternoon highlights','11 West 53rd Street. Allow a focused museum visit before its normal closing time, not a hotel pause.','museum','ticket-to-check');
+    one.start=c.c6==='chelsea'?'16:25':'16:10';one.end='17:23';
+    const two=assign(e,'rockefeller','Rockefeller Center · Fifth Avenue architecture','Rockefeller Plaza and Fifth Avenue on foot, between MoMA and the evening programme.','walk','proposed');
+    two.id='reset_plaza';two.start='17:34';two.end='18:15';return [one,two];
+   }
+   if(e.id==='music'&&c.c2==='rest')return [assign(e,'nines','The Nines · dinner, live piano and cocktails','9 Great Jones Street, NoHo. An elegant supper club with food and live piano, not a vague free evening. Reservations and possible cover to check.','food','proposed')];
+  }
+  if(day==='wed'){
+   if(e.id==='late')return [breakfast(day,e,c)];
+   if(e.id==='vintage'){
+    const a=assign(e,'awoke','Awoke Vintage · 132 North 5th Street','Named Williamsburg thrift stop; the shop lists daily opening 10:00–21:00.','shopping','proposed');
+    a.end='15:06';
+    const b=assign(e,'stella','10 ft Single by Stella Dallas · North 6th','285 North 6th Street; curated American vintage and adjacent Stella Dallas Living.','shopping','proposed');
+    b.id='vintage_stella';b.start='15:17';b.end='16:02';return [a,b];
+   }
+   if(e.id==='hotel'){
+    const a=assign(e,'maisonPremiere','Maison Premiere · oysters and cocktails','298 Bedford Avenue; real oyster bar with dinner service. Reservation recommended, especially for the dining room.','food','proposed');
+    a.end='19:25';
+    const b=assign(e,c.c3==='rest'?'domino':'westlight',c.c3==='rest'?'Domino Park · skyline from the waterfront':'Westlight · Williamsburg skyline cocktails',
+      c.c3==='rest'?'Return to the Domino Park waterfront for skyline views before the piano bar.':'111 North 12th Street; rooftop cocktails and Manhattan views. Thanksgiving-week seating and weather to check.','cocktail','proposed');
+    b.id='hotel_view';b.start='19:40';b.end='20:40';return [a,b];
+   }
+   if(e.id==='night'&&c.c3==='rest')return [assign(e,'nines','The Nines · late piano bar in NoHo','9 Great Jones Street; a refined, atmospheric alternative to clubbing. Confirm the Wednesday piano programme.','music','proposed')];
+  }
+  if(day==='thu'){
+   if(e.id==='open'&&c.c5==='rest'){
+    let v=assign(e,'oculus','World Trade Center Oculus · architecture walk','50 Church Street. Visit the Calatrava station, Memorial Plaza exteriors and surrounding architecture. Retail holiday hours may vary.','walk','proposed');
+    v.end='13:45';return [v];
+   }
+   if(e.id==='chill'&&c.c5==='rest'){
+    let v=assign(e,'seaport','South Street Seaport · Pier 17 waterfront','89 South Street. East River promenade and views of the Brooklyn Bridge, not an unspecified break.','walk','proposed');
+    v.start='14:10';return [v];
+   }
+   if(e.id==='lunch'){
+    if(c.c5==='mercer')return [assign(e,'cecconi',"Cecconi's DUMBO · waterfront lunch",'55 Water Street, Brooklyn. Named Italian restaurant at the next walking destination; verify Thanksgiving opening and table.','food','hours-to-check')];
+    if(c.c5==='highline')return [assign(e,'losTacosChelsea','Los Tacos No. 1 · Chelsea Market lunch','Chelsea Market is open on Thanksgiving 07:00–22:00, but vendors set their own holiday hours. Los Tacos service is NOT confirmed for this date.','food','hours-to-check')];
+   }
+   if(e.id==='reset'){
+    const v=c.c5==='mercer'
+      ?assign(e,'dumbo','Brooklyn Heights Promenade · DUMBO afternoon','Brooklyn waterfront views and cobbled streets before the evening transfer.','walk','proposed')
+      :c.c5==='rest'
+      ?assign(e,'battery','The Battery · harbour promenade','Lower Manhattan waterfront and harbour views; holiday shops may be closed, outdoor paths remain the focus.','walk','proposed')
+      :assign(e,'littleIsland','Little Island · Pier 55 riverside stroll','Free public riverfront park, winter opening and weather conditions to verify.','walk','proposed');
+    if(c.c4==='boogie')v.end='17:05';return [v];
+   }
+   if(e.id==='dinner'){
+    if(c.c7==='river')return [assign(e,'river','The River Café · Thanksgiving prix fixe ($255 pp)','1 Water Street, Brooklyn. Official Thanksgiving 2026 menu published, 13:00–20:00 service; jacket and collared shirt required. Reservation not made.','dinner','proposed')];
+    if(['westmorales','morales'].includes(c.c4))return [assign(e,'leuca','Leuca · Thanksgiving dinner at The William Vale','111 North 12th Street, Williamsburg. Published Thanksgiving menu; easy pairing with Westlight and a later trip to Refuge. Reserve separately.','dinner','proposed')];
+    if(c.c4==='boogie'){
+     const v=assign(e,'smithNoMad','The Smith NoMad · Thanksgiving dinner ($88 pp)','1150 Broadway at 27th Street. Published three-course Thanksgiving menu, near 230 Fifth. Reservation not made.','dinner','proposed');
+     v.start='17:20';return [v];
+    }
+    return [assign(e,'standardGrill','The Standard Grill · Thanksgiving dinner ($125 pp)','848 Washington Street, Meatpacking. Official three-course holiday menu; near Le Bain. Book a table before assuming this plan is secured.','dinner','proposed')];
+   }
+   if(e.id==='night'&&c.c4==='rest')return [assign(e,'meatpacking','Gansevoort Plaza → West Village night walk','Walk the Meatpacking cobblestones and West Village streets after dinner. A named open-air evening rather than returning to the hotel.','walk','proposed')];
+  }
+  if(day==='fri'){
+   if(e.id==='breakfast'){
+    const v=assign(e,'friedmans',"Friedman's Edison · breakfast before checkout",'228 West 47th Street. Grab a quick breakfast with bags already packed; hotel checkout and airport-transfer deadline take priority.','food','arranged');
+    return [v];
+   }
+   if(e.id==='walk'&&c.c8==='rest')return [assign(e,'cultureEspresso','Culture Espresso → Bryant Park','72 West 38th Street. Coffee and the park, then collect bags before the transfer.','walk','proposed')];
+   if(e.id==='walk'&&c.c8==='rockefeller'){
+    const a=assign(e,'rockefeller','Rockefeller Center · the plaza and Channel Gardens','Classic Midtown plaza before leaving; no timed observatory ticket without confirmed airport pickup.','walk','proposed');
+    a.end='11:04';
+    const b=assign(e,'roughtrade','Rough Trade Below · final vinyl browse','Concourse level at Rockefeller Center; check shop opening and allow time to retrieve hotel luggage.','shopping','proposed');
+    b.id='walk_roughtrade';b.start='11:10';return [a,b];
+   }
+   if(e.id==='pickup'){
+    const v=clone(e);v.title='Return for airport transfer · pickup time to confirm';
+    v.detail='The transfer operator has not confirmed the collection time. Be back at the hotel with luggage ready; adjust this provisional window once confirmed.';
+    return [v];
+   }
+  }
+  return [e];
+ }
+ function install(){
+  if(installed)return true;
+  DATA=window.NYC_DATA;PLAN=window.NYC_PLAN;
+  if(!DATA||!PLAN||!DATA.P||typeof PLAN.day!=='function')return false;
+  Object.keys(P).forEach(k=>{if(!DATA.P[k])DATA.P[k]=P[k]});
+  (DATA.CHOICES||[]).forEach(c=>{
+   const patch=OPTIONS[c.id];if(!patch)return;
+   c.title=patch.title;c.desc=patch.desc;
+   (c.options||[]).forEach(o=>{const v=patch.options[o[0]];if(v){o[1]=v[0];o[2]=v[1]}});
+  });
+  BASE=PLAN.day.bind(PLAN);
+  PLAN.day=function(day,choices){
+   const orig=BASE(day,choices);
+   if(!Array.isArray(orig))return orig;
+   try{
+    const ch=Object.assign({},DATA.DEFAULT||{},choices||{});
+    const out=[];
+    orig.forEach(e=>{fix(day,e,ch).forEach(x=>out.push(x))});
+    const sorted=sortEvents(out);
+    // Actual bookings and fixed journey events are never removed.
+    return sorted;
+   }catch(_){return orig}
+  };
+  installed=true;return true;
+ }
+ window.NOUX_VENUES={install,version:'2026.11.15',catalogue:()=>Object.keys(P).length};
+})();
