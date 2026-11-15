@@ -35,6 +35,14 @@ The public `choice-orchestrator.js` and `day-audit.js` layers run only **after**
 
 **Important:** transfer estimates and venue hours are not live guarantees. Protected bookings survive conflicts, which are flagged for human resolution. The client-only choice journal and personal custom stops are not automatically synchronised across devices.
 
+## Final-day coach, sunrise and encrypted checklists
+
+- **Friday 27 November:** breakfast at the hotel from 07:00 to 10:00; check out **before 12:00**, leaving suitcases with hotel reception. The booked group transfer is by coach with a French-speaking guide, **approximately 17:00** from the hotel to JFK Terminal 1. The planner puts guests in the lobby by 16:45. This supersedes the earlier speculative noon/15:50 pickup. The private encrypted itinerary retains actual flight booking details.
+- **Brooklyn Bridge sunrise:** a non-ticketed photo-and-walking excursion can be selected for **Wednesday** (default, approximately 06:54 sunrise), **Friday** (approximately 06:56) or skipped. The proposed DUMBO waterfront photo session leads into a Brooklyn → Manhattan pedestrian bridge crossing; travel and dawn weather need rechecking.
+- After successful vault unlock, a final **Departure & gifts** navigation tab appears (mobile: visible fixed launcher). It provides **independent Lyna/Benjamin completion tickboxes**, an editable NYC shopping/bringing-home list, separate **Bought** / **Packed** markers, curated shop websites, Google Maps directions and a one-click current Google Maps shop search for any newly added item. The "Suggest best day" action uses an approximate neighbourhood match to the itinerary, **not live stock availability**.
+- All ticks and shopping notes are saved on the current device, **encrypted locally with AES-GCM** using the locally derived itinerary key. Changes persist after reload; encrypted JSON export/import can move them to another device with the same passphrase. **There is no automatic multi-device synchronisation** and no checklist plaintext is pushed to GitHub.
+- The shopping suggestions and France customs caveats are informational. Store inventory, special holiday hours, carrier baggage conditions and customs exemptions need verification before purchase.
+
 ## Activate the optional MTA Cloudflare Worker
 
 1. Create/authorise a Cloudflare Workers account.
