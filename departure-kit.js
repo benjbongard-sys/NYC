@@ -101,7 +101,19 @@ function topInfo(){
  const block=el('div','noux-departure-travel');
  block.append(el('strong',null,'FRIDAY · LAST DAY'),el('p',null,'Hotel breakfast 07:00–10:00 daily. Check out before 12:00; hotel stores luggage. Group coach around 17:00: be back and ready by 16:45. Airport: JFK Terminal 1. French-speaking guide assists at airport.'));
  const caution=el('p','noux-departure-caution','This is your group transfer, not a separately booked private car. Exact boarding details from the guide take precedence.');
- block.append(caution);return block;
+ block.append(caution);
+ // Flight identity and actual flight departure are taken only from the
+ // decrypted itinerary. Never place personal booking references in public JS.
+ try{
+  const plan=window.NYC_PLAN,choices=(window.NYC_DATA&&window.NYC_DATA.DEFAULT)||{};
+  const rows=plan&&typeof plan.day==='function'?plan.day('fri',choices):[];
+  const flight=Array.isArray(rows)&&rows.find(x=>x.id==='flight'||(/flight|vol air france/i.test(String(x.title||''))&&x.kind==='flight'));
+  if(flight){
+   const text=[flight.start,flight.title].filter(Boolean).join(' · ');
+   block.append(el('p','noux-departure-flight','Return flight from encrypted itinerary: '+text));
+  }
+ }catch(_){}
+ return block;
 }
 function packingView(){
  const grid=el('div','noux-departure-packgrid');
