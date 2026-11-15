@@ -55,6 +55,7 @@
    rest:["The Nines · piano, dinner & cocktails","An actual NoHo supper club at 9 Great Jones Street, not a hotel recovery slot."]
   }},
   c4:{title:'Thanksgiving · where are we dancing?',desc:'Named Thanksgiving dinner venues are matched to the selected evening location.',options:{
+   lebain:["Le Bain · Thanksgiving DJ night · 22:00","Le Bain officially advertises City Kids Thanksgiving on 26 Nov; Resident Advisor lists Nadine Regne and Kristine Barilli for the same date. Confirm the lineup. Dancefloor and views; rooftop terrace weather-dependent. No guaranteed entry."],
    rest:["The Standard Grill → Meatpacking night walk","A published Thanksgiving dinner, then Gansevoort Plaza and the neighbourhood."]
   }},
   c5:{title:'Thanksgiving · choose a specific daytime route',desc:'Each option now names actual accessible stops; holiday opening hours remain important.',options:{
@@ -167,6 +168,10 @@
    if(e.id==='night'&&c.c3==='rest'){const v=assign(e,'nines','The Nines · late piano bar in NoHo','9 Great Jones Street; a refined, atmospheric alternative to clubbing. Confirm the Wednesday piano programme.','music','proposed');v.start='21:30';return [v];}
   }
   if(day==='thu'){
+   if(e.id==='night'&&c.c4==='lebain'){
+    const v=assign(e,'lebain','Le Bain · Thanksgiving house/disco night','26 November, doors 22:00. The venue names City Kids Thanksgiving; Resident Advisor currently lists Nadine Regne and Kristine Barilli for this date. Confirm the final billing. No general cover advertised by venue, but admission is subject to capacity/door policy. Dancefloor is indoors; outdoor skyline terrace access is weather-dependent.','club','proposed');
+    v.start='22:00';v.end='00:45';return [v];
+   }
    if(e.id==='slow')return [assign(e,'friedmans',"Friedman's Edison · Thanksgiving brunch",'228 West 47th Street. An actual breakfast venue; only use this slot when it does not conflict with the Macy’s parade. Holiday service unconfirmed.','food','hours-to-check')];
    if(e.id==='open'&&c.c5==='rest'){
     let v=assign(e,'oculus','World Trade Center Oculus · architecture walk','50 Church Street. Visit the Calatrava station, Memorial Plaza exteriors and surrounding architecture. Retail holiday hours may vary.','walk','proposed');
