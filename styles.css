@@ -268,3 +268,83 @@ a[class~="photo-credit"] { display:none !important; }
  .noux-subway-legend{gap:7px}
 }
 @media(prefers-reduced-motion:reduce){.noux-second-row button,.noux-subway-companion *{scroll-behavior:auto}}
+
+
+/* Departure & Bring Home · encrypted personal checklists */
+body.noux-departure-open{overflow:hidden}
+.mainnav .noux-departure-navtab{color:#f0d8b5;border-color:rgba(214,184,139,.35);background:rgba(214,184,139,.08);flex-shrink:0}
+.noux-departure-launcher{display:none;position:fixed;right:max(16px,env(safe-area-inset-right));bottom:max(15px,env(safe-area-inset-bottom));z-index:501;background:#d6b88b;color:#16191f;border:1px solid #f4dbaa;border-radius:24px;box-shadow:0 12px 35px rgba(0,0,0,.36);padding:13px 16px;font-weight:800;font-size:12px;min-height:45px}
+.noux-departure-modal{position:fixed;inset:0;z-index:1100;overflow:auto;overscroll-behavior:contain;background:radial-gradient(ellipse at top right,rgba(124,85,92,.25),transparent 45%),#10141d;color:#f3ece5}
+.noux-departure-modal[hidden]{display:none!important}
+.noux-departure-scroll{max-width:1080px;margin:0 auto;padding:clamp(18px,4vw,50px) clamp(16px,3vw,35px) 100px}
+.noux-departure-head{display:flex;align-items:start;justify-content:space-between;gap:15px;margin-bottom:24px}
+.noux-departure-eyebrow{font-size:10px;font-weight:850;color:#d6b88b;letter-spacing:.2em}
+.noux-departure-head h2{font:400 clamp(32px,4.2vw,55px)/1.08 Georgia,serif;margin:10px 0 9px}
+.noux-departure-head p{font-size:13px;color:#c4bbc2;margin:0}
+.noux-departure-close{background:#242b35;color:#f0d8b5;border:1px solid #66594c;border-radius:11px;padding:11px 16px;min-height:46px;white-space:nowrap}
+.noux-departure-travel{background:rgba(229,194,149,.07);border:1px solid rgba(227,197,151,.25);border-radius:14px;padding:18px 21px;margin-bottom:17px}
+.noux-departure-travel>strong{font-size:11px;letter-spacing:.18em;color:#e6c797}
+.noux-departure-travel p{font-size:13px;color:#ecdfcd;line-height:1.7;margin:7px 0}
+.noux-departure-travel .noux-departure-caution{font-size:11px;color:#beb7b1}
+.noux-departure-progress{font-size:11px;color:#b4c5c7;margin:8px 0 17px;font-variant-numeric:tabular-nums}
+.noux-departure-sections{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:22px}
+.noux-departure-sections button{padding:12px 15px;min-height:47px;border:1px solid rgba(214,184,139,.3);color:#d8c7b0;border-radius:10px;background:#232b35;font-weight:760;font-size:12px}
+.noux-departure-sections button.chosen{background:#3c3434;border-color:#d9b780;color:#f8e4c6}
+.noux-departure-legend,.noux-departure-packrow{display:grid;grid-template-columns:minmax(0,1fr) 100px 100px;gap:10px;align-items:center}
+.noux-departure-legend{padding:13px 15px;color:#dec6a4;font-size:11px;letter-spacing:.04em;border-bottom:1px solid rgba(255,255,255,.15)}
+.noux-departure-legend span:not(:first-child){text-align:center}
+.noux-departure-group{font:400 24px Georgia,serif;margin:21px 0 9px;color:#d8bb94}
+.noux-departure-packrow{border:1px solid rgba(232,218,195,.11);background:rgba(255,255,255,.025);padding:12px 15px;border-radius:10px;margin-bottom:6px;min-height:64px}
+.noux-departure-pack-copy{display:grid;gap:5px;min-width:0}
+.noux-departure-pack-copy b{font-size:13px;line-height:1.4;color:#f1e9e2}
+.noux-departure-pack-copy small{font-size:11px;color:#b0a9af;line-height:1.5}
+.noux-departure-pack-check{text-align:center}
+.noux-departure-check{display:inline-flex;align-items:center;gap:7px;cursor:pointer;color:#d3d5da;font-size:12px;min-height:36px}
+.noux-departure-pack-check .noux-departure-check span{display:none}
+.noux-departure-check input{width:20px;height:20px;accent-color:#d5b789;flex:0 0 auto;cursor:pointer}
+.noux-departure-help,.noux-departure-fine{font-size:11px;color:#c3bac0;line-height:1.7}
+.noux-departure-save-note{font-size:11px;color:#b2d8bc;margin:17px 0 10px;min-height:18px}
+.noux-departure-actions{display:flex;gap:9px;flex-wrap:wrap;margin:14px 0}
+.noux-departure-actions button,.noux-departure-primary{border-radius:9px;min-height:42px;padding:11px 15px;font-size:11px;font-weight:780}
+.noux-departure-action,.noux-departure-tiny{border:1px solid rgba(230,199,157,.37);background:rgba(230,199,157,.08);color:#f0d4a4}
+.noux-departure-primary{background:#e2c193;color:#18202a;border:1px solid #e2c193}
+.noux-departure-filter{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0 22px}
+.noux-departure-filter-btn{border-radius:20px;padding:9px 12px;min-height:38px;color:#bcbcc5;border:1px solid #424b56;background:rgba(255,255,255,.04);font-size:11px}
+.noux-departure-filter-btn.selected{border-color:#d1ae80;color:#ffe3bb;background:#403633}
+.noux-departure-shopgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.noux-departure-shop{border:1px solid rgba(232,218,195,.14);border-radius:15px;padding:17px;background:rgba(255,255,255,.028);min-width:0;display:flex;flex-direction:column;gap:10px}
+.noux-departure-shop-top{display:flex;justify-content:space-between;align-items:start;gap:10px}
+.noux-departure-tag{color:#c8ae87;letter-spacing:.12em;font-size:9px;text-transform:uppercase}
+.noux-departure-shop h3{font:400 21px/1.25 Georgia,serif;margin:7px 0;color:#f2e8da}
+.noux-departure-day{font-size:10px;color:#d8c4a6;max-width:46%;text-align:right}
+.noux-departure-shop-top small{display:block}
+.noux-departure-shop-note{color:#c1b9b8;font-size:11px;line-height:1.7;margin:0}
+.noux-departure-shop-address{font-size:11px;color:#a8b9c4;margin:0;line-height:1.6}
+.noux-departure-shop-actions{margin-top:auto;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.noux-departure-shop-actions .noux-departure-check{padding:4px 7px;background:rgba(255,255,255,.05);border-radius:8px}
+.noux-departure-link{font-size:11px;font-weight:700;color:#e5c699}
+.noux-departure-tiny{font-size:10px;padding:8px 11px;min-height:32px;border-radius:8px}
+.noux-departure-add,.noux-departure-rules{border:1px solid rgba(224,185,136,.27);border-radius:14px;padding:20px;margin:25px 0 14px;background:rgba(255,255,255,.025)}
+.noux-departure-add h3{font:400 25px Georgia,serif;margin:0 0 18px}
+.noux-departure-add-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.noux-departure-add-fields input,.noux-departure-add-fields select{font-size:14px;min-width:0;width:100%;min-height:43px;padding:11px;background:#242b36;border:1px solid #676264;border-radius:9px;color:#fff}
+.noux-departure-add-fields input:first-child{grid-column:1/-1}
+.noux-departure-rules{background:rgba(186,137,91,.065)}
+.noux-departure-rules b{font-size:13px;color:#edd3a9}
+.noux-departure-rules p{font-size:12px;color:#c7c1b9;line-height:1.8}
+@media(max-width:760px){
+ .noux-departure-launcher{display:block}
+ .noux-departure-navtab{display:none!important}
+ .noux-departure-shopgrid{grid-template-columns:1fr}
+ .noux-departure-packrow,.noux-departure-legend{grid-template-columns:minmax(0,1fr) 48px 48px}
+ .noux-departure-legend{padding:10px 7px;font-size:10px}
+ .noux-departure-packrow{padding:12px 9px;gap:6px}
+ .noux-departure-pack-copy b{font-size:12px}
+ .noux-departure-pack-copy small{font-size:10px}
+ .noux-departure-add-fields{grid-template-columns:1fr}
+ .noux-departure-add-fields input:first-child{grid-column:auto}
+ .noux-departure-modal{padding-bottom:max(8px,env(safe-area-inset-bottom))}
+ .noux-departure-head h2{font-size:33px}
+}
+@media(max-width:390px){.noux-departure-head{flex-direction:column}.noux-departure-close{align-self:flex-end}.noux-departure-sections button{font-size:10px;padding:9px 6px}.noux-departure-shop{padding:13px}}
+@media(prefers-reduced-motion:reduce){.noux-departure-modal *{scroll-behavior:auto!important}}
