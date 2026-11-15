@@ -29,7 +29,7 @@ const makeDocument=()=>{
  const body=new FakeNode('body'),nav=new FakeNode('nav'),root=new FakeNode('div');root.id='root';
  return {body,root,nav,createElement:t=>new FakeNode(t),getElementById:id=>nodes(body).find(n=>n.id===id)||(id==='root'?root:null),querySelector:q=>q==='.topbar .mainnav'?nav:null,addEventListener(){}};
 };
-const encode=b=>Buffer.from(b).toString('base64');
+const encode=b=>Buffer.from(b,'binary').toString('base64');
 const decode=s=>new Uint8Array(Buffer.from(s,'base64'));
 const keyPromise=webcrypto.subtle.generateKey({name:'AES-GCM',length:256},false,['encrypt','decrypt']);
 async function instance(key){
@@ -58,7 +58,7 @@ async function main(){
  const ben=nodes(a.document.body).find(n=>n.tagName==='input'&&n.attrs['aria-label']==='Benjamin · Passport, ESTA and entry papers');
  assert(lyna&&ben,'Separate labelled traveller tickboxes exist');
  ben.checked=true;ben.listeners.change();
- await new Promise(resolve=>setTimeout(resolve,5));
+ await new Promise(resolve=>setTimeout(resolve,30));
  let updated=await plaintext(key);
  assert.equal(updated.check['Benjamin:documents'],true,'Benjamin completion persists');
  assert.equal(Boolean(updated.check['Lyna:documents']),false,'Lyna remains independent');
@@ -73,7 +73,7 @@ async function main(){
  assert(!saved.noux_departure_checklists_aes_v1.includes('Unique New York souvenir'),'Custom gift text encrypted');
  a=await instance(key);
  a.document.body.children.find(n=>n.className==='noux-departure-launcher').click();
- assert(nodes(a.document.body).some(x=>x.textContent==='Lyna · 0/18')===false,'Rerender is safe after decrypt');
+ assert(nodes(a.document.body).some(x=>x.attrs&&x.attrs['aria-label']==='Benjamin · Passport, ESTA and entry papers'&&x.checked),'Reload restores Benjamin checkbox state');
  assert((await plaintext(key)).check['Benjamin:documents'],'Reopening after reload preserves tick');
  console.log('Departure kit PASS: AES-GCM local state, independent travellers, custom gift, holiday caveats and persisted reload.');
 }
