@@ -13,7 +13,6 @@
   {id:'housingworks',phrases:['housing works'],kind:'culture',minutes:42,min:26,hours:[660,1140],days:['mon','tue','wed','fri'],weight:82},
   {id:'roughtrade',phrases:['rough trade','vinyl'],kind:'shopping',minutes:38,min:25,hours:[600,1200],days:['mon','tue','wed','fri'],weight:72},
   {id:'topofrock',phrases:['top of the rock'],kind:'view',minutes:48,min:35,hours:[540,1260],days:['mon','tue','wed','fri'],weight:83},
-  {id:'bamharvey',phrases:['la distance','bam'],kind:'theatre',minutes:85,min:85,hours:[1170,1255],days:['wed'],fixed:1170,weight:95},
   {id:'ballooninflation',phrases:['balloon inflation','macy balloons','thanksgiving balloon'],kind:'event',minutes:60,min:55,hours:[780,1080],days:['wed'],weight:75,publicEvent:true},
   {id:'bamharvey',phrases:['la distance','bam'],kind:'theatre',minutes:85,min:85,hours:[1170,1255],days:['wed'],fixed:1170,weight:98,alwaysSuggest:true},
   {id:'maisonpremiere',phrases:['maison premiere','oyster experience'],kind:'food',minutes:65,min:48,hours:[1020,1320],days:['wed'],weight:93,alwaysSuggest:true},
@@ -88,6 +87,7 @@
   var cap=day==='fri'?2:day==='thu'?3:5;
   function sorted(){return events.slice().sort(function(a,b){return minute(a.start)-minute(b.start)})}
   function tryInsert(c){
+   if(used.has(c.id))return false;
    var loc=DATA.P[c.id];if(!loc)return false;
    // Do not invent a second evening meal when the decrypted itinerary already has dinner.
    if(c.kind==='food'&&events.some(function(e){return ['food','dinner'].includes(String(e.kind))&&minute(e.start)>=990&&minute(e.start)<1260}))return false;
