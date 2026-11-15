@@ -48,29 +48,40 @@ function thursday(rows){for(let i=rows.length-1;i>=0;i--){const e=rows[i];if(!ha
   const x=item('audited_parade_walk','09:15','09:40','Walk to Sixth Avenue · Thanksgiving viewing','centennial_parade','Crowds and barriers may require a different walking approach.','travel');x.auditAnchor=true;propose(rows,x)
  }
  return rows}
-function friday(rows){const pickup=rows.find(e=>e.id==='pickup'||(/airport transfer|airport pickup/i.test(e.title||'')&&e.kind==='logistics'));
- const placeholder=pickup&&!hard(pickup)&&pickup.start==='12:00'&&pickup.end==='13:00'&&['verify','proposed','unverified',''].includes(String(pickup.status||'').toLowerCase());
- if(!placeholder)return rows;
- pickup.start='15:50';pickup.end='16:10';pickup.status='verify';pickup.title='Airport transfer · operator pickup time to confirm';
- pickup.detail='PROVISIONAL planning window, not an operator-confirmed collection. For international travel, target JFK about three hours before the confirmed departure, subject to the boarding pass. Verify transfer method, traffic and exact pickup time.';
+function friday(rows){
+ const pickup=rows.find(e=>e.id==='pickup'||(/airport transfer|airport pickup|group coach/i.test(e.title||'')&&e.kind==='logistics'));
+ // The group coach is arranged by the travel organiser. Departure is around 17:00:
+ // this is an actual constraint, not the earlier provisional noon pickup.
+ if(pickup&&!hard(pickup)){
+  pickup.start='16:45';pickup.end='17:10';pickup.status='arranged';
+  pickup.title='Guided group coach · airport Terminal 1, around 17:00';
+  pickup.detail='Organised hotel pickup with a French-speaking guide, around 17:00. Be in the lobby by 16:45. Exact coach boarding time is subject to the group guide. Assistance with airport check-in and boarding.';
+ }else if(!pickup){
+  const e=item('pickup','16:45','17:10','Guided group coach · airport Terminal 1, around 17:00',placeForHotel(rows),'Group guide meets passengers at the hotel. Be in the lobby by 16:45; exact coach boarding time subject to the organiser.','logistics','arranged');
+  propose(rows,e);
+ }
  const hotel=placeForHotel(rows);
- const all=Object.keys(DATA.P);
- const times=all.includes('losTacosTimes')?'losTacosTimes':hotel;
+ const times=DATA.P.losTacosTimes?'losTacosTimes':hotel;
  addPlace('auditGrandCentral',{name:'Grand Central Terminal',address:'89 E 42nd St, New York, NY 10017, USA',area:'Midtown',lat:40.75273,lng:-73.97723,kind:'architecture',url:'https://grandcentralterminal.com/visit/'});
  addPlace('auditBryantPark',{name:'Bryant Park Winter Village',address:'42nd Street and Sixth Avenue, New York, NY 10018, USA',area:'Midtown',lat:40.7536,lng:-73.9832,kind:'walk',url:'https://bryantpark.org/activities/bank-of-america-winter-village-at-bryant-park'});
- if(!rows.some(e=>/check.?out|bag drop|store.*luggage/i.test((e.id||'')+' '+(e.title||''))))propose(rows,item('audited_checkout','10:15','10:35','Hotel checkout · leave bags at reception',hotel,'Checkout before 11:00. Confirm luggage storage with reception.','logistics'));
- propose(rows,item('audited_friday_lunch','12:05','12:40','Midtown lunch · Los Tacos No. 1',times,'229 West 43rd Street if choosing Los Tacos. Short lunch, not a seated 90-minute meal.','food'));
- propose(rows,item('audited_grand_central','13:20','13:50','Grand Central Terminal · architecture and photographs','auditGrandCentral','Main Concourse and celestial ceiling. 30 minutes is sufficient for a focused visit.','culture'));
- // Friday's morning option may already include Bryant Park. Never walk there twice.
+ const breakfast=rows.find(e=>e.id==='breakfast'||(/breakfast|petit.d.jeu/i.test(e.title||'')&&e.kind==='food'));
+ if(breakfast&&!hard(breakfast))breakfast.detail=(breakfast.detail||'')+' Hotel breakfast buffet is available daily 07:00–10:00; choose this breakfast or the outside café, not both.';
+ if(!rows.some(e=>/check.?out|bag drop|store.*luggage/i.test((e.id||'')+' '+(e.title||''))))
+  propose(rows,item('audited_checkout','11:35','11:55','Hotel checkout · leave luggage at reception',hotel,'Room must be vacated before 12:00; luggage storage is available for the afternoon.','logistics'));
+ propose(rows,item('audited_friday_lunch','12:05','12:40','Midtown lunch · Los Tacos No. 1',times,'229 West 43rd Street if chosen; allow approximately 35 minutes.','food'));
+ propose(rows,item('audited_grand_central','13:15','13:45','Grand Central Terminal · architecture and photographs','auditGrandCentral','30 minutes in the Main Concourse. Transit Museum gift shop and 2026 Holiday Fair are nearby in the same terminal; use free time to shop.','culture'));
+ propose(rows,item('audited_grand_shops','13:45','14:25','Grand Central · Holiday Fair and Transit Museum shop','auditGrandCentral','Both located inside Grand Central: shopping and gifts without a separate subway journey. Friday hours and availability to check.','shopping'));
  const alreadyBryant=rows.some(e=>/bryant park/i.test(String(e.title||'')));
  if(alreadyBryant){
   addPlace('auditStPatrick',{name:"St. Patrick's Cathedral",address:'5th Ave at East 50th Street, New York, NY 10022, USA',area:'Midtown',lat:40.7585,lng:-73.976,kind:'culture',url:'https://saintpatrickscathedral.org/'});
-  if(!rows.some(e=>/st. patrick|st patrick/i.test(String(e.title||''))))propose(rows,item('audited_stpatrick','14:10','14:35',"St. Patrick's Cathedral · focused visit",'auditStPatrick','Fifth Avenue interior or exterior depending on services; 25 minutes, then walk west to the hotel.','culture'));
+  if(!rows.some(e=>/st. patrick|st patrick/i.test(String(e.title||''))))
+   propose(rows,item('audited_stpatrick','14:35','15:00',"St. Patrick's Cathedral · focused visit",'auditStPatrick','Fifth Avenue interior or exterior depending on services; short visit, then walk towards the hotel.','culture'));
  }else{
-  propose(rows,item('audited_bryant','14:10','14:35','Bryant Park · Winter Village and holiday shops','auditBryantPark','A compact holiday-market visit, then return west to collect luggage.','walk'));
+  propose(rows,item('audited_bryant','14:35','15:00','Bryant Park · Winter Village and holiday shops','auditBryantPark','Short holiday-market visit near the route back to the hotel.','walk'));
  }
- propose(rows,item('audited_bags','15:15','15:40','Return to hotel · collect stored luggage',hotel,'Make sure bags are collected and everyone is ready before the confirmed airport transfer.','logistics'));
- return rows}
+ propose(rows,item('audited_bags','16:10','16:40','Hotel · collect bags and prepare for coach',hotel,'Retrieve luggage from reception, use the restroom and be at the lobby for the group guide by 16:45.','logistics'));
+ return rows
+}
 function openOn(day,e){const p=String(e.place||'').toLowerCase(),t=String(e.title||'').toLowerCase();
  if(day==='thu'&&(/\b(amnh|guggenheim|moma|whitney|met|butterflies)\b/.test(p)||/museum of modern art|butterfly vivarium|guggenheim|whitney museum|metropolitan museum/.test(t)))return false;
  if(day==='wed'&&(p==='met'||/\bthe met\b/.test(t)))return false;
@@ -103,5 +114,5 @@ function install(){if(installed)return true;DATA=window.NYC_DATA;PLAN=window.NYC
  BASE=PLAN.day.bind(PLAN);PLAN.day=function(day,choices){const original=BASE(day,choices);if(!Array.isArray(original))return original;
  try{const rows=original.map(x=>({...x}));if(day==='mon')monday(rows);if(day==='thu')thursday(rows);if(day==='fri')friday(rows);return resolve(day,rows)}catch(_){return original}
  };installed=true;return true}
-window.NOUX_DAY_AUDIT={install,version:'2026.11.15-audit-v2',pending:()=>{try{return Object.values(JSON.parse(localStorage.getItem(KEY)||'{}')).flat().filter(Boolean)}catch(_){return []}}};
+window.NOUX_DAY_AUDIT={install,version:'2026.11.15-audit-v3',pending:()=>{try{return Object.values(JSON.parse(localStorage.getItem(KEY)||'{}')).flat().filter(Boolean)}catch(_){return []}}};
 })();
