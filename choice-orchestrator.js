@@ -190,6 +190,8 @@ function planWednesdayExperience(orig,choices){
  const mode=['williamsburg','williamsburg_vintage'].includes(choices.c9)?choices.c9:'manhattan';
  const haveBookedBAM=orig.some(x=>isProtected(x)&&/bamharvey|la distance/i.test((x.place||'')+' '+(x.title||'')));
  const attendBAM=choices.c10==='bam'||haveBookedBAM;
+ const bamClash=orig.find(x=>isProtected(x)&&!(/bamharvey|la distance/i.test((x.place||'')+' '+(x.title||'')))&&timeClash(x,e('bam_candidate','19:30','20:55','BAM La Distance','bamharvey','')));
+ const effectiveBAM=attendBAM&&(!bamClash||haveBookedBAM);
  const oldNight=orig.find(x=>x.id==='night');
  const keep=orig.filter(x=>{
   if(isProtected(x))return true;
@@ -200,6 +202,7 @@ function planWednesdayExperience(orig,choices){
    !['vintage','vintage_stella','domino','hotel','hotel_view'].includes(x.id);
  });
  const out=sorted(keep.slice()),deferred=[];
+ if(attendBAM&&!effectiveBAM)deferred.push({title:'BAM · La Distance at 19:30',reason:'Conflicts with confirmed '+bamClash.title+'; theatre and transfer postponed rather than deleting a booking'});
  const add=item=>{
   const clash=out.find(x=>timeClash(item,x));
   if(clash){
@@ -215,7 +218,7 @@ function planWednesdayExperience(orig,choices){
   slot('wed_whitney','14:25','15:40','Whitney Museum · art and the Meatpacking waterfront','whitney','99 Gansevoort Street. Reserve admission; adjust if you prefer another Manhattan gallery.','museum','ticket-to-check');
   slot('wed_little_island','15:52','16:17','Little Island · Hudson River walk','littleIsland','Pier 55. Outdoor public park; weather-dependent.','walk');
   slot('wed_west_village','16:30','17:00','West Village · Bleecker and Christopher Streets','westVillage','Neighbourhood walk and small independent shops; time for a relaxed evening.','walk');
-  if(choices.c3!=='rest')slot('wed_dante','17:15',attendBAM?'17:55':'18:15','Dante West Village · dinner and cocktails','danteWest','551 Hudson Street, a named West Village restaurant near the afternoon trail. Suggested table; not reserved.','food','hours-to-check');
+  if(choices.c3!=='rest')slot('wed_dante','17:15',effectiveBAM?'17:55':'18:15','Dante West Village · dinner and cocktails','danteWest','551 Hudson Street, a named West Village restaurant near the afternoon trail. Suggested table; not reserved.','food','hours-to-check');
  }else{
   const vintage=mode==='williamsburg_vintage';
   if(vintage){
@@ -232,10 +235,10 @@ function planWednesdayExperience(orig,choices){
   }
   slot('wed_westlight',vintage?'16:15':'16:05',vintage?'17:05':'17:00','Westlight · sunset skyline cocktails','westlight','111 North 12th Street. Opens from 16:00 on Wednesdays; seats, weather and holiday schedule unconfirmed. This is not a confirmed DJ night.','cocktail','hours-to-check');
   transit('wed_to_oysters',vintage?'17:05':'17:00',vintage?'17:25':'17:20','Westlight → Maison Premiere · walk','maisonPremiere','Allow approximately 20 minutes south towards Bedford Avenue.');
-  slot('wed_oysters',vintage?'17:25':'17:20',attendBAM?'18:05':'18:35','Maison Premiere · oysters and cocktails','maisonPremiere','298 Bedford Avenue. Oyster stop, not automatically a full dinner; check reservations. Published Wednesday service begins at noon.','food','hours-to-check');
+  slot('wed_oysters',vintage?'17:25':'17:20',effectiveBAM?'18:05':'18:35','Maison Premiere · oysters and cocktails','maisonPremiere','298 Bedford Avenue. Oyster stop, not automatically a full dinner; check reservations. Published Wednesday service begins at noon.','food','hours-to-check');
  }
- if(attendBAM){
-  transit('wed_to_bam',mode==='manhattan'?'18:05':'18:05','19:12',
+ if(effectiveBAM){
+  transit('wed_to_bam','18:05','19:12',
    mode==='manhattan'?'Manhattan → BAM · theatre transfer':'Williamsburg → BAM · theatre transfer','bamharvey','Reach Fort Greene in time for the 19:30 curtain and admission.');
   if(!haveBookedBAM)slot('wed_bam','19:30','20:55','BAM · La Distance (French with English supertitles)','bamharvey','Harvey Theater, Fort Greene. Official running time 1h25. Tickets to purchase separately.','theatre','ticket-to-check');
  }
@@ -245,15 +248,15 @@ function planWednesdayExperience(orig,choices){
    night=Object.assign({},night,{start:'22:00',end:'00:45',title:'Louie Vega · Flashback · house/disco dancing',place:'superiorIngredients',kind:'club',status:'ticket-to-check',
     detail:'Superior Ingredients, The Room (indoors, no skyline rooftop). Official event runs 22:00–04:00; 00:45 is a suggested early departure before Thanksgiving. Tickets not booked.'});
   }else if(choices.c3==='rest'){
-   night=Object.assign({},night,{start:attendBAM?'21:50':mode==='manhattan'?'20:30':'20:45',end:attendBAM?'23:20':'22:40',
+   night=Object.assign({},night,{start:effectiveBAM?'21:50':mode==='manhattan'?'20:30':'20:45',end:effectiveBAM?'23:20':'22:40',
     detail:String(night.detail||'')+' Dinner/piano programme and seating still require confirmation.'});
   }
-  const lateStart=attendBAM?'21:00':mode==='manhattan'?'20:55':'21:10';
-  const lateEnd=attendBAM?'21:45':mode==='manhattan'?'21:50':'21:50';
+  const lateStart=effectiveBAM?'21:00':mode==='manhattan'?'20:55':'21:10';
+  const lateEnd=effectiveBAM?'21:45':mode==='manhattan'?'21:50':'21:50';
   if(choices.c3!=='rest')transit('wed_night_transfer',lateStart,lateEnd,
-     attendBAM?'BAM → late-night venue · subway/taxi':mode==='manhattan'?'Manhattan → Brooklyn · club transfer':'Williamsburg → late-night venue · transfer',
+     effectiveBAM?'BAM → late-night venue · subway/taxi':mode==='manhattan'?'Manhattan → Brooklyn · club transfer':'Williamsburg → late-night venue · transfer',
      night.place,'Check the event entrance and last train connection.');
-  else if(attendBAM||mode!=='manhattan')transit('wed_night_transfer',attendBAM?'20:55':'19:55',attendBAM?'21:45':'20:40',
+  else if(effectiveBAM||mode!=='manhattan')transit('wed_night_transfer',effectiveBAM?'20:55':'19:55',effectiveBAM?'21:45':'20:40',
       'Travel to The Nines · NoHo',night.place,'Allow travel from Brooklyn to Manhattan.');
   add(night);
  }
@@ -293,7 +296,8 @@ function install(){
    if(day==='wed'){
     const prepared=wanted.size>=2&&wanted.has('chelsea')?planWednesday(result,wanted):result;
     const updated=planWednesdayExperience(prepared,opts);
-    return noOverlap(updated)?updated:result;
+    // A final routing layer resolves and records clashes; never revert to the original unoptimised plan.
+    return updated;
    }
    if(wanted.size<2)return result;
    const updated=day==='tue'?planTuesday(result,wanted,opts):result;
