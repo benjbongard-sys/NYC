@@ -160,6 +160,7 @@
    if(e.id==='night'&&c.c3==='rest'){const v=assign(e,'nines','The Nines · late piano bar in NoHo','9 Great Jones Street; a refined, atmospheric alternative to clubbing. Confirm the Wednesday piano programme.','music','proposed');v.start='21:30';return [v];}
   }
   if(day==='thu'){
+   if(e.id==='slow')return [assign(e,'friedmans',"Friedman's Edison · Thanksgiving brunch",'228 West 47th Street. An actual breakfast venue; only use this slot when it does not conflict with the Macy’s parade. Holiday service unconfirmed.','food','hours-to-check')];
    if(e.id==='open'&&c.c5==='rest'){
     let v=assign(e,'oculus','World Trade Center Oculus · architecture walk','50 Church Street. Visit the Calatrava station, Memorial Plaza exteriors and surrounding architecture. Retail holiday hours may vary.','walk','proposed');
     v.end='13:20';return [v];
@@ -246,6 +247,21 @@
     }
     if(day==='thu'&&ch.c4==='rest'&&!out.some(e=>e.id==='night')&&!out.some(e=>e.kind==='walk'&&e.start>='20:20')){
      out.push({id:'quiet_thu_village',start:'20:55',end:'21:35',place:'westVillage',title:'West Village · Bleecker Street night walk',detail:'Christopher Street and Bleecker Street after the Thanksgiving dinner; open-air and flexible.',kind:'walk',status:'proposed'});
+    }
+    // The River Café is a complete skyline dining experience; do not double-book Westlight.
+    if(day==='thu'&&ch.c7==='river'&&ch.c4==='westmorales'){
+     const i=out.findIndex(e=>e.id==='rooftop'&&!['booked','confirmed'].includes(e.status));
+     if(i!==-1)out.splice(i,1);
+    }
+    // 230 Fifth + River Café cannot both begin in their original slots.
+    // Offer a clearly conditional, later rooftop visit instead of showing overlapping events.
+    if(day==='thu'&&ch.c7==='river'&&ch.c4==='boogie'){
+     const night=out.find(e=>e.id==='night'&&!['booked','confirmed'].includes(e.status));
+     if(night){night.start='21:15';night.title='230 Fifth · late rooftop visit (admission to verify)';night.detail='Proposed late arrival after dinner at The River Café. Confirm the holiday event is running and accepts admission at 21:15; its DJ programme is not guaranteed.';night.status='unverified'}
+    }
+    // Never show breakfast over the parade's public viewing window.
+    if(day==='thu'&&out.some(e=>e.id==='centennial_parade_2026'||e.id==='centennial_parade_walk')){
+     for(let i=out.length-1;i>=0;i--)if(out[i].id==='slow'&&!['booked','confirmed'].includes(out[i].status))out.splice(i,1);
     }
     // Avoid repeat walks to the same block during one evening, while keeping all dining and booked events.
     const sorted=sortEvents(out);
