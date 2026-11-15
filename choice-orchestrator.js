@@ -53,6 +53,7 @@ function guidance(c,v){
 }
 function alternatives(choices){
  const chosen=Object.assign({},DATA.DEFAULT||{},choices||{});
+ const pending=(journal().deferredWednesday||[]).map((item,i)=>({group:'c9',day:'wed',value:'deferred_'+i,title:item.title,detail:'Selected stop needs a revised time',pinned:false,actionable:false,planned:false,note:item.reason,history:true}));
  return (DATA.CHOICES||[]).flatMap(c=>(c.options||[]).filter(o=>{
   return o&&o[0]!==chosen[c.id]&&!(c.id==='c6'&&chosen.c6==='all')&&o[0]!=='all'&&!['rest','standard'].includes(o[0]);
  }).map(o=>({
@@ -141,6 +142,120 @@ function planWednesday(orig,wanted){
  result.push(e('art_wed_lunch','12:58','13:35','Golden Diner · quick lunch','golden','123 Madison Street. Queue permitting; retain the Williamsburg transfer buffer.','food'));
  return repairBam(result);
 }
+
+/* Wednesday is Manhattan-first by default. Williamsburg is a deliberate
+ * afternoon choice, not an automatic filler; BAM and the club are separate. */
+function wedPlaces(){
+ const places={
+  westlight:{name:'Westlight · Williamsburg rooftop',address:'111 N 12th St, Brooklyn, NY 11249, USA',area:'Williamsburg',lat:40.7222,lng:-73.9597,kind:'cocktail',url:'https://www.westlightnyc.com/'},
+  superiorIngredients:{name:'Superior Ingredients · The Room',address:'74 Wythe Ave, Brooklyn, NY 11249, USA',area:'Williamsburg',lat:40.72232,lng:-73.95782,kind:'club',url:'https://www.si-bk.com/shows'},
+  domino:{name:'Domino Park · waterfront',address:'15 River St, Brooklyn, NY 11249, USA',area:'Williamsburg',lat:40.7154,lng:-73.9682,kind:'walk',url:'https://www.dominopark.com/'}
+ };
+ Object.keys(places).forEach(k=>{if(!DATA.P[k])DATA.P[k]=places[k]});
+}
+function wedChoices(){
+ if(!DATA.DEFAULT||!Array.isArray(DATA.CHOICES))return;
+ const insert=(id,value,title,desc,options)=>{
+  if(!Object.prototype.hasOwnProperty.call(DATA.DEFAULT,id))DATA.DEFAULT[id]=value;
+  if(!DATA.CHOICES.some(c=>c.id===id))DATA.CHOICES.push({id,day:'wed',title,desc,options});
+ };
+ insert('c9','manhattan','Wednesday afternoon · Manhattan or Williamsburg?',
+  'Manhattan is the default. Williamsburg becomes a purposeful skyline, rooftop and oyster excursion, never a compulsory half-day.',[
+   ['manhattan','Manhattan first · Whitney, Little Island and West Village','Keep the afternoon on Manhattan, with a museum and waterside walk. Williamsburg remains available for another visit.'],
+   ['williamsburg','Williamsburg · waterfront → Westlight → oysters','Domino Park in daylight, rooftop at sunset, then Maison Premiere. Travel and opening times require checking.'],
+   ['williamsburg_vintage','Williamsburg · vintage shops + skyline + oysters','Add Awoke and Stella Dallas to the sunset trail; this is a fuller, more demanding afternoon.']
+  ]);
+ insert('c10','skip','Wednesday evening · BAM theatre?',
+  'The 19:30 La Distance performance in Fort Greene is optional. Selecting it reserves travel time, not a theatre seat.',[
+   ['skip','No BAM performance · keep the evening flexible','The theatre stays in Second Chances. No ticket is assumed.'],
+   ['bam','BAM · La Distance at 19:30 · tickets to check','French-language theatre with English supertitles. Travel to Fort Greene and check-in are explicitly planned.']
+  ]);
+ const night=DATA.CHOICES.find(c=>c.id==='c3');
+ if(night&&!(night.options||[]).some(o=>o[0]==='louievega')){
+  night.options.push(['louievega','Louie Vega · Flashback at Superior Ingredients','25 November, 22:00–04:00 at The Room (indoors, not the rooftop). House/disco dancing; tickets not booked.']);
+ }
+}
+function timeClash(a,b){
+ const a0=minutes(a.start),b0=minutes(b.start);
+ let a1=minutes(a.end),b1=minutes(b.end);
+ if(a1<a0)a1+=1440;if(b1<b0)b1+=1440;
+ return a0<b1&&b0<a1;
+}
+function planWednesdayExperience(orig,choices){
+ const mode=['williamsburg','williamsburg_vintage'].includes(choices.c9)?choices.c9:'manhattan';
+ const haveBookedBAM=orig.some(x=>isProtected(x)&&/bamharvey|la distance/i.test((x.place||'')+' '+(x.title||'')));
+ const attendBAM=choices.c10==='bam'||haveBookedBAM;
+ const oldNight=orig.find(x=>x.id==='night');
+ const keep=orig.filter(x=>{
+  if(isProtected(x))return true;
+  if(/^(?:custom|user)_/.test(String(x.id||'')))return true;
+  // Retain the morning and lunch. Rebuild only the optional afternoon/night.
+  return minutes(x.end)<=14*60 && minutes(x.start)<14*60 &&
+   !/^(?:explore_wed_(?:bamharvey|maisonpremiere|westlight)|explore_walk_wed_)/.test(String(x.id||'')) &&
+   !['vintage','vintage_stella','domino','hotel','hotel_view'].includes(x.id);
+ });
+ const out=sorted(keep.slice()),deferred=[];
+ const add=item=>{
+  const clash=out.find(x=>timeClash(item,x));
+  if(clash){
+   deferred.push({title:item.title,reason:'Conflicts with '+clash.title+' · review before booking'});
+   return false;
+  }
+  if(!out.some(x=>x.id===item.id)){out.push(item);sorted(out);return true}
+  return false;
+ };
+ const slot=(id,start,end,title,place,detail,kind='experience',status='proposed')=>add(e(id,start,end,title,place,detail,kind,status));
+ const transit=(id,start,end,title,place,detail)=>slot(id,start,end,title,place,detail+' Allow for NYC traffic, subway waits and station access; follow live MTA directions.','travel');
+ if(mode==='manhattan'){
+  slot('wed_whitney','14:25','15:40','Whitney Museum · art and the Meatpacking waterfront','whitney','99 Gansevoort Street. Reserve admission; adjust if you prefer another Manhattan gallery.','museum','ticket-to-check');
+  slot('wed_little_island','15:50','16:25','Little Island · Hudson River walk','littleIsland','Pier 55. Outdoor public park; weather-dependent.','walk');
+  slot('wed_west_village','16:40','17:20','West Village · Bleecker and Christopher Streets','westVillage','Neighbourhood walk and small independent shops; time for a relaxed evening.','walk');
+ }else{
+  const vintage=mode==='williamsburg_vintage';
+  if(vintage){
+   transit('wed_to_brooklyn','13:35','14:15','Manhattan → Williamsburg · subway transfer','awoke','Travel towards Bedford Avenue and the vintage shops.');
+   slot('wed_awoke','14:15','14:35','Awoke Vintage · browse','awoke','132 North 5th Street. Optional vintage stop.','shopping');
+   slot('wed_stella','14:42','15:00','10 ft Single by Stella Dallas · vintage','stella','285 North 6th Street. A short second vintage stop.','shopping');
+   transit('wed_to_domino','15:00','15:20','Walk to Domino Park','domino','Walk south and west through Williamsburg.');
+   slot('wed_domino','15:20','15:45','Domino Park · Manhattan skyline in daylight','domino','East River waterfront; sunset is approximately 16:31 on this date.','walk');
+   transit('wed_to_westlight','15:45','16:10','Domino Park → Westlight · walk north','westlight','Allow about 25 minutes for the waterfront-to-rooftop transfer.');
+  }else{
+   transit('wed_to_brooklyn','14:15','14:55','Manhattan → Williamsburg · subway transfer','domino','Leave time for the transfer to the East River waterfront.');
+   slot('wed_domino','15:00','15:35','Domino Park · Manhattan skyline in daylight','domino','East River waterfront; sunset is approximately 16:31 on this date.','walk');
+   transit('wed_to_westlight','15:35','16:10','Domino Park → Westlight · walk north','westlight','Allow a generous transfer to the William Vale rooftop.');
+  }
+  slot('wed_westlight','16:10','17:00','Westlight · sunset skyline cocktails','westlight','111 North 12th Street. Opens from 16:00 on Wednesdays; seats, weather and holiday schedule unconfirmed. This is not a confirmed DJ night.','cocktail','hours-to-check');
+  transit('wed_to_oysters','17:00','17:20','Westlight → Maison Premiere · walk','maisonPremiere','Allow approximately 20 minutes south towards Bedford Avenue.');
+  slot('wed_oysters','17:20',attendBAM?'18:05':'18:35','Maison Premiere · oysters and cocktails','maisonPremiere','298 Bedford Avenue. Oyster stop, not automatically a full dinner; check reservations. Published Wednesday service begins at noon.','food','hours-to-check');
+ }
+ if(attendBAM){
+  transit('wed_to_bam',mode==='manhattan'?'18:00':'18:05','19:12',
+   mode==='manhattan'?'Manhattan → BAM · theatre transfer':'Williamsburg → BAM · theatre transfer','bamharvey','Reach Fort Greene in time for the 19:30 curtain and admission.');
+  if(!haveBookedBAM)slot('wed_bam','19:30','20:55','BAM · La Distance (French with English supertitles)','bamharvey','Harvey Theater, Fort Greene. Official running time 1h25. Tickets to purchase separately.','theatre','ticket-to-check');
+ }
+ if(oldNight&&!isProtected(oldNight)||choices.c3==='louievega'&&!oldNight){
+  let night=oldNight?Object.assign({},oldNight):e('night','22:00','00:45','Night out','superiorIngredients','','club','ticket-to-check');
+  if(choices.c3==='louievega'){
+   night=Object.assign({},night,{start:'22:00',end:'00:45',title:'Louie Vega · Flashback · house/disco dancing',place:'superiorIngredients',kind:'club',status:'ticket-to-check',
+    detail:'Superior Ingredients, The Room (indoors, no skyline rooftop). Official event runs 22:00–04:00; 00:45 is a suggested early departure before Thanksgiving. Tickets not booked.'});
+  }else if(choices.c3==='rest'){
+   night=Object.assign({},night,{start:attendBAM?'21:50':mode==='manhattan'?'20:30':'20:45',end:attendBAM?'23:20':'22:40',
+    detail:String(night.detail||'')+' Dinner/piano programme and seating still require confirmation.'});
+  }
+  const lateStart=attendBAM?'21:00':mode==='manhattan'?'20:55':'21:10';
+  const lateEnd=attendBAM?'21:45':mode==='manhattan'?'21:50':'21:50';
+  if(choices.c3!=='rest')transit('wed_night_transfer',lateStart,lateEnd,
+     attendBAM?'BAM → late-night venue · subway/taxi':mode==='manhattan'?'Manhattan → Brooklyn · club transfer':'Williamsburg → late-night venue · transfer',
+     night.place,'Check the event entrance and last train connection.');
+  else if(attendBAM||mode!=='manhattan')transit('wed_night_transfer',attendBAM?'20:55':'19:55',attendBAM?'21:45':'20:40',
+      'Travel to The Nines · NoHo',night.place,'Allow travel from Brooklyn to Manhattan.');
+  add(night);
+ }
+ const j=journal();
+ j.deferredWednesday=deferred.slice(0,18);
+ save(j);
+ return sorted(out);
+}
 function noOverlap(events){
  for(let i=1;i<events.length;i++){
   const a=events[i-1],b=events[i];let end=minutes(a.end);
@@ -159,6 +274,8 @@ function install(){
   c6.title='Tuesday art trail · one, several or all?';
   c6.desc='You can do them all. The intensive plan covers Tuesday and Wednesday, not three simultaneous museums.';
  }
+ wedPlaces();
+ wedChoices();
  BASE=PLAN.day.bind(PLAN);
  PLAN.day=function(day,choices){
   const result=BASE(day,choices);
@@ -167,13 +284,18 @@ function install(){
    const opts=Object.assign({},DATA.DEFAULT||{},choices||{});
    record(opts);
    const wanted=activeArt(opts);
-   if(wanted.size<2)return day==='wed'?repairBam(result):result;
-   const updated=day==='tue'?planTuesday(result,wanted,opts):day==='wed'?planWednesday(result,wanted):result;
+   if(day==='wed'){
+    const prepared=wanted.size>=2&&wanted.has('chelsea')?planWednesday(result,wanted):result;
+    const updated=planWednesdayExperience(prepared,opts);
+    return noOverlap(updated)?updated:result;
+   }
+   if(wanted.size<2)return result;
+   const updated=day==='tue'?planTuesday(result,wanted,opts):result;
    return noOverlap(updated)?updated:result;
   }catch(_){return result}
  };
  installed=true;
  return true;
 }
-window.NOUX_CHOICES={install,alternatives,toggle,pinned,activeArt,version:'2026.11.15',history:()=>journal().history};
+window.NOUX_CHOICES={install,alternatives,toggle,pinned,activeArt,version:'2026.11.15-wed3',history:()=>journal().history};
 })();
