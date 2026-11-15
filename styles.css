@@ -145,3 +145,10 @@
   input,select,textarea{font-size:16px!important;}
   button{touch-action:manipulation;}
 }
+
+/* NOUX PHOTO PRESENTATION CLEANUP 2026-11-15 */
+/* The image-source links remain in the bundled source metadata, not in the visitor-facing cards. */
+.photo-caption > a,
+.photo-caption a[href],
+a.photo-credit,
+a[class~="photo-credit"] { display:none !important; }
