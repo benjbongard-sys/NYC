@@ -31,6 +31,7 @@ const V={
  zwirner:{name:"David Zwirner · Yoshitomo Nara exhibition",area:"Chelsea",address:"537 W 20th St, New York, NY 10011, USA",lat:40.7468,lng:-74.0062,kind:"gallery",url:"https://www.davidzwirner.com/exhibitions/2026/yoshitomo-nara"},
  pace:{name:"Pace Gallery · Li Hei Di / Lucas Samaras",area:"Chelsea",address:"540 W 25th St, New York, NY 10001, USA",lat:40.7492,lng:-74.0056,kind:"gallery",url:"https://www.pacegallery.com/galleries/new-york/"},
  gramercy:{name:"Gramercy Tavern · Thanksgiving",area:"Flatiron",address:"42 E 20th St, New York, NY 10003, USA",lat:40.7390,lng:-73.9889,kind:"restaurant",url:"https://www.gramercytavern.com/"},
+ pier57roof:{name:"Pier 57 Rooftop Park",area:"Meatpacking / Chelsea",address:"25 11th Ave, New York, NY 10011, USA",lat:40.7430,lng:-74.0104,kind:"park",url:"https://pier57nyc.com/rooftop/"},
  littleisland:{name:"Little Island · Pier 55",area:"Meatpacking",address:"Pier 55, Hudson River Park, New York, NY 10014, USA",lat:40.7413,lng:-74.0103,kind:"park",url:"https://littleisland.org/rules-faq/"},
  oysterbar:{name:"Grand Central Oyster Bar",area:"Grand Central",address:"89 E 42nd St, Lower Level, New York, NY 10017, USA",lat:40.7527,lng:-73.9772,kind:"restaurant",url:"https://www.oysterbarny.com/"},
  maisonpremiere:{name:"Maison Premiere · oysters & cocktails",area:"Williamsburg",address:"298 Bedford Ave, Brooklyn, NY 11249, USA",lat:40.7139,lng:-73.9612,kind:"restaurant",url:"https://maisonpremiere.com/"},
@@ -42,7 +43,7 @@ function clone(e){return Object.assign({},e)}
 const fixed=e=>['booked','arranged','confirmed'].includes(String(e.status||'').toLowerCase())||
  /cruise|flight|airport|pickup|transfer|boarding|luggage|macy's thanksgiving day parade/i.test(e.title||'')&&['travel','logistics','highlight'].includes(e.kind);
 function assign(e,place,title,detail,kind,status){
- if(fixed(e))return e;
+ if(fixed(e)&&!['breakfast'].includes(e.id))return e;
  let o=Object.assign({},e,{place,title,detail});
  if(kind)o.kind=kind;
  if(status)o.status=status;
@@ -105,6 +106,8 @@ function resolve(day,events,selections,D){
     return Object.assign(assign(e,'washSq','Washington Square Park · Village walk','The arch and Greenwich Village before a classic Joe’s Pizza slice and Blue Note. No hotel break.','walk','proposed'),{start:'16:10',end:'17:05'});
    }
    if(id==='music'&&c.c2==='rest')return assign(e,'thenines','The Nines · piano, cocktails and supper','9 Great Jones St in NoHo. Elegant live-music supper-club choice; programme and reservations require verification.','music','unverified');
+   if(id.startsWith('explore_tue_joespizza')&&c.c2==='agency')return assign(e,'oysterbar','Grand Central Oyster Bar · before the vinyl set','89 E 42nd St, lower level; oysters close to Agency of Record. Reserve or use the raw-bar counter.','food','unverified');
+   if(id.startsWith('explore_tue_joespizza')&&c.c2==='jazzgallery')return assign(e,'eataly','Eataly Flatiron · quick pre-jazz bite','200 Fifth Ave, near The Jazz Gallery; open on regular Tuesdays.','food','proposed');
    if(id.startsWith('explore_walk_'))return assign(e,'washSq','Washington Square Park · evening Village stroll','A named walk around Washington Square Arch, rather than unspecific city wandering.','walk','proposed');
   }
   if(day==='wed'){
@@ -130,13 +133,16 @@ function resolve(day,events,selections,D){
    if(id==='dinner'){
     if(c.c7==='river')return assign(e,'river','The River Café · Thanksgiving dinner','1 Water St, Brooklyn. Official Thanksgiving 2026 menu $255 per person, service 1–8pm. Jacket and collared shirt required for gentlemen; reservation NOT confirmed.','dinner','unverified');
     if(['westmorales','morales'].includes(c.c4))return Object.assign(assign(e,'kru','KRU · Thai Thanksgiving dinner','190 N 14th St, Williamsburg. Official special Thanksgiving menu $55 per person, dinner advertised 5:30–9:30pm. Reserve a table; allow travel to Refuge.','dinner','unverified'),{start:c.c4==='westmorales'?'20:15':'19:00',end:c.c4==='westmorales'?'21:30':'20:30'});
-    if(c.c4==='boogie')return Object.assign(assign(e,'smithnomad','The Smith NoMad · Thanksgiving dinner','1150 Broadway at 27th St. Thanksgiving three-course menu $88 per adult, 12–9pm; a table is not booked. Walk to 230 Fifth afterwards.','dinner','unverified'),{start:'17:00',end:'19:00'});
+    if(c.c4==='boogie')return Object.assign(assign(e,'smithnomad','The Smith NoMad · Thanksgiving dinner','1150 Broadway at 27th St. Thanksgiving three-course menu $88 per adult, 12–9pm; a table is not booked. Walk to 230 Fifth afterwards.','dinner','unverified'),{start:'17:30',end:'19:15'});
     if(c.c4==='rest')return Object.assign(assign(e,'manhatta','Manhatta · Thanksgiving with a skyline','60th floor, 28 Liberty St. Thanksgiving four-course menu $225 per person. Allow two hours; booking not confirmed.','dinner','unverified'),{start:'18:00',end:'20:00'});
     return Object.assign(assign(e,'ciSiamo','Ci Siamo · Thanksgiving dinner','440 W 33rd St, Manhattan West. Official Thanksgiving three-course menu $155 per person. No reservation confirmed.','dinner','unverified'),{start:'18:15',end:'20:00'});
    }
+   if(id==='rooftop'&&c.c7==='river')return Object.assign(e,{__skipVenueResolver:true});
+   if(id==='night'&&c.c4==='boogie'&&c.c7==='river')return Object.assign({},e,{start:'20:35',end:'22:45',detail:(e.detail||'')+' River Café dinner runs later: arrive only if late entry is permitted.'});
    if(id==='night'&&c.c4==='rest')return Object.assign(assign(e,'bryantwinter','Bryant Park Winter Village · ice-rink lights','Rink open during the November holiday season, generally until midnight; shops may close earlier. Walking visit, not a ticketed skate session.','walk','proposed'),{start:'20:45',end:'22:00'});
    if(id.startsWith('explore_walk_')){
     if(e.place==='edge')return assign(e,'hudsonplaza','Hudson Yards Plaza · Vessel exterior','Explore the actual Hudson Yards public plaza before the next venue.','walk','proposed');
+    if(e.place==='littleisland')return assign(e,'pier57roof','Pier 57 Rooftop Park · Hudson views','25 11th Ave, next to Little Island. Public roof is normally open daily 6am–1am; weather may affect access.','walk','proposed');
     if(e.place==='lebain')return assign(e,'meatpacking','Gansevoort Plaza · Meatpacking District','Walk a specific nightlife district before Le Bain; no invented show or rooftop access.','walk','proposed');
    }
   }
@@ -147,6 +153,7 @@ function resolve(day,events,selections,D){
   }
   return e;
  });
+ p=p.filter(e=>!e.__skipVenueResolver);
  const add=(id,start,finish,place,title,detail,kind,status)=>optional(p,id,start,finish,place,title,detail,kind,status);
  if(day==='mon'&&c.c1==='rest')add('venue_mon_evening','20:50','21:35','bryantwinter','Bryant Park Winter Village · festive night walk','A final outdoor New York stop after dinner; no hotel early-night placeholder.','walk','proposed');
  if(day==='tue'&&c.c6==='chelsea'){
@@ -167,8 +174,8 @@ function resolve(day,events,selections,D){
  for(let i=1;i<p.length;i++){
   if(end(p[i-1])>m(p[i].start)){
    const prev=p[i-1],cur=p[i];
-   if(String(cur.id).startsWith('venue_')){p.splice(i,1);i--;continue}
-   if(String(prev.id).startsWith('venue_')){p.splice(i-1,1);i=Math.max(0,i-2);continue}
+   if(String(cur.id).startsWith('venue_')||String(cur.id).startsWith('explore_walk_')){p.splice(i,1);i--;continue}
+   if(String(prev.id).startsWith('venue_')||String(prev.id).startsWith('explore_walk_')){p.splice(i-1,1);i=Math.max(0,i-2);continue}
   }
  }
  return p;
