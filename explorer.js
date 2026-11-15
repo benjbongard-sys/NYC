@@ -29,6 +29,7 @@
  function includesPhrase(text,phrase){var t=' '+norm(text)+' ',p=' '+norm(phrase)+' ';return p.length>3&&t.indexOf(p)!==-1}
  function clock(n){return String(Math.floor(n/60)%24).padStart(2,'0')+':'+String(n%60).padStart(2,'0')}
  function minute(t){var a=String(t||'').split(':').map(Number);return a.length===2&&a.every(Number.isFinite)?a[0]*60+a[1]:NaN}
+ function actualEnd(e){var end=minute(e.end),start=minute(e.start);return Number.isFinite(start)&&Number.isFinite(end)&&end<start?end+1440:end}
  function getMode(){try{return localStorage.getItem(KEY)==='original'?'original':'full'}catch(e){return 'full'}}
  function setMode(v){try{localStorage.setItem(KEY,v)}catch(e){}}
  function wishList(){return Array.isArray(DATA.WISHES)?DATA.WISHES:[]}
@@ -84,7 +85,7 @@
    var boundaries=[{start:clock(startOfDay),end:clock(startOfDay),place:null}].concat(itinerary,[{start:clock(endOfDay),end:clock(endOfDay),place:null}]);
    var best=null;
    for(var i=0;i<boundaries.length-1;i++){
-    var before=boundaries[i],after=boundaries[i+1],left=Math.max(startOfDay,minute(before.end)),right=Math.min(endOfDay,minute(after.start));
+    var before=boundaries[i],after=boundaries[i+1],left=Math.max(startOfDay,actualEnd(before)),right=Math.min(endOfDay,minute(after.start));
     if(!Number.isFinite(left)||!Number.isFinite(right)||right-left<c.min+12)continue;
     if(before===boundaries[0]&&after===boundaries[boundaries.length-1])continue;
     var go=before.place?travel(before.place,c.id):0,back=after.place?travel(c.id,after.place):0;
@@ -125,7 +126,7 @@
      extended.push({id:'explore_walk_'+day+'_'+j,start:clock(gapStart),end:clock(gapEnd),title:title,place:basePlace,kind:'walk',detail:'Explore the streets and architecture around this stop. Flexible, outdoors, no booking.',status:'proposed'});
     }
    }
-   extended.push(e);prevEnd=Math.max(prevEnd,minute(e.end)>minute(e.start)?minute(e.end):minute(e.start));
+   extended.push(e);prevEnd=Math.max(prevEnd,actualEnd(e));
   }
   return extended.sort(function(a,b){return minute(a.start)-minute(b.start)});
  }
