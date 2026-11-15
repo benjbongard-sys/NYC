@@ -13,7 +13,7 @@
  const mark=(text,status='')=>{msg.textContent=text;msg.dataset.status=status};
  async function derive(password,salt,rounds){
   const key=await crypto.subtle.importKey('raw',enc.encode(password),'PBKDF2',false,['deriveKey']);
-  return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:rounds,hash:'SHA-256'},key,{name:'AES-GCM',length:256},false,['decrypt']);
+  return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:rounds,hash:'SHA-256'},key,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
  }
  form.addEventListener('submit',async e=>{
   e.preventDefault();if(unlocked||!input.value||!crypto?.subtle)return;
@@ -76,6 +76,9 @@
     }
    }
    $('root').hidden=false;screen.style.display='none';
+   // Reuse the same locally derived AES key for encrypted user tickboxes.
+   // The passphrase and key are never persisted or sent to a server.
+   if(window.NOUX_DEPARTURE){try{await window.NOUX_DEPARTURE.install({key});}catch(_){/* The main private itinerary remains available. */}}
    // The password is never persisted, logged or placed in the URL.
   }catch(error){
    unlocked=false;attempts++;bar.style.width='0%';button.disabled=false;input.disabled=false;
