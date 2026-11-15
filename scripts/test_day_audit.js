@@ -27,9 +27,14 @@ assert.equal(tue.find(x=>x.id==='photo').end,'10:25','Photo stop capped');
 const thu=day('thu');
 assert.equal(thu.find(x=>x.id==='parade').start,'09:40','Early parade corrected');
 const fri=day('fri');
-assert.equal(fri.find(x=>x.id==='pickup').start,'15:50','Unconfirmed noon pickup is not treated as fixed');
+assert.equal(fri.find(x=>x.id==='pickup').start,'16:45','Friday guided coach arrival in lobby before 17:00');
+assert.equal(fri.find(x=>x.id==='pickup').status,'arranged','Group transfer is arranged, not merely a speculative pickup');
+assert.equal(fri.find(x=>x.id==='pickup').end,'17:10','Approximate coach window recorded');
+assert(fri.some(x=>x.id==='audited_checkout'&&x.end==='11:55'),'Hotel checkout before noon');
+assert(fri.some(x=>x.id==='audited_bags'&&x.end==='16:40'),'All luggage collected before coach');
 assert(fri.some(x=>x.id==='audited_bags'),'Hotel luggage collection preserved');
 assert(fri.some(x=>x.id==='audited_grand_central'),'Final afternoon near Midtown');
+assert(fri.some(x=>x.id==='audited_grand_shops'),'Grand Central gift stores added without another cross-town trip');
 assert(fri.some(x=>x.id==='audited_bryant'),'Winter Village included when not already visited earlier');
 orig.fri.find(x=>x.id==='walk').title='Culture Espresso → Bryant Park';
 const repeatProtected=day('fri');
@@ -37,6 +42,13 @@ assert(!repeatProtected.some(x=>x.id==='audited_bryant'),'Do not revisit Bryant 
 assert(repeatProtected.some(x=>x.id==='audited_stpatrick'),'Replace repeat with nearby St Patrick visit');
 orig.fri.find(x=>x.id==='walk').title='Walk';
 assert.equal(fri.find(x=>x.id==='flight').start,'23:15','Booked flight unaffected');
+const sunriseWed=window.NYC_PLAN.day('wed',{c11:'wed'}),sunriseFri=window.NYC_PLAN.day('fri',{c11:'fri'});
+for(const code of ['out','photos','entrance','bridge','return'])assert(sunriseWed.some(x=>x.id==='sunrise_wed_'+code),'Wednesday sunrise has '+code);
+assert(sunriseWed.find(x=>x.id==='sunrise_wed_photos').start==='06:45','DUMBO sunrise photos before 06:54 sunup');
+assert(!sunriseWed.some(x=>x.id.startsWith('sunrise_fri_')),'Sunrise only on one day');
+assert(sunriseFri.some(x=>x.id==='sunrise_fri_photos'),'Optional Friday sunrise remains available');
+assert(!window.NYC_PLAN.day('wed',{c11:'skip'}).some(x=>x.id.startsWith('sunrise_')),'Skipping sunrise restores relaxed morning');
+for(const [d,list] of [['wed',sunriseWed],['fri',sunriseFri]]){for(let i=1;i<list.length;i++){const a=list[i-1],b=list[i];assert((+a.end.slice(0,2)*60+ +a.end.slice(3))<=(+b.start.slice(0,2)*60+ +b.start.slice(3)),'Sunrise chronology '+d+' '+a.id+' / '+b.id)}}
 for(const d of ['mon','tue','wed','thu','fri']){
  const arr=day(d);
  for(let i=1;i<arr.length;i++){
