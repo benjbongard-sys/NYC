@@ -110,8 +110,22 @@ function planTuesday(orig,wanted,choices){
  orig.filter(x=>isProtected(x)&&!result.some(y=>y.id===x.id)).forEach(x=>result.push(x));
  return sorted(result);
 }
+function repairBam(rows){
+ const hasBAM=rows.some(x=>/bamharvey|theatre|la distance/i.test((x.id||'')+' '+(x.title||''))&&x.start>='19:00'&&x.start<='20:30');
+ if(!hasBAM)return sorted(rows);
+ const conflict=rows.some(x=>['hotel','hotel_view','explore_wed_maisonpremiere'].includes(x.id));
+ if(!conflict)return sorted(rows);
+ // A 19:30 curtain in Fort Greene is incompatible with 19:40 cocktails
+ // in Williamsburg. Keep oysters but leave an honest subway buffer.
+ const out=rows.filter(x=>!['hotel','hotel_view','explore_wed_maisonpremiere'].includes(x.id));
+ if(!out.some(x=>x.id==='art_wed_oysters'))
+  out.push(e('art_wed_oysters','17:28','18:10','Maison Premiere · oysters and cocktails','maisonPremiere','298 Bedford Avenue, Williamsburg. Short oyster stop; reserve ahead if using the dining room.','food'));
+ if(!out.some(x=>x.id==='art_wed_bam_transfer'))
+  out.push(e('art_wed_bam_transfer','18:10','19:17','Travel Williamsburg → BAM Fort Greene','bamharvey','Allow subway travel, waiting and theatre check-in. Live directions take priority.','travel'));
+ return sorted(out);
+}
 function planWednesday(orig,wanted){
- if(!wanted.has('chelsea'))return orig;
+ if(!wanted.has('chelsea'))return repairBam(orig);
  // Chelsea replaces Tuesday MoMA. Recover MoMA on Wednesday, shifting the libraries
  // while preserving Williamsburg, the evening performance and late-night music.
  const removeIds=new Set(['late','library','snfl','lunch']);
@@ -122,16 +136,7 @@ function planWednesday(orig,wanted){
  result.push(e('art_wed_library','11:43','12:12','NYPL · Rose Main Reading Room','nypl','476 Fifth Avenue. Visitor access depends on library rules.','culture'));
  result.push(e('art_wed_snfl','12:17','12:37','Stavros Niarchos Library · Fifth Avenue','snfl','455 Fifth Avenue. The rooftop may have separate opening restrictions.','culture'));
  result.push(e('art_wed_lunch','12:58','13:35','Golden Diner · quick lunch','golden','123 Madison Street. Queue permitting; retain the Williamsburg transfer buffer.','food'));
- const hasBAM=result.some(x=>/bamharvey|theatre|la distance/i.test(x.id+' '+x.title)&&x.start>='19:00'&&x.start<='20:30');
- if(hasBAM){
-  for(let i=result.length-1;i>=0;i--){
-   const v=result[i];
-   if(['hotel','hotel_view'].includes(v.id)||/^explore_wed_maisonpremiere$/.test(v.id))result.splice(i,1);
-  }
-  result.push(e('art_wed_oysters','17:28','18:10','Maison Premiere · oysters and cocktails','maisonPremiere','298 Bedford Avenue, Williamsburg. Short oyster stop, not a three-hour dinner; check service and reservation.','food'));
-  result.push(e('art_wed_bam_transfer','18:10','19:17','Travel Williamsburg → BAM Fort Greene','bamharvey','Allow for subway access, waiting and the theatre check-in; verify the actual travel route.','travel'));
- }
- return sorted(result);
+ return repairBam(result);
 }
 function noOverlap(events){
  for(let i=1;i<events.length;i++){
@@ -159,7 +164,7 @@ function install(){
    const opts=Object.assign({},DATA.DEFAULT||{},choices||{});
    record(opts);
    const wanted=activeArt(opts);
-   if(wanted.size<2)return result;
+   if(wanted.size<2)return day==='wed'?repairBam(result):result;
    const updated=day==='tue'?planTuesday(result,wanted,opts):day==='wed'?planWednesday(result,wanted):result;
    return noOverlap(updated)?updated:result;
   }catch(_){return result}
