@@ -50,7 +50,7 @@ assert(!wed.some(x=>x.place==='golden'),'Do not backtrack to Golden Diner before
 assert.equal(wed.find(x=>x.id==='wed_whitney').start,'14:05','Art-heavy day reaches Whitney after café lunch');
 assert(!tue.some(x=>x.id==='allart_moma'),'MoMA must move to Wednesday when Chelsea included');
 assert(tue.some(x=>x.id==='music'&&x.start==='19:05'),'Evening concert must be preserved');
-assert(wed.some(x=>x.id==='night'&&x.end==='02:00'),'Night club must be preserved');
+assert(wed.some(x=>x.id==='night'&&x.end==='00:45'),'Night club must be preserved with early Thanksgiving departure suggested');
 assert(!wed.some(x=>x.id==='art_wed_bam_transfer'||x.id==='wed_to_bam'),'No BAM transfer when theatre is not selected');
 const brooklyn=assertClean('wed',{...all,c9:'williamsburg',c10:'bam'});
 for(const id of ['wed_domino','wed_westlight','wed_oysters','wed_to_bam','wed_bam','night'])assert(brooklyn.some(x=>x.id===id),'Missing explicitly selected Brooklyn+theatre '+id);
