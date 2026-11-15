@@ -71,6 +71,7 @@
      if(window.NOUX_EXPLORER){try{window.NOUX_EXPLORER.install()}catch(_){/* Keep the private trip available. */}}
      if(window.NOUX_VENUES){try{window.NOUX_VENUES.install()}catch(_){/* Never block decryption on a display enhancement. */}}
      if(window.NOUX_CHOICES){try{window.NOUX_CHOICES.install()}catch(_){/* Fallback: the existing encrypted schedule stays usable. */}}
+     if(window.NOUX_DAY_AUDIT){try{window.NOUX_DAY_AUDIT.install()}catch(_){/* Keep encrypted planner usable without the route audit. */}}
      if(window.NOUX_SUBWAY){try{window.NOUX_SUBWAY.install()}catch(_){/* Do not block the itinerary when mapping is unavailable. */}}
     }
    }
