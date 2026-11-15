@@ -272,22 +272,9 @@ function mount(){
  });
  document.body.append(file);
  LAUNCHER=btn('Departure & gifts',open,'noux-departure-launcher');LAUNCHER.setAttribute('aria-controls',ROOT.id);document.body.append(LAUNCHER);
- function ensureNavigation(){
-  const nav=document.querySelector('.topbar .mainnav');
-  if(!nav)return;
-  if(!nav.querySelector('.noux-departure-navtab')){
-   const tab=btn('Departure & gifts',open,'noux-departure-navtab');
-   tab.setAttribute('aria-controls',ROOT.id);nav.append(tab)
-  }
- }
- ensureNavigation();
- const app=document.getElementById('root');
- if(app&&window.MutationObserver){
-  let queued=false;NAVOBS=new MutationObserver(()=>{
-   if(queued)return;queued=true;
-   requestAnimationFrame(()=>{queued=false;ensureNavigation()});
-  });NAVOBS.observe(app,{childList:true,subtree:true});
- }
+ // Render the launcher outside React's managed #root subtree. Modifying
+ // .mainnav directly can break React reconciliation during its first update.
+ // The launcher remains visible on both desktop and mobile.
  document.addEventListener('keydown',e=>{if(OPEN&&e.key==='Escape')close()});
  MOUNTED=true;
 }
@@ -320,5 +307,5 @@ async function install(options){
  mount();
  return true;
 }
-window.NOUX_DEPARTURE={install,whenSaved:()=>SAVING,version:'2026.11.15-encrypted-v3'};
+window.NOUX_DEPARTURE={install,whenSaved:()=>SAVING,version:'2026.11.16-react-safe'};
 })();
