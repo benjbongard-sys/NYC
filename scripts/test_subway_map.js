@@ -1,0 +1,21 @@
+/* Subway map semantics and public-bundle safety tests: no private travel data. */
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+const code=fs.readFileSync('subway-map.js','utf8');
+const html=fs.readFileSync('index.html','utf8');
+const workflow=fs.readFileSync('.github/workflows/pages.yml','utf8');
+assert(code.includes('NEXT PREDICTED STOP')&&code.includes('not physical GPS'),'No claim of GPS positions');
+assert(!code.includes('api-endpoint.mta.info'),'Must never attempt MTA direct browser feeds');
+assert(code.includes('MTA.tripUpdates')&&code.includes('ROUTER.plan'),'Uses official realtime feeds and timetable router');
+assert(code.includes('maplibregl.Map'),'Interactive map present');
+assert(html.includes('subway-map.js')&&html.includes('choice-orchestrator.js'),'Scripts loaded after initial bundles');
+assert(workflow.includes('subway-map.js')&&workflow.includes('choice-orchestrator.js'),'Site deployment includes public enhancements');
+assert(!code.includes('NOUX_PASSPHRASE')&&!code.includes('private.vault.json'),'No secret handling');
+const w={};vm.runInNewContext(code,{window:w,document:{},localStorage:{},Date,Intl,URL,Promise,setInterval(){},MutationObserver:function(){}});
+const d=w.NOUX_SUBWAY.directionName;
+assert.match(d('R16N','R'),/Uptown/,'N platform guidance');
+assert.match(d('R16S','R'),/Downtown/,'S platform guidance');
+assert.match(d('L08N','L'),/terminal|platform/i,'Crosstown service uses final terminus, not generic Uptown');
+assert.match(d('B99','B'),/sign/,'Unknown suffix avoids incorrect compass promise');
+assert.equal(w.NOUX_SUBWAY.install(),false,'Map does not initialise before private data unlock');
+console.log('Subway map PASS: direction guidance, live/feed boundaries, schedule linkage, private-data safety.');
