@@ -67,7 +67,7 @@
     if(!scripts[name])throw Error('Unable to open a part of our itinerary: '+name);
     const el=document.createElement('script');el.textContent=scripts[name]+`\n//# sourceURL=noux-private-${name}`;document.head.appendChild(el);
     if(name==='itinerary.js')attachCentennialParade();
-    if(name==='custom-stops.js'&&window.NOUX_EXPLORER)window.NOUX_EXPLORER.install();
+    if(name==='custom-stops.js'&&window.NOUX_EXPLORER){try{window.NOUX_EXPLORER.install()}catch(_){/* Enhancements never prevent opening the private trip. */}}
    }
    $('root').hidden=false;screen.style.display='none';
    // The password is never persisted, logged or placed in the URL.
