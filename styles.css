@@ -273,7 +273,7 @@ a[class~="photo-credit"] { display:none !important; }
 /* Departure & Bring Home · encrypted personal checklists */
 body.noux-departure-open{overflow:hidden}
 .mainnav .noux-departure-navtab{color:#f0d8b5;border-color:rgba(214,184,139,.35);background:rgba(214,184,139,.08);flex-shrink:0}
-.noux-departure-launcher{display:none;position:fixed;right:max(16px,env(safe-area-inset-right));bottom:max(15px,env(safe-area-inset-bottom));z-index:501;background:#d6b88b;color:#16191f;border:1px solid #f4dbaa;border-radius:24px;box-shadow:0 12px 35px rgba(0,0,0,.36);padding:13px 16px;font-weight:800;font-size:12px;min-height:45px}
+.noux-departure-launcher{display:block;position:fixed;right:max(16px,env(safe-area-inset-right));top:86px;bottom:auto;z-index:501;background:#d6b88b;color:#16191f;border:1px solid #f4dbaa;border-radius:24px;box-shadow:0 12px 35px rgba(0,0,0,.36);padding:13px 16px;font-weight:800;font-size:12px;min-height:45px}
 .noux-departure-modal{position:fixed;inset:0;z-index:1100;overflow:auto;overscroll-behavior:contain;background:radial-gradient(ellipse at top right,rgba(124,85,92,.25),transparent 45%),#10141d;color:#f3ece5}
 .noux-departure-modal[hidden]{display:none!important}
 .noux-departure-scroll{max-width:1080px;margin:0 auto;padding:clamp(18px,4vw,50px) clamp(16px,3vw,35px) 100px}
@@ -333,7 +333,7 @@ body.noux-departure-open{overflow:hidden}
 .noux-departure-rules b{font-size:13px;color:#edd3a9}
 .noux-departure-rules p{font-size:12px;color:#c7c1b9;line-height:1.8}
 @media(max-width:760px){
- .noux-departure-launcher{display:block;bottom:calc(77px + env(safe-area-inset-bottom,0px));right:15px}
+ .noux-departure-launcher{display:block;top:auto;bottom:calc(77px + env(safe-area-inset-bottom,0px));right:15px}
  .noux-departure-navtab{display:none!important}
  .noux-departure-shopgrid{grid-template-columns:1fr}
  .noux-departure-packrow,.noux-departure-legend{grid-template-columns:minmax(0,1fr) 48px 48px}
