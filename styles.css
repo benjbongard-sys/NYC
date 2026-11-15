@@ -152,3 +152,50 @@
 .photo-caption a[href],
 a.photo-credit,
 a[class~="photo-credit"] { display:none !important; }
+
+
+/* NOUX EXPLORER 2026 · POST-UNLOCK DYNAMIC INTERFACE */
+.noux-explorer-launch{position:fixed;right:clamp(14px,2vw,30px);bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:245;background:linear-gradient(115deg,#ebd8b7,#bd9b70);color:#171824;border:1px solid #f5dfba;box-shadow:0 16px 48px rgba(0,0,0,.45),0 0 25px rgba(215,185,136,.18);border-radius:999px;min-height:48px;padding:11px 20px;font-size:12px;font-weight:800;letter-spacing:.07em;transition:transform .22s ease,box-shadow .22s ease}
+.noux-explorer-launch:hover{transform:translateY(-3px);box-shadow:0 19px 55px rgba(0,0,0,.48),0 0 30px rgba(215,185,136,.32)}
+.noux-explorer-drawer[hidden]{display:none!important}
+.noux-explorer-drawer{position:fixed;z-index:246;right:clamp(12px,2vw,30px);bottom:calc(76px + env(safe-area-inset-bottom,0px));width:min(430px,calc(100vw - 24px));max-height:min(78dvh,850px);overflow:auto;overscroll-behavior:contain;padding:24px;background:linear-gradient(145deg,rgba(32,34,43,.98),rgba(14,23,32,.985));border:1px solid rgba(223,195,158,.36);border-radius:20px;box-shadow:0 35px 95px rgba(0,0,0,.66),inset 0 1px rgba(255,255,255,.045);backdrop-filter:blur(24px);animation:noux-rise .32s ease both;color:#f4f0e9}
+@keyframes noux-rise{from{opacity:0;transform:translateY(15px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+.noux-explorer-head{display:flex;align-items:start;gap:10px;justify-content:space-between}
+.noux-explorer-head .noux-kicker{color:#dec19a;font-size:9px;font-weight:750;letter-spacing:.19em;text-transform:uppercase}
+.noux-explorer-head h2{font:italic 29px/1.08 var(--serif,Georgia,serif);margin:10px 0 0;color:#fff1dd}
+.noux-explorer-close{border:1px solid rgba(255,255,255,.19);border-radius:50%;width:38px;min-width:38px;height:38px;color:#fff;background:rgba(255,255,255,.04);font-size:25px;line-height:1}
+.noux-explorer-intro{font-size:11px;color:#c1c6cb;line-height:1.7;margin:11px 0 19px}
+.noux-explorer-now{border:1px solid rgba(222,182,120,.24);background:linear-gradient(120deg,rgba(232,198,142,.11),rgba(24,63,76,.2));padding:13px 15px;border-radius:12px;display:grid;gap:6px;margin-bottom:17px}
+.noux-explorer-now small{color:#d7c0a2;letter-spacing:.14em;font-size:9px;text-transform:uppercase}
+.noux-explorer-now b{font-weight:650;font-size:14px;line-height:1.4}
+.noux-explorer-now .noux-explorer-link{border:0;background:transparent;color:#e3c59c;padding:6px 0;text-align:left;font-size:11px;width:fit-content;text-decoration:underline;text-underline-offset:3px}
+.noux-explorer-modes{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:4px;border-radius:11px;background:rgba(255,255,255,.06);margin-bottom:21px}
+.noux-explorer-modes button{padding:10px 8px;border-radius:8px;border:1px solid transparent;color:#adb5b9;background:transparent;font-size:11px;min-height:40px;font-weight:750}
+.noux-explorer-modes button.is-active{background:rgba(232,205,166,.16);border-color:rgba(232,205,166,.35);color:#f6e6d0}
+.noux-explorer-metric{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.noux-explorer-metric strong{font:30px/1 var(--serif,Georgia,serif);color:#f0d8b5;white-space:nowrap}
+.noux-explorer-metric span{color:#c0c1c2;font-size:10px;line-height:1.35;text-align:right;max-width:150px}
+.noux-explorer-bar{height:5px;margin:10px 0 8px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}
+.noux-explorer-bar>span{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#ac8769,#efd6a4);transition:width .38s ease}
+.noux-explorer-drawer .noux-help{color:#929da6;font-size:10px;line-height:1.55;display:block;margin-top:5px}
+.noux-explorer-drawer h3{font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#e9d5b6;margin:23px 0 10px}
+.noux-explorer-days{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.noux-explorer-days button{border-radius:9px;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.035);padding:12px 4px;min-height:68px;color:#f3eae0;letter-spacing:.02em;font-weight:800;font-size:10px}
+.noux-explorer-days button:hover,.noux-explorer-days button.is-selected{background:rgba(223,195,158,.14);border-color:rgba(223,195,158,.56)}
+.noux-explorer-days button small{display:block;font-size:9px;font-weight:400;color:#aeb5b9;line-height:1.3;margin-top:6px}
+.noux-explorer-radar{display:grid;gap:2px}
+.noux-explorer-wish{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.noux-explorer-wish span{font-size:11px;color:#e4e5e3;line-height:1.45}
+.noux-explorer-wish small{color:#b1a6a2;font-size:9px;white-space:nowrap;text-transform:capitalize}
+.noux-explorer-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:19px}
+.noux-explorer-actions button{min-height:43px;padding:10px;border-radius:9px;font-size:11px;font-weight:750;border:1px solid rgba(234,209,175,.35)}
+.noux-explorer-primary{color:#192029;background:linear-gradient(120deg,#e7cfaa,#bfa47f)}
+.noux-explorer-secondary{color:#ecd7ba;background:rgba(255,255,255,.055)}
+@media(max-width:600px){
+ .noux-explorer-launch{right:15px;bottom:calc(12px + env(safe-area-inset-bottom,0px));padding:10px 17px;font-size:11px;min-height:45px}
+ .noux-explorer-drawer{left:0;right:0;bottom:0;width:100%;max-height:min(86dvh,930px);border-radius:20px 20px 0 0;border-bottom:0;padding:20px 17px calc(23px + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 65px rgba(0,0,0,.7)}
+ .noux-explorer-days{gap:4px}
+ .noux-explorer-days button{padding:10px 2px;font-size:9px}
+}
+@media(max-height:490px) and (orientation:landscape){.noux-explorer-drawer{max-height:93dvh;padding-top:12px}.noux-explorer-head h2{font-size:24px}}
+@media(prefers-reduced-motion:reduce){.noux-explorer-drawer{animation:none}.noux-explorer-launch{transition:none}.noux-explorer-bar>span{transition:none}}
