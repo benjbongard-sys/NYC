@@ -31,6 +31,7 @@ vm.runInNewContext(script,env,{filename:'choice-orchestrator.js'});
 const app=env.window.NOUX_CHOICES;
 assert.equal(app.install(),true);
 assert(choices[0].options.some(x=>x[0]==='all'),'All activities option appears in decision card');
+assert(choices.some(c=>c.id==='c11'&&c.options.some(x=>x[0]==='wed')&&c.options.some(x=>x[0]==='fri')&&c.options.some(x=>x[0]==='skip')),'Sunrise can be scheduled once, swapped to Friday, or skipped');
 const mins=t=>Number(t.slice(0,2))*60+Number(t.slice(3));
 function assertClean(day,c){
  const list=env.window.NYC_PLAN.day(day,c);
