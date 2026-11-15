@@ -65,7 +65,7 @@ jobs:
           MTA_PROXY_URL: ${{ vars.MTA_PROXY_URL || 'https://noux-mta-live.benjbongard.workers.dev' }}
         run: |
           mkdir -p _site
-          cp index.html unlock.js explorer.js styles.css manifest.webmanifest robots.txt .nojekyll _site/
+          cp index.html unlock.js explorer.js venues.js styles.css manifest.webmanifest robots.txt .nojekyll _site/
           cp -a lib assets _site/
           node -e 'require("fs").writeFileSync("_site/worker-config.js", "window.NYC_MTA_PROXY_URL = " + JSON.stringify(process.env.MTA_PROXY_URL || "") + ";\n")'
           python scripts/check_public.py
