@@ -142,9 +142,40 @@ function shopItem(row){
  actions.append(checkbox(row.packed,v=>{row.packed=v;save();render()},'Packed'));
  if(row.url&&/^https:\/\//i.test(row.url)){const site=el('a','noux-departure-link','Official shop');site.href=row.url;site.target='_blank';site.rel='noopener noreferrer';actions.append(site)}
  if(row.address){const link=el('a','noux-departure-link','Directions');link.href='https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(row.address);link.target='_blank';link.rel='noopener noreferrer';actions.append(link)}
+ actions.append(btn('Find shops live',()=>findLiveShops(row.name,row.day,row.shop),'noux-departure-tiny'));
  actions.append(btn('Edit',()=>{EDIT=row.id;render()},'noux-departure-tiny'));
  if(row.custom)actions.append(btn('Remove',()=>{STATE.items=STATE.items.filter(x=>x.id!==row.id);EDIT=null;save();render()},'noux-departure-tiny'));
  wrap.append(actions);return wrap;
+}
+function routeArea(day){
+ const wanted=day||'fri';
+ const areas={
+  mon:'Times Square Midtown Manhattan New York',
+  tue:'Chelsea or Upper West Side Manhattan New York',
+  wed:'SoHo or Meatpacking Manhattan New York',
+  thu:'Meatpacking or Chelsea Manhattan New York',
+  fri:'Times Square or Grand Central Manhattan New York',
+  any:'Midtown Manhattan New York'
+ };
+ return areas[wanted]||areas.any;
+}
+function recommendedDay(title,store){
+ const t=String(title+' '+(store||'')).toLowerCase();
+ if(/zabar|upper west|amnh|butterfl|coffee bean|bagel/.test(t))return 'tue';
+ if(/nypl|public library|moma|museum|art print|book|strand|whitney|brooklyn|vintage|soho/.test(t))return 'wed';
+ if(/chelsea|high line|trader joe|seasoning|spice|vinyl/.test(t))return 'tue';
+ if(/le bain|meatpacking|rooftop/.test(t))return 'thu';
+ return 'fri'; // Final shopping cluster is near the Midtown hotel.
+}
+function findLiveShops(item,day,shop){
+ const title=String(item||'').trim();if(!title){NOTE='Enter the item you want to find first.';updateNote();return}
+ const area=routeArea(day||recommendedDay(title,shop));
+ const query=title+' '+(String(shop||'').trim()||'shop')+' near '+area;
+ const url='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(query);
+ // This opens fresh Google Maps results and current publicly displayed opening
+ // information on user click, not a stock guarantee or autonomous web search.
+ const opened=window.open(url,'_blank','noopener,noreferrer');
+ if(!opened){NOTE='Allow the shop search popup or open Google Maps separately.';updateNote()}
 }
 function makeForm(){
  const record=EDIT?STATE.items.find(x=>x.id===EDIT):null;
@@ -157,6 +188,15 @@ function makeForm(){
  const shop=el('input');shop.placeholder='Preferred shop (optional)';shop.maxLength=150;shop.value=record?(record.shop||''):'';
  const url=el('input');url.placeholder='Official shop URL (optional, https://)';url.maxLength=500;url.value=record?(record.url||''):'';
  fields.append(name,recipient,day,shop,url);form.append(fields);
+ const discovery=el('div','noux-departure-add-discovery');
+ discovery.append(btn('Suggest best day',()=>{
+  const suggested=recommendedDay(name.value,shop.value);
+  day.value=suggested;Array.from(day.children).forEach(opt=>opt.selected=opt.value===suggested);
+  NOTE='Suggested '+(day.selectedOptions[0]?.textContent||suggested)+' based on the current itinerary. Check the actual shop before travelling.';updateNote();
+ },'noux-departure-action'));
+ discovery.append(btn('Find shops live',()=>findLiveShops(name.value,day.value,shop.value),'noux-departure-action'));
+ discovery.append(el('small',null,'Live Google Maps shop search opens in a new tab. Recommendations are route-based, not verified inventory or reservations.'));
+ form.append(discovery);
  const actions=el('div','noux-departure-actions');
  const submit=el('button','noux-departure-primary',record?'Save changes':'+ Add to souvenirs');submit.type='submit';actions.append(submit);
  if(record)actions.append(btn('Cancel',()=>{EDIT=null;render()},'noux-departure-action'));
@@ -268,5 +308,5 @@ async function install(options){
  mount();
  return true;
 }
-window.NOUX_DEPARTURE={install,version:'2026.11.15-encrypted-v1'};
+window.NOUX_DEPARTURE={install,version:'2026.11.15-encrypted-v2'};
 })();
