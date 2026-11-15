@@ -290,6 +290,20 @@ async function exportFile(){
   NOTE='Encrypted file exported; transfer it privately to your other device.';updateNote();
  }catch(err){NOTE='Unable to export; check browser download permissions.';updateNote()}
 }
+async function getSharedSnapshot(){
+ if(!STATE||!KEY)return null;
+ await SAVING;
+ return JSON.parse(JSON.stringify(STATE));
+}
+async function applySharedSnapshot(remote){
+ if(!STATE||!KEY||!remote||typeof remote!=='object')return false;
+ const candidate=normalise(JSON.parse(JSON.stringify(remote)));
+ if(JSON.stringify(candidate)===JSON.stringify(STATE))return true;
+ STATE=candidate;
+ await save();
+ if(OPEN)render();
+ return true;
+}
 async function install(options){
  if(MOUNTED)return true;
  if(!options||!options.key||!crypto||!crypto.subtle)return false;
@@ -307,5 +321,5 @@ async function install(options){
  mount();
  return true;
 }
-window.NOUX_DEPARTURE={install,whenSaved:()=>SAVING,version:'2026.11.16-react-safe'};
+window.NOUX_DEPARTURE={install,whenSaved:()=>SAVING,getSharedSnapshot,applySharedSnapshot,version:'2026.11.16-cross-device'};
 })();
