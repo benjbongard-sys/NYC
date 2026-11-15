@@ -82,3 +82,66 @@
 /* Travel-first interface: clean connection and image treatments. */
 .connection-summary{display:flex;align-items:center;gap:15px;border:1px solid rgba(202,174,129,.25);background:linear-gradient(115deg,rgba(214,184,139,.085),rgba(65,88,105,.09));padding:17px 20px;border-radius:13px;margin:20px 0 15px}.connection-summary strong{color:#f7e7d0;font-size:15px}.connection-summary .sub{margin:5px 0 0}.connection-light{width:12px;height:12px;border-radius:50%;flex:0 0 12px}.connection-light.connected{background:#92d7b6;box-shadow:0 0 0 5px rgba(146,215,182,.12),0 0 18px rgba(146,215,182,.2)}.connection-light.disconnected{background:#d8ae80;box-shadow:0 0 0 5px rgba(216,174,128,.12)}
 .advanced-settings{border:1px solid rgba(223,195,158,.20);border-radius:12px;padding:0 17px;margin-top:12px;background:rgba(255,255,255,.019)}.advanced-settings>summary{cursor:pointer;padding:16px 0;list-style:none;color:#d9cabc;font-size:12px;font-weight:700;letter-spacing:.03em;display:flex;align-items:center;justify-content:space-between}.advanced-settings>summary::-webkit-details-marker{display:none}.advanced-settings>summary:after{content:'+';font-size:20px;font-weight:400;color:var(--warm)}.advanced-settings[open]>summary:after{content:'−'}.advanced-settings[open]>summary{border-bottom:1px solid rgba(223,195,158,.17);margin-bottom:15px}.advanced-settings>.sub{margin:0 0 17px}.advanced-settings>.field{display:block;margin-bottom:9px}.advanced-settings .settings-actions{margin:12px 0 17px}.no-photo span{font-size:24px;opacity:.75}.no-photo b{max-width:28ch;font:italic 20px var(--serif);letter-spacing:normal;text-transform:none}.photo-caption>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px}.photo-caption>a{white-space:nowrap;font-size:9px}.settings-strip{font-size:11px;color:#bcb1a5}.route-leave-by{font-weight:600}.live-grid .error-box{border-left:3px solid #c7a67d}
+
+
+/* MOBILE POLISH — 15 NOV 2026: reliable touch layout, short-screen unlock, no dialog clipping. */
+@media (max-width: 760px) {
+  .topbar { display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:8px 10px; min-height:0; padding:8px 12px 7px; }
+  .topbar .brand { order:unset; grid-column:1; grid-row:1; min-width:0; margin:0; gap:8px; }
+  .topbar .brand-emblem { flex:0 0 34px; }
+  .topbar .brand b { font-size:12px; letter-spacing:.15em; }
+  .topbar .brand small { font-size:7px; letter-spacing:.10em; }
+  .topbar .top-tools { order:unset; grid-column:2; grid-row:1; margin:0; gap:6px; }
+  .topbar .mainnav { order:unset; grid-column:1/-1; grid-row:2; flex-basis:auto; min-width:0; width:100%; overflow-x:auto; overscroll-behavior-x:contain; scrollbar-width:none; padding:2px 0 4px; }
+  .topbar .mainnav button { flex:0 0 auto; min-height:42px; padding:10px 12px; }
+  .topbar .top-tools .time-now {display:none}
+  .topbar .top-tools .search-open { width:40px; height:40px; font-size:0; display:grid;place-items:center; padding:0; }
+  .topbar .top-tools .search-open::before {content:'⌕';font-size:23px;line-height:1;}
+  .topbar .top-tools .top-add-stop { width:42px; height:40px; padding:0!important; font-size:0!important; display:grid;place-items:center;}
+  .topbar .top-tools .top-add-stop::before { content:'+'; font-size:24px; font-weight:700; line-height:1;}
+  .topbar .top-tools .settings-button {width:40px;height:40px;flex:0 0 40px;}
+}
+@media (max-width:360px){
+  .topbar {padding-inline:9px;gap:5px}
+  .brand small {display:none!important}
+  .topbar .mainnav button {font-size:10px;min-height:42px; padding-inline:11px}
+}
+/* The whole modal must remain inside the viewport, including editor buttons and iOS safe areas. */
+.modal-overlay {grid-template-columns:minmax(0,1fr); padding:clamp(8px,2vw,18px); max-width:100vw; max-height:100dvh;}
+.modal-overlay > .modal {min-width:0; max-width:100%; box-sizing:border-box;}
+.modal-overlay > .stop-editor {width:min(860px,100%);max-width:100%;max-height:calc(100dvh - 18px);overscroll-behavior:contain;}
+@media (max-width:560px){
+  .modal-overlay > .stop-editor {padding:18px 14px;}
+  .stop-editor .settings-actions {bottom:-18px;flex-wrap:wrap;}
+  .stop-editor .settings-actions button {white-space:normal;min-height:44px;}
+  .stop-editor .modal-head h2 {font-size:clamp(27px,8vw,37px);line-height:1.05;}
+}
+/* Landscape and keyboard-friendly unlocking: never cut off password or submit control. */
+.lock-screen {overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;align-items:safe center;padding:8px 0;}
+.lock-card {margin-block:auto;}
+@media (max-height:480px) and (orientation:landscape){
+  .lock-screen {align-items:start;padding:6px 10px;}
+  .lock-card {width:min(710px,100%); margin:auto; padding:9px 22px 12px;}
+  .lock-ornament {font-size:22px;letter-spacing:.14em;}
+  .lock-ornament span {font-size:13px;vertical-align:4px;margin-inline:3px;}
+  .lock-eyebrow {font-size:8px;margin:5px 0 3px;}
+  .lock-card h1 {font-size:27px;margin:3px 0 7px;}
+  .lock-intro {display:none;}
+  .lock-card label {font-size:9px;margin:4px 0;}
+  .password-control {min-height:40px;}
+  .password-control input {padding:9px 12px;}
+  .unlock-submit {margin-top:7px;padding:10px 14px;}
+  .unlock-message {margin:7px 0 5px;min-height:15px;font-size:10px;}
+  .lock-footer {display:none;}
+}
+/* Fingers and iOS forms: 44px touch targets and no unexpected Safari input zoom. */
+@media (max-width:760px){
+  .topbar .mainnav button {min-height:44px;}
+  .topbar .top-tools .search-open,
+  .topbar .top-tools .top-add-stop,
+  .topbar .top-tools .settings-button {width:44px;height:44px;min-width:44px;}
+  .modal-head button {min-width:44px;min-height:44px;}
+  .mainnav,.daytabs{-webkit-overflow-scrolling:touch;}
+  input,select,textarea{font-size:16px!important;}
+  button{touch-action:manipulation;}
+}
