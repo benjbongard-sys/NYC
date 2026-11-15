@@ -35,8 +35,11 @@ function monday(rows){const cruise=rows.find(e=>e.id==='cruise'||(/cruise/i.test
 function thursday(rows){for(let i=rows.length-1;i>=0;i--){const e=rows[i];if(!hard(e)&&e.kind==='travel'&&minute(e.start)<540&&/parade/i.test((e.id||'')+' '+(e.title||'')))rows.splice(i,1)}
  const parade=rows.find(e=>/macy.{0,28}parade|thanksgiving.{0,24}parade/i.test(e.title||'')&&e.kind!=='travel');
  if(parade&&!hard(parade)&&minute(parade.start)<555){parade.start='09:40';parade.end='11:15';parade.detail=String(parade.detail||'')+' Relaxed public viewing near Sixth Avenue; no front-row guarantee. NYPD barriers may restrict crossing.'}
- if(parade&&!rows.some(e=>e.id==='centennial_parade_walk'||e.id==='audited_parade_walk')){
-  const x=item('audited_parade_walk','09:15','09:40','Walk to Sixth Avenue · Thanksgiving viewing','centennial_parade','Crowds and barriers may require a different walking approach.','travel');propose(rows,x)
+ if(parade)parade.auditAnchor=true;
+ const existingWalk=rows.find(e=>e.id==='centennial_parade_walk'||e.id==='audited_parade_walk');
+ if(existingWalk)existingWalk.auditAnchor=true;
+ if(parade&&!existingWalk){
+  const x=item('audited_parade_walk','09:15','09:40','Walk to Sixth Avenue · Thanksgiving viewing','centennial_parade','Crowds and barriers may require a different walking approach.','travel');x.auditAnchor=true;propose(rows,x)
  }
  return rows}
 function friday(rows){const pickup=rows.find(e=>e.id==='pickup'||(/airport transfer|airport pickup/i.test(e.title||'')&&e.kind==='logistics'));
