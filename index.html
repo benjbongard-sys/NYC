@@ -1,19 +1,28 @@
 <!doctype html>
 <html lang="en"><head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#10141d"><meta name="robots" content="noindex, nofollow, noarchive"><meta name="description" content="Ben & Lyna · A curated interactive New York itinerary, 23–27 November 2026.">
-<title>New York, our way · Ben × Lyna</title>
-<link rel="manifest" href="./manifest.webmanifest"><link rel="icon" href="./assets/nyx-icon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="./styles.css">
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<!-- Leaflet is optional. When it cannot load, the route remains navigable as a list. -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
-<script src="./lib/react.min.js" defer></script><script src="./lib/react-dom.min.js" defer></script>
-<script src="./data.js" defer></script><script src="./itinerary.js" defer></script><script src="./mta.js" defer></script><script src="./photo-sources.js" defer></script>
-<script src="./assets/photo-index.js" defer></script>
-<script defer>window.NYC_BASE=new URL('./',location.href).href;</script>
-<script src="./app.js" defer></script>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#070e17"><meta name="robots" content="noindex,nofollow,noarchive,nosnippet"><meta name="referrer" content="no-referrer">
+<meta name="description" content="A private NYC experience · unlock to enter."><title>NOUX · Private Edition</title>
+<link rel="icon" href="./assets/nyx-icon.svg" type="image/svg+xml"><link rel="stylesheet" href="./styles.css">
+<link rel="stylesheet" href="./lib/leaflet.css">
+<script src="./lib/leaflet.js" defer></script>
+<script src="./lib/react.min.js" defer></script><script src="./lib/react-dom.min.js" defer></script><script src="./assets/photo-index.js" defer></script><script src="./worker-config.js" defer></script><script src="./unlock.js" defer></script>
 </head><body>
-<div id="root"><div style="min-height:100vh;display:grid;place-items:center;background:#10141d;color:#d6b88b;font:22px Georgia,serif">New York, our way. ✦</div></div>
-<noscript>This interactive trip planner requires JavaScript.</noscript>
+<main class="lock-screen" id="lock-screen" aria-labelledby="lock-title">
+ <div class="lock-photo" aria-hidden="true"></div><div class="lock-sky" aria-hidden="true"></div>
+ <div class="lock-grain" aria-hidden="true"></div><div class="lock-stars" id="lock-stars" aria-hidden="true"></div>
+ <div class="lock-gates" aria-hidden="true"><div class="gate-left"></div><div class="gate-right"></div></div>
+ <section class="lock-card" id="lock-card">
+  <div class="lock-ornament">N<span>✦</span> X</div>
+  <p class="lock-eyebrow">A PRIVATE NEW YORK COLLECTION</p>
+  <h1 id="lock-title">The city is <em>ours.</em></h1>
+  <p class="lock-intro">A journey curated for two. Enter the private passphrase to reveal the itinerary.</p>
+  <form id="unlock-form" autocomplete="off"><label for="unlock-pass">OUR PRIVATE PASSPHRASE</label><div class="password-control"><input id="unlock-pass" type="password" name="passphrase" autocomplete="off" spellcheck="false" placeholder="Enter the secret phrase…" minlength="8" required><button type="button" id="toggle-visibility" aria-label="Show or hide passphrase">◉</button></div><button type="submit" class="unlock-submit" id="unlock-submit"><span>Unlock our New York</span><span aria-hidden="true">↗</span></button></form>
+  <div class="unlock-message" id="unlock-message" role="status" aria-live="polite">Encrypted locally in your browser; no password is sent to a server.</div>
+  <div class="lock-progress"><span id="unlock-bar"></span></div>
+  <p class="lock-footer">NOUX PRIVATE EDITION <span>•</span> NEW YORK</p>
+ </section>
+ <div class="unlock-message-big" id="unlock-welcome" aria-hidden="true">Welcome to <em>our New York.</em></div>
+</main>
+<div id="root" hidden></div>
+<noscript>This website requires JavaScript to unlock the encrypted programme.</noscript>
 </body></html>

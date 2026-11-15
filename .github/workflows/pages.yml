@@ -1,4 +1,4 @@
-name: Build, download verified photographs, and publish NYC planner
+name: Publish encrypted NOUX planner with verified photography
 on:
   push:
     branches: [main]
@@ -21,42 +21,38 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Build self-hosted React 18 bundles
+      - name: Bundle React dependencies without storing private itinerary source
         run: |
           npm install --no-audit --no-fund --ignore-scripts
-          npm test
           mkdir -p lib
           cp node_modules/react/umd/react.production.min.js lib/react.min.js
           cp node_modules/react-dom/umd/react-dom.production.min.js lib/react-dom.min.js
+          cp node_modules/leaflet/dist/leaflet.js lib/leaflet.js
+          cp node_modules/leaflet/dist/leaflet.css lib/leaflet.css
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - name: Install image validator
         run: pip install Pillow==11.3.0
-      - name: Download and bundle real place photos
+      - name: Fetch and validate original venue photography
         run: python scripts/fetch_photos.py
-      - name: Report photo integrity
-        run: |
-          python - <<'PY'
-          import json
-          p=json.load(open('assets/photo-index.json'))
-          ok=[k for k,v in p.items() if v.get('path')]
-          print('Bundled and validated photo IDs:',', '.join(ok))
-          assert len(ok)>=8,'Less than 8 usable photos; no pictureless publication'
-          PY
-      - name: Collect only public website assets (never publish Git metadata or development scripts)
+      - name: Construct publication package with encrypted itinerary ONLY
+        env:
+          MTA_PROXY_URL: ${{ vars.MTA_PROXY_URL }}
         run: |
           mkdir -p _site
-          cp index.html styles.css app.js data.js itinerary.js mta.js photo-sources.js manifest.webmanifest .nojekyll _site/
+          cp index.html unlock.js styles.css manifest.webmanifest robots.txt .nojekyll _site/
           cp -a lib assets _site/
-          printf 'Unzip this folder and open index.html. Real photographs are bundled locally.\n' > _site/START_HERE.txt
-          echo "Contents of the deployed website:" && find _site -maxdepth 3 -type f | sort | head -60
-      - name: Preserve complete photo-built website even when Pages is not yet enabled
+          node -e 'require("fs").writeFileSync("_site/worker-config.js", "window.NYC_MTA_PROXY_URL = " + JSON.stringify(process.env.MTA_PROXY_URL || "") + ";\n")'
+          python scripts/check_public.py
+          echo 'Encrypted website assets:'
+          find _site -maxdepth 2 -type f | sort | head -70
+      - name: Save independent fully illustrated offline artifact
         uses: actions/upload-artifact@v4
         with:
-          name: nyc-lyna-photographic-website
+          name: noux-private-nyc-site
           path: _site
-          retention-days: 14
+          retention-days: 7
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
