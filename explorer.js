@@ -11,7 +11,7 @@
   {id:'met',phrases:['the met','metropolitan museum','islamic art','costume art'],kind:'museum',minutes:65,min:42,hours:[600,1020],days:['tue','fri'],weight:85},
   {id:'whitney',phrases:['whitney','minnie evans'],kind:'museum',minutes:65,min:42,hours:[630,1080],days:['wed','fri'],weight:88},
   {id:'housingworks',phrases:['housing works'],kind:'culture',minutes:42,min:26,hours:[660,1140],days:['mon','tue','wed','fri'],weight:82},
-  {id:'roughtrade',phrases:['rough trade','vinyl'],kind:'shopping',minutes:38,min:25,hours:[600,1200],days:['mon','tue','wed','fri'],weight:72},
+  {id:'roughtrade',phrases:['rough trade'],kind:'shopping',minutes:38,min:25,hours:[600,1200],days:['mon','tue','wed','fri'],weight:72},
   {id:'topofrock',phrases:['top of the rock'],kind:'view',minutes:48,min:35,hours:[540,1260],days:['mon','tue','wed','fri'],weight:83},
   {id:'ballooninflation',phrases:['balloon inflation','macy balloons','thanksgiving balloon'],kind:'event',minutes:60,min:55,hours:[780,1080],days:['wed'],weight:75,publicEvent:true},
   {id:'bamharvey',phrases:['la distance','bam'],kind:'theatre',minutes:85,min:85,hours:[1170,1255],days:['wed'],fixed:1170,weight:98,alwaysSuggest:true},
@@ -117,7 +117,7 @@
    if(c.publicEvent)note='Viewing arrangements and exact access hours must be verified with the organiser.';
    var status=c.kind==='museum'||c.kind==='theatre'||c.kind==='view'?'ticket-to-check':'hours-to-check';
    if(c.id==='littleisland')status='proposed';
-   events.push({id:'explore_'+day+'_'+c.id,start:clock(best.start),end:clock(best.end),title:(loc.name||String(w[0]||'Extra stop'))+' · wish-list pick',place:c.id,kind:c.kind,detail:note,status:status});
+   events.push({id:'explore_'+day+'_'+c.id,start:clock(best.start),end:clock(best.end),title:(loc.name||String(w[0]||'Extra stop'))+(matched(c).length?' · wish-list pick':' · suggested addition'),place:c.id,kind:c.kind,detail:note,status:status});
    used.add(c.id);
    return true;
   }
