@@ -207,8 +207,9 @@
   }
   if(day==='fri'){
    if(e.id==='breakfast'){
-    const v=assign(e,'friedmans',"Friedman's Edison · breakfast before checkout",'228 West 47th Street. Quick breakfast with bags packed; return for luggage and the operator-confirmed pickup. No table reserved.','food','proposed');
-    v.end=minutes(e.start)>9*60?'10:05':'09:25';return [v];
+    const hotel=DATA.P.sanctuary?'sanctuary':DATA.P.hotel?'hotel':e.place;
+    const v=assign(e,hotel,'Hotel breakfast · buffet available 07:00–10:00','Breakfast is included and available each day from 07:00 to 10:00. Suggested 09:00–09:35 on departure day, leaving time for checkout and sightseeing.','food','proposed');
+    v.start='09:00';v.end='09:35';return [v];
    }
    if(e.id==='walk'&&c.c8==='rest')return [assign(e,'cultureEspresso','Culture Espresso → Bryant Park','72 West 38th Street. Coffee and the park, then collect bags before the transfer.','walk','proposed')];
    if(e.id==='walk'&&c.c8==='rockefeller'){
