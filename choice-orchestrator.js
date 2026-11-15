@@ -153,6 +153,7 @@ function wedPlaces(){
   westlight:{name:'Westlight · Williamsburg rooftop',address:'111 N 12th St, Brooklyn, NY 11249, USA',area:'Williamsburg',lat:40.7222,lng:-73.9597,kind:'cocktail',url:'https://www.westlightnyc.com/'},
   superiorIngredients:{name:'Superior Ingredients · The Room',address:'74 Wythe Ave, Brooklyn, NY 11249, USA',area:'Williamsburg',lat:40.72232,lng:-73.95782,kind:'club',url:'https://www.si-bk.com/shows'},
   washingtonSquare:{name:'Washington Square Park',address:'Washington Square, New York, NY 10012, USA',area:'Greenwich Village',lat:40.7308,lng:-73.9973,kind:'park',url:'https://www.nycgovparks.org/parks/washington-square-park'},
+  frenchetteWhitney:{name:'Frenchette Café at the Whitney',address:'99 Gansevoort St, New York, NY 10014, USA',area:'Meatpacking',lat:40.7396,lng:-74.0089,kind:'food',url:'https://whitney.org/visit/dining'},
   danteWest:{name:'Dante West Village · cocktails and dinner',address:'551 Hudson St, New York, NY 10014, USA',area:'West Village',lat:40.7356,lng:-74.0064,kind:'restaurant',url:'https://www.dante-nyc.com/location/dante-nyc/'},
   domino:{name:'Domino Park · waterfront',address:'15 River St, Brooklyn, NY 11249, USA',area:'Williamsburg',lat:40.7154,lng:-73.9682,kind:'walk',url:'https://www.dominopark.com/'}
  };
@@ -197,11 +198,22 @@ function planWednesdayExperience(orig,choices){
   if(isProtected(x))return true;
   if(/^(?:custom|user)_/.test(String(x.id||'')))return true;
   // Retain the morning and lunch. Rebuild only the optional afternoon/night.
-  return minutes(x.end)<=14*60 && minutes(x.start)<14*60 &&
+  return !(mode==='manhattan'&&['lunch','art_wed_lunch'].includes(x.id)) && minutes(x.end)<=14*60 && minutes(x.start)<14*60 &&
    !/^(?:explore_wed_(?:bamharvey|maisonpremiere|westlight)|explore_walk_wed_)/.test(String(x.id||'')) &&
    !['vintage','vintage_stella','domino','hotel','hotel_view'].includes(x.id);
  });
  const out=sorted(keep.slice()),deferred=[];
+ const artMorning=out.some(x=>x.id==='art_wed_moma');
+ if(!artMorning){
+  const set=(id,start,finish)=>{const x=out.find(v=>v.id===id&&!isProtected(v));if(x){x.start=start;x.end=finish}};
+  set('late','09:15','09:45');
+  set('library','10:00','10:35');
+  set('snfl','10:40','11:00');
+  if(mode!=='manhattan')set('lunch','13:05','13:40');
+ }else if(mode!=='manhattan'){
+  const lunch=out.find(x=>x.id==='art_wed_lunch'&&!isProtected(x));if(lunch){lunch.start='13:15';lunch.end='13:45'}
+ }
+ sorted(out);
  if(attendBAM&&!effectiveBAM)deferred.push({title:'BAM · La Distance at 19:30',reason:'Conflicts with confirmed '+bamClash.title+'; theatre and transfer postponed rather than deleting a booking'});
  const add=item=>{
   const clash=out.find(x=>timeClash(item,x));
@@ -215,25 +227,38 @@ function planWednesdayExperience(orig,choices){
  const slot=(id,start,end,title,place,detail,kind='experience',status='proposed')=>add(e(id,start,end,title,place,detail,kind,status));
  const transit=(id,start,end,title,place,detail)=>slot(id,start,end,title,place,detail+' Allow for NYC traffic, subway waits and station access; follow live MTA directions.','travel');
  if(mode==='manhattan'){
-  slot('wed_whitney','14:25','15:40','Whitney Museum · art and the Meatpacking waterfront','whitney','99 Gansevoort Street. Reserve admission; adjust if you prefer another Manhattan gallery.','museum','ticket-to-check');
-  slot('wed_little_island','15:52','16:17','Little Island · Hudson River walk','littleIsland','Pier 55. Outdoor public park; weather-dependent.','walk');
-  slot('wed_west_village','16:30','17:00','West Village · Bleecker and Christopher Streets','westVillage','Neighbourhood walk and small independent shops; time for a relaxed evening.','walk');
-  if(choices.c3!=='rest')slot('wed_dante','17:15',effectiveBAM?'17:55':'18:15','Dante West Village · dinner and cocktails','danteWest','551 Hudson Street, a named West Village restaurant near the afternoon trail. Suggested table; not reserved.','food','hours-to-check');
+  // Walk progressively south-west: Midtown library → Whitney (lunch on site)
+  // → Hudson waterfront → West Village. No Lower East Side lunch detour.
+  const across=artMorning?['12:40','13:20']:['11:10','11:50'];
+  transit('wed_to_whitney',across[0],across[1],'Midtown → Whitney · downtown subway','whitney','Go directly towards Meatpacking, without crossing to the Lower East Side.');
+  slot('wed_frenchette',artMorning?'13:25':'11:55',artMorning?'14:00':'12:35','Frenchette Café · lunch inside the Whitney','frenchetteWhitney','99 Gansevoort Street. A real café in the museum building; weekday service verified, no table booked.','food','hours-to-check');
+  slot('wed_whitney',artMorning?'14:05':'12:40',artMorning?'15:20':'14:00','Whitney Museum · selected exhibitions and terrace','whitney','99 Gansevoort Street. Focused 75–80-minute art visit; entry not booked.','museum','ticket-to-check');
+  slot('wed_little_island',artMorning?'15:30':'14:10',artMorning?'15:55':'14:35','Little Island · 25-minute Hudson River walk','littleIsland','Pier 55, immediately north of the Whitney. Weather-dependent.','walk');
+  slot('wed_west_village',artMorning?'16:10':'14:50',artMorning?'16:40':'15:30','West Village · Bleecker and Christopher Streets','westVillage','Independent shops and neighbourhood atmosphere as we continue north and east.','walk');
+  if(choices.c3!=='rest')slot('wed_dante',artMorning?'17:00':'16:00',artMorning?(effectiveBAM?'17:55':'18:05'):'17:05','Dante West Village · dinner and cocktails','danteWest','551 Hudson Street. A named local restaurant; booking and holiday-week hours to verify.','food','hours-to-check');
  }else{
+  // Brooklyn-focused alternative: Lower Manhattan lunch then only one crossing.
+  if(artMorning){
+   transit('wed_to_golden','12:40','13:15','Midtown → Golden Diner · downtown transfer','golden','Allow the actual southbound subway journey instead of a 20-minute guess.');
+  }else{
+   transit('wed_to_housing','11:05','11:45','Midtown → SoHo · downtown subway','housingworks','Travel towards Crosby Street.');
+   slot('wed_housingworks','11:50','12:20','Housing Works Bookstore · books and vinyl','housingworks','126 Crosby Street. Open Wednesday from 11:00; 30 minutes is sufficient for browsing.','shopping');
+   transit('wed_to_golden','12:20','13:00','SoHo → Golden Diner · downtown transfer','golden','Allow for Lower Manhattan streets, station access and queues.');
+  }
   const vintage=mode==='williamsburg_vintage';
   if(vintage){
-   transit('wed_to_brooklyn','13:45','14:20','Manhattan → Williamsburg · subway transfer','awoke','Travel towards Bedford Avenue and the vintage shops.');
-   slot('wed_awoke','14:25','14:45','Awoke Vintage · browse','awoke','132 North 5th Street. Optional vintage stop.','shopping');
-   slot('wed_stella','14:52','15:12','10 ft Single by Stella Dallas · vintage','stella','285 North 6th Street. A short second vintage stop.','shopping');
-   transit('wed_to_domino','15:12','15:35','Walk to Domino Park','domino','Walk south and west through Williamsburg.');
-   slot('wed_domino','15:35','15:55','Domino Park · Manhattan skyline in daylight','domino','East River waterfront; sunset is approximately 16:31 on this date.','walk');
-   transit('wed_to_westlight','15:55','16:15','Domino Park → Westlight · walk north','westlight','Allow about 25 minutes for the waterfront-to-rooftop transfer.');
+   transit('wed_to_brooklyn','13:55','14:30','Lower Manhattan → Williamsburg · subway transfer','awoke','Travel towards Bedford Avenue and the vintage shops.');
+   slot('wed_awoke','14:35','14:55','Awoke Vintage · 20-minute browse','awoke','132 North 5th Street. Short first vintage stop.','shopping');
+   slot('wed_stella','15:02','15:20','10 ft Single by Stella Dallas · vintage','stella','285 North 6th Street. Short second vintage stop.','shopping');
+   transit('wed_to_domino','15:20','15:40','Walk to Domino Park','domino','Walk south and west through Williamsburg.');
+   slot('wed_domino','15:40','16:00','Domino Park · skyline photographs','domino','Twenty minutes by the East River before sunset at about 16:31.','walk');
+   transit('wed_to_westlight','16:00','16:20','Domino Park → Westlight · walk north','westlight','Allow time for the waterfront-to-rooftop transfer.');
   }else{
-   transit('wed_to_brooklyn','14:15','14:55','Manhattan → Williamsburg · subway transfer','domino','Leave time for the transfer to the East River waterfront.');
+   transit('wed_to_brooklyn','14:15','14:55','Lower Manhattan → Williamsburg · subway transfer','domino','Leave time for the transfer to the East River waterfront.');
    slot('wed_domino','15:00','15:25','Domino Park · Manhattan skyline in daylight','domino','East River waterfront; sunset is approximately 16:31 on this date.','walk');
    transit('wed_to_westlight','15:25','16:05','Domino Park → Westlight · walk north','westlight','Allow a generous transfer to the William Vale rooftop.');
   }
-  slot('wed_westlight',vintage?'16:15':'16:05',vintage?'17:05':'17:00','Westlight · sunset skyline cocktails','westlight','111 North 12th Street. Opens from 16:00 on Wednesdays; seats, weather and holiday schedule unconfirmed. This is not a confirmed DJ night.','cocktail','hours-to-check');
+  slot('wed_westlight',vintage?'16:20':'16:05',vintage?'17:05':'17:00','Westlight · sunset skyline cocktails','westlight','111 North 12th Street. Opens from 16:00 on Wednesdays; seats, weather and holiday schedule unconfirmed. This is not a confirmed DJ night.','cocktail','hours-to-check');
   transit('wed_to_oysters',vintage?'17:05':'17:00',vintage?'17:25':'17:20','Westlight → Maison Premiere · walk','maisonPremiere','Allow approximately 20 minutes south towards Bedford Avenue.');
   slot('wed_oysters',vintage?'17:25':'17:20',effectiveBAM?'18:05':'18:35','Maison Premiere · oysters and cocktails','maisonPremiere','298 Bedford Avenue. Oyster stop, not automatically a full dinner; check reservations. Published Wednesday service begins at noon.','food','hours-to-check');
  }
