@@ -242,9 +242,38 @@
    });
    if(miss.length>5)radar.appendChild(element('small','noux-help','+'+(miss.length-5)+' more choices and alternatives'));
    if(!miss.length)radar.appendChild(element('p','noux-help','Every listed wish is represented in the active itinerary.'));
+   // Never silently drop an unselected option; keep a visible second-chance ledger.
+   var second=element('section','noux-second-chances');
+   var chooser=window.NOUX_CHOICES;
+   if(chooser&&typeof chooser.alternatives==='function'){
+    var alternatives=chooser.alternatives(choices),allChosen=choices.c6==='all';
+    second.append(element('h3',null,'Second chances · still on the list'));
+    second.append(element('p','noux-help',allChosen?'All three art choices are spread across Tuesday and Wednesday.':'Preferences remain saved on this device; compatible unselected art can be added elsewhere.'));
+    alternatives.sort(function(a,b){return Number(b.actionable)-Number(a.actionable)||Number(b.history)-Number(a.history)});
+    alternatives.slice(0,8).forEach(function(item){
+     var row=element('div','noux-second-row'),copy=element('div','noux-second-info');
+     copy.append(element('b',null,item.title),element('small',null,item.planned?'Already included on the art trail':item.note));
+     row.append(copy);
+     if(item.actionable){
+      row.append(press(item.planned?'noux-second-added':'noux-second-add',item.planned?'Added ✓':'+ Add too',function(){
+       chooser.toggle(item.value);draw();rerender();
+      }));
+     }else{
+      row.append(press('noux-second-review','Review',function(){
+       var nav=Array.from(document.querySelectorAll('.topbar .mainnav button')).find(function(x){return /decisions/i.test(x.textContent)});
+       if(nav)nav.click();
+       open=false;drawer.hidden=true;trigger.setAttribute('aria-expanded','false');
+       setTimeout(function(){var target=document.getElementById('decision-'+item.group);if(target)target.scrollIntoView({behavior:'smooth',block:'center'})},60);
+      }));
+     }
+     second.append(row);
+    });
+    if(alternatives.length>8)second.append(element('small','noux-help','+'+(alternatives.length-8)+' additional alternatives remain in Lyna’s decisions.'));
+    if(!alternatives.length)second.append(element('p','noux-help','All applicable choices have been included.'));
+   }
    var controls=element('div','noux-explorer-actions');
    controls.append(press('noux-explorer-primary','Open wish list',function(){var b=Array.from(document.querySelectorAll('.topbar .mainnav button')).find(function(x){return /wish list/i.test(x.textContent)});if(b)b.click();open=false;drawer.hidden=true}),press('noux-explorer-secondary','Add a stop',function(){var b=document.querySelector('.top-add-stop');if(b)b.click();open=false;drawer.hidden=true}));
-   drawer.replaceChildren(head,intro,live,modes,summary,track,help,daysHead,dayGrid,wishHead,radar,controls);
+   drawer.replaceChildren(head,intro,live,modes,summary,track,help,daysHead,dayGrid,wishHead,radar,second,controls);
   }
   var root=document.getElementById('root');
   var timer=null;
@@ -253,6 +282,7 @@
    observer.observe(root,{childList:true,subtree:true,characterData:true});
   }
   document.addEventListener('keydown',function(e){if(e.key==='Escape'&&open){open=false;drawer.hidden=true;trigger.setAttribute('aria-expanded','false')}});
+  document.addEventListener('noux:replan',function(){rerender();if(open)draw()});
   setInterval(function(){if(open)draw()},60000);
  }
  function install(options){
