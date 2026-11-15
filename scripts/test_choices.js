@@ -44,8 +44,10 @@ function assertClean(day,c){
 const all={...defaults,c6:'all'};
 const tue=assertClean('tue',all),wed=assertClean('wed',all);
 for(const id of ['allart_butterflies','allart_guggenheim','allart_luhring','allart_pace'])assert(tue.some(x=>x.id===id),'Missing combined Tuesday '+id);
-for(const id of ['art_wed_moma','art_wed_library','art_wed_snfl','wed_whitney','wed_dante'])assert(wed.some(x=>x.id===id),'Missing shifted Wednesday '+id);
+for(const id of ['art_wed_moma','art_wed_library','art_wed_snfl','wed_to_whitney','wed_frenchette','wed_whitney','wed_dante'])assert(wed.some(x=>x.id===id),'Missing shifted Wednesday '+id);
 assert(!wed.some(x=>['vintage','vintage_stella','domino','hotel_view','explore_wed_bamharvey','wed_bam'].includes(x.id)),'Manhattan-first Wednesday must not force Williamsburg or an unbooked show');
+assert(!wed.some(x=>x.place==='golden'),'Do not backtrack to Golden Diner before Whitney on a Manhattan day');
+assert.equal(wed.find(x=>x.id==='wed_whitney').start,'14:05','Art-heavy day reaches Whitney after café lunch');
 assert(!tue.some(x=>x.id==='allart_moma'),'MoMA must move to Wednesday when Chelsea included');
 assert(tue.some(x=>x.id==='music'&&x.start==='19:05'),'Evening concert must be preserved');
 assert(wed.some(x=>x.id==='night'&&x.end==='02:00'),'Night club must be preserved');
@@ -53,6 +55,8 @@ assert(!wed.some(x=>x.id==='art_wed_bam_transfer'||x.id==='wed_to_bam'),'No BAM 
 const brooklyn=assertClean('wed',{...all,c9:'williamsburg',c10:'bam'});
 for(const id of ['wed_domino','wed_westlight','wed_oysters','wed_to_bam','wed_bam','night'])assert(brooklyn.some(x=>x.id===id),'Missing explicitly selected Brooklyn+theatre '+id);
 assert(brooklyn.find(x=>x.id==='wed_domino').end==='15:25','Waterfront photographs should take 25 minutes');
+const soho=assertClean('wed',{...defaults,c9:'williamsburg',c10:'skip'});
+for(const id of ['wed_housingworks','wed_to_golden','wed_domino'])assert(soho.some(x=>x.id===id),'Brooklyn day includes logical SoHo → Lower Manhattan corridor: '+id);
 const vintage=assertClean('wed',{...all,c9:'williamsburg_vintage',c10:'skip'});
 for(const id of ['wed_awoke','wed_stella','wed_domino','wed_westlight'])assert(vintage.some(x=>x.id===id),'Missing requested fuller vintage afternoon '+id);
 const dj=assertClean('wed',{...all,c9:'williamsburg',c10:'skip',c3:'louievega'});
