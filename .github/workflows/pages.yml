@@ -36,9 +36,14 @@ jobs:
         run: pip install Pillow==11.3.0
       - name: Fetch and validate original venue photography
         run: python scripts/fetch_photos.py
+      - name: Verify MTA Worker health (diagnostic only)
+        continue-on-error: true
+        run: |
+          echo 'Testing deployed MTA proxy /health endpoint'
+          curl -sS --location --max-time 25 -w '\nHTTP %{http_code}\n' 'https://noux-mta-live.benjbongard.workers.dev/health'
       - name: Construct publication package with encrypted itinerary ONLY
         env:
-          MTA_PROXY_URL: ${{ vars.MTA_PROXY_URL }}
+          MTA_PROXY_URL: ${{ vars.MTA_PROXY_URL || 'https://noux-mta-live.benjbongard.workers.dev' }}
         run: |
           mkdir -p _site
           cp index.html unlock.js styles.css manifest.webmanifest robots.txt .nojekyll _site/
