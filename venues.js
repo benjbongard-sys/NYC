@@ -36,7 +36,8 @@
    friedmans:loc("Friedman's · Edison Hotel",'228 W 47th St, New York, NY 10036, USA',40.7597,-73.9858,'breakfast','https://www.friedmansrestaurant.com/location/edison/','Times Square'),
    urbanCove:loc('Urban Cove · Seaport','33 Peck Slip, New York, NY 10038, USA',40.7079,-74.0009,'restaurant','https://www.urbancoveseaport.com/','Seaport'),
    westVillage:loc('West Village · Christopher and Bleecker Streets','Christopher St & 7th Ave S, New York, NY 10014, USA',40.7338,-74.0029,'walk','https://www.nyctourism.com/neighborhoods/west-village/','West Village'),
-   stPatrick:loc("St. Patrick's Cathedral · Fifth Avenue",'5th Ave & E 50th St, New York, NY 10022, USA',40.7586,-73.9759,'sight','https://saintpatrickscathedral.org/','Midtown')
+   stPatrick:loc("St. Patrick's Cathedral · Fifth Avenue",'5th Ave & E 50th St, New York, NY 10022, USA',40.7586,-73.9759,'sight','https://saintpatrickscathedral.org/','Midtown'),
+   brooklynHeights:loc('Brooklyn Heights Promenade','Montague St & Columbia Heights, Brooklyn, NY 11201, USA',40.6956,-73.9961,'walk','https://www.nycgovparks.org/parks/brooklyn-heights-promenade','Brooklyn Heights')
  };
  const OPTIONS={
   c1:{title:'Monday · Which first-night dinner and skyline?',desc:'A named dinner venue for every option, followed by your chosen first-night view.',options:{
@@ -94,8 +95,12 @@
   if(/^explore_walk_/.test(e.id)){
    if(e.place==='edge')return [assign(e,'hudsonYards','Hudson Yards plaza · Vessel exterior','Walk through the Hudson Yards public square for architecture and views.','walk','proposed')];
    if(e.place==='lebain'||e.place==='littleisland'||e.place==='meatpacking'){
-    const v=assign(e,'westVillage','West Village · Christopher Street and Bleecker','A specific walk from Meatpacking through Christopher Street and Bleecker Street.','walk','proposed');
-    return [v];
+    if(minutes(e.start)<20*60)return [assign(e,'meatpacking','Gansevoort Plaza · Meatpacking streets','Explore Gansevoort Plaza and historic cobblestones beside the Standard Grill.','walk','proposed')];
+    return [assign(e,'westVillage','West Village · Christopher Street and Bleecker','A named evening route along Christopher and Bleecker Streets after dinner.','walk','proposed')];
+   }
+   if(e.place==='dumbo'){
+    const v=assign(e,'brooklynHeights','Brooklyn Heights Promenade · Manhattan panorama','Columbia Heights at Montague Street; uninterrupted skyline and bridge views.','walk','proposed');
+    v.start='16:15';v.end='16:55';return [v];
    }
    if(e.place==='roughtrade'||e.place==='rockefeller')return [assign(e,'rockefeller','Rockefeller Center · Channel Gardens','Architecture and window displays around Rockefeller Plaza, not a hotel break.','walk','proposed')];
    if(e.place==='domino'||e.place==='thrift')return [assign(e,'domino','Domino Park · East River promenade','Waterfront skyline and the public Domino Park paths in Williamsburg.','walk','proposed')];
@@ -173,7 +178,7 @@
       :c.c5==='rest'
       ?assign(e,'battery','The Battery · harbour promenade','Lower Manhattan waterfront and harbour views; holiday shops may be closed, outdoor paths remain the focus.','walk','proposed')
       :assign(e,'littleIsland','Little Island · Pier 55 riverside stroll','Free public riverfront park, winter opening and weather conditions to verify.','walk','proposed');
-    if(c.c4==='boogie')v.end='17:05';return [v];
+    if(c.c5==='rest'){v.start='16:25';v.end='17:30'}if(c.c4==='boogie')v.end='17:05';return [v];
    }
    if(e.id==='dinner'){
     if(c.c7==='river')return [assign(e,'river','The River Café · Thanksgiving prix fixe ($255 pp)','1 Water Street, Brooklyn. Official Thanksgiving 2026 menu published, 13:00–20:00 service; jacket and collared shirt required. Reservation not made.','dinner','proposed')];
@@ -239,8 +244,8 @@
      if(!out.some(e=>e.id==='chill'))add('urban_pier17','14:35','15:35','seaport','South Street Seaport and Pier 17','89 South Street. East River promenade and Brooklyn Bridge views.','walk');
      if(!out.some(e=>e.id==='reset'))add('urban_battery','15:55','16:55','battery','The Battery · harbour views','Battery Place. Waterfront walk before heading to the dinner neighbourhood.','walk');
     }
-    if(day==='thu'&&ch.c4==='rest'&&!out.some(e=>e.id==='night')){
-     out.push({id:'quiet_thu_village',start:'20:40',end:'21:25',place:'westVillage',title:'West Village · Bleecker Street night walk',detail:'Christopher Street and Bleecker Street after the Thanksgiving dinner; open-air and flexible.',kind:'walk',status:'proposed'});
+    if(day==='thu'&&ch.c4==='rest'&&!out.some(e=>e.id==='night')&&!out.some(e=>e.kind==='walk'&&e.start>='20:20')){
+     out.push({id:'quiet_thu_village',start:'20:55',end:'21:35',place:'westVillage',title:'West Village · Bleecker Street night walk',detail:'Christopher Street and Bleecker Street after the Thanksgiving dinner; open-air and flexible.',kind:'walk',status:'proposed'});
     }
     // Avoid repeat walks to the same block during one evening, while keeping all dining and booked events.
     const sorted=sortEvents(out);
