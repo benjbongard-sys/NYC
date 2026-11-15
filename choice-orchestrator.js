@@ -54,10 +54,10 @@ function guidance(c,v){
 function alternatives(choices){
  const chosen=Object.assign({},DATA.DEFAULT||{},choices||{});
  return (DATA.CHOICES||[]).flatMap(c=>(c.options||[]).filter(o=>{
-  return o&&o[0]!==chosen[c.id]&&o[0]!=='all'&&!['rest','standard'].includes(o[0]);
+  return o&&o[0]!==chosen[c.id]&&!(c.id==='c6'&&chosen.c6==='all')&&o[0]!=='all'&&!['rest','standard'].includes(o[0]);
  }).map(o=>({
   group:c.id,day:c.day,value:o[0],title:o[1],detail:o[2]||'',
-  pinned:c.id==='c6'&&pinned(o[0]),actionable:c.id==='c6'&&ART.includes(o[0]),
+  pinned:c.id==='c6'&&pinned(o[0]),actionable:c.id==='c6'&&ART.includes(o[0]),planned:c.id==='c6'&&activeArt(chosen).has(o[0]),
   note:guidance(c,o[0]),history:(journal().history[c.id]||[]).some(h=>h.value===o[0])
  })));
 }
