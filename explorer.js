@@ -14,7 +14,12 @@
   {id:'roughtrade',phrases:['rough trade','vinyl'],kind:'shopping',minutes:38,min:25,hours:[600,1200],days:['mon','tue','wed','fri'],weight:72},
   {id:'topofrock',phrases:['top of the rock'],kind:'view',minutes:48,min:35,hours:[540,1260],days:['mon','tue','wed','fri'],weight:83},
   {id:'bamharvey',phrases:['la distance','bam'],kind:'theatre',minutes:85,min:85,hours:[1170,1255],days:['wed'],fixed:1170,weight:95},
-  {id:'ballooninflation',phrases:['balloon inflation','macy balloons','thanksgiving balloon'],kind:'event',minutes:60,min:55,hours:[780,1080],days:['wed'],weight:75,publicEvent:true}
+  {id:'ballooninflation',phrases:['balloon inflation','macy balloons','thanksgiving balloon'],kind:'event',minutes:60,min:55,hours:[780,1080],days:['wed'],weight:75,publicEvent:true},
+  {id:'bamharvey',phrases:['la distance','bam'],kind:'theatre',minutes:85,min:85,hours:[1170,1255],days:['wed'],fixed:1170,weight:98,alwaysSuggest:true},
+  {id:'maisonpremiere',phrases:['maison premiere','oyster experience'],kind:'food',minutes:65,min:48,hours:[1020,1320],days:['wed'],weight:93,alwaysSuggest:true},
+  {id:'joespizza',phrases:['joe s pizza','new york slice'],kind:'food',minutes:30,min:23,hours:[1020,1300],days:['tue'],weight:79,alwaysSuggest:true},
+  {id:'westlight',phrases:['westlight'],kind:'cocktail',minutes:50,min:35,hours:[960,1380],days:['wed'],weight:70,alwaysSuggest:true},
+  {id:'littleisland',phrases:['little island'],kind:'walk',minutes:43,min:30,hours:[960,1260],days:['thu'],weight:80,alwaysSuggest:true}
  ];
  var extraPlaces={
   moma:{name:'The Museum of Modern Art (MoMA)',area:'Midtown',address:'11 W 53rd St, New York, NY 10019, USA',lat:40.7614,lng:-73.9776,kind:'museum',url:'https://www.moma.org/visit/'},
@@ -23,7 +28,10 @@
   roughtrade:{name:'Rough Trade Below',area:'Rockefeller Center',address:'30 Rockefeller Plaza, Concourse Level, New York, NY 10112, USA',lat:40.7588,lng:-73.9788,kind:'vinyl',url:'https://www.roughtrade.com/en-us/stores/below'},
   topofrock:{name:'Top of the Rock Observation Deck',area:'Rockefeller Center',address:'30 Rockefeller Plaza, New York, NY 10112, USA',lat:40.7592,lng:-73.9793,kind:'view',url:'https://www.topoftherocknyc.com/'},
   bamharvey:{name:'BAM Harvey Theater',area:'Fort Greene',address:'651 Fulton St, Brooklyn, NY 11217, USA',lat:40.6882,lng:-73.9781,kind:'theatre',url:'https://www.bam.org/theater/2026/la-distance'},
-  ballooninflation:{name:"Macy's Balloon Inflation viewing area",area:'Upper West Side',address:'West 77th Street and Columbus Avenue, New York, NY 10024, USA',lat:40.7818,lng:-73.9764,kind:'event'}
+  ballooninflation:{name:"Macy's Balloon Inflation viewing area",area:'Upper West Side',address:'West 77th Street and Columbus Avenue, New York, NY 10024, USA',lat:40.7818,lng:-73.9764,kind:'event'},
+  maisonpremiere:{name:'Maison Premiere · oysters and cocktails',area:'Williamsburg',address:'298 Bedford Ave, Brooklyn, NY, USA',lat:40.7139,lng:-73.9612,kind:'food',url:'https://maisonpremiere.com/'},
+  joespizza:{name:"Joe's Pizza · classic NYC slice",area:'Greenwich Village',address:'7 Carmine St, New York, NY 10014, USA',lat:40.7301,lng:-74.0023,kind:'food',url:'https://www.joespizzanyc.com/'},
+  littleisland:{name:'Little Island · Hudson River Park',area:'Meatpacking District',address:'Pier 55, Hudson River Park, New York, NY 10014, USA',lat:40.7412,lng:-74.0104,kind:'walk',url:'https://littleisland.org/rules-faq/'}
  };
  function norm(s){return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim()}
  function includesPhrase(text,phrase){var t=' '+norm(text)+' ',p=' '+norm(phrase)+' ';return p.length>3&&t.indexOf(p)!==-1}
@@ -61,7 +69,7 @@
   return catalog.filter(function(c){
    if(!c.days.includes(day)||used.has(c.id))return false;
    if(c.publicEvent&&!wishList().some(function(w){return c.phrases.some(function(p){return includesPhrase(w[0],p)})}))return false;
-   return matched(c).length>0;
+   return matched(c).length>0||c.alwaysSuggest===true;
   }).map(function(c){
    var wishes=matched(c),core=wishes.some(function(w){return String(w[3])==='core'});
    var pref=wishes.some(function(w){return String(w[2])===day});
@@ -77,10 +85,12 @@
   var picks=candidates(day,used);
   var startOfDay=day==='thu'?360:day==='fri'?480:day==='mon'?600:480;
   var endOfDay=day==='fri'?780:day==='wed'?1320:day==='thu'?1320:day==='mon'?1350:1320;
-  var cap=day==='fri'?2:day==='thu'?2:4;
+  var cap=day==='fri'?2:day==='thu'?3:5;
   function sorted(){return events.slice().sort(function(a,b){return minute(a.start)-minute(b.start)})}
   function tryInsert(c){
    var loc=DATA.P[c.id];if(!loc)return false;
+   // Do not invent a second evening meal when the decrypted itinerary already has dinner.
+   if(c.kind==='food'&&events.some(function(e){return ['food','dinner'].includes(String(e.kind))&&minute(e.start)>=990&&minute(e.start)<1260}))return false;
    var itinerary=sorted();
    var boundaries=[{start:clock(startOfDay),end:clock(startOfDay),place:null}].concat(itinerary,[{start:clock(endOfDay),end:clock(endOfDay),place:null}]);
    var best=null;
@@ -90,6 +100,7 @@
     if(before===boundaries[0]&&after===boundaries[boundaries.length-1])continue;
     var go=before.place?travel(before.place,c.id):0,back=after.place?travel(c.id,after.place):0;
     var earliest=Math.max(left+go,c.hours[0]),latest=Math.min(right-back,c.hours[1]);
+    if(c.alwaysSuggest&&c.id==='westlight'&&(go+back)>48)continue;
     if(c.fixed!==undefined){earliest=Math.max(earliest,c.fixed);latest=Math.min(latest,c.fixed+c.minutes)}
     var duration=Math.min(c.minutes,latest-earliest);
     if(duration<c.min)continue;
@@ -100,8 +111,12 @@
    var w=matched(c)[0]||[],note='Suggested extra stop from the wish list; timing and admission are not booked.';
    if(c.kind==='museum')note='Focused highlights visit. Check exhibition availability and reserve admission where required.';
    if(c.kind==='theatre')note='Performance option only. Buy tickets before treating this as confirmed.';
+   if(c.id==='maisonpremiere')note='Oyster-bar experience and light dinner. Reservation and Thanksgiving-week hours are not confirmed.';
+   if(c.id==='joespizza')note='Quick classic New York slice before the evening programme. Standard hours may vary.';
+   if(c.id==='littleisland')note='Free riverside park; November closing time is 21:00, weather permitting.';
    if(c.publicEvent)note='Viewing arrangements and exact access hours must be verified with the organiser.';
    var status=c.kind==='museum'||c.kind==='theatre'||c.kind==='view'?'ticket-to-check':'hours-to-check';
+   if(c.id==='littleisland')status='proposed';
    events.push({id:'explore_'+day+'_'+c.id,start:clock(best.start),end:clock(best.end),title:(loc.name||String(w[0]||'Extra stop'))+' · wish-list pick',place:c.id,kind:c.kind,detail:note,status:status});
    used.add(c.id);
    return true;
