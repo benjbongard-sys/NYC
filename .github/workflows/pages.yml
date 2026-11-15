@@ -50,6 +50,7 @@ jobs:
           node scripts/test_explorer.js
           node scripts/test_venues.js
           node scripts/test_choices.js
+          node scripts/test_day_audit.js
           node scripts/test_subway_map.js
           python - <<'PY_CHECK'
           import json,pathlib
@@ -68,7 +69,7 @@ jobs:
           MTA_PROXY_URL: ${{ vars.MTA_PROXY_URL || 'https://noux-mta-live.benjbongard.workers.dev' }}
         run: |
           mkdir -p _site
-          cp index.html unlock.js explorer.js venues.js choice-orchestrator.js subway-map.js styles.css manifest.webmanifest robots.txt .nojekyll _site/
+          cp index.html unlock.js explorer.js venues.js choice-orchestrator.js day-audit.js subway-map.js styles.css manifest.webmanifest robots.txt .nojekyll _site/
           cp -a lib assets _site/
           node -e 'require("fs").writeFileSync("_site/worker-config.js", "window.NYC_MTA_PROXY_URL = " + JSON.stringify(process.env.MTA_PROXY_URL || "") + ";\n")'
           python scripts/check_public.py
