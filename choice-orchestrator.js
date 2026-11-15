@@ -219,20 +219,20 @@ function planWednesdayExperience(orig,choices){
  }else{
   const vintage=mode==='williamsburg_vintage';
   if(vintage){
-   transit('wed_to_brooklyn','13:35','14:15','Manhattan → Williamsburg · subway transfer','awoke','Travel towards Bedford Avenue and the vintage shops.');
-   slot('wed_awoke','14:15','14:35','Awoke Vintage · browse','awoke','132 North 5th Street. Optional vintage stop.','shopping');
-   slot('wed_stella','14:42','15:00','10 ft Single by Stella Dallas · vintage','stella','285 North 6th Street. A short second vintage stop.','shopping');
-   transit('wed_to_domino','15:00','15:20','Walk to Domino Park','domino','Walk south and west through Williamsburg.');
-   slot('wed_domino','15:20','15:45','Domino Park · Manhattan skyline in daylight','domino','East River waterfront; sunset is approximately 16:31 on this date.','walk');
-   transit('wed_to_westlight','15:45','16:10','Domino Park → Westlight · walk north','westlight','Allow about 25 minutes for the waterfront-to-rooftop transfer.');
+   transit('wed_to_brooklyn','13:45','14:20','Manhattan → Williamsburg · subway transfer','awoke','Travel towards Bedford Avenue and the vintage shops.');
+   slot('wed_awoke','14:25','14:45','Awoke Vintage · browse','awoke','132 North 5th Street. Optional vintage stop.','shopping');
+   slot('wed_stella','14:52','15:12','10 ft Single by Stella Dallas · vintage','stella','285 North 6th Street. A short second vintage stop.','shopping');
+   transit('wed_to_domino','15:12','15:35','Walk to Domino Park','domino','Walk south and west through Williamsburg.');
+   slot('wed_domino','15:35','15:55','Domino Park · Manhattan skyline in daylight','domino','East River waterfront; sunset is approximately 16:31 on this date.','walk');
+   transit('wed_to_westlight','15:55','16:15','Domino Park → Westlight · walk north','westlight','Allow about 25 minutes for the waterfront-to-rooftop transfer.');
   }else{
    transit('wed_to_brooklyn','14:15','14:55','Manhattan → Williamsburg · subway transfer','domino','Leave time for the transfer to the East River waterfront.');
-   slot('wed_domino','15:00','15:35','Domino Park · Manhattan skyline in daylight','domino','East River waterfront; sunset is approximately 16:31 on this date.','walk');
-   transit('wed_to_westlight','15:35','16:10','Domino Park → Westlight · walk north','westlight','Allow a generous transfer to the William Vale rooftop.');
+   slot('wed_domino','15:00','15:25','Domino Park · Manhattan skyline in daylight','domino','East River waterfront; sunset is approximately 16:31 on this date.','walk');
+   transit('wed_to_westlight','15:25','16:05','Domino Park → Westlight · walk north','westlight','Allow a generous transfer to the William Vale rooftop.');
   }
-  slot('wed_westlight','16:10','17:00','Westlight · sunset skyline cocktails','westlight','111 North 12th Street. Opens from 16:00 on Wednesdays; seats, weather and holiday schedule unconfirmed. This is not a confirmed DJ night.','cocktail','hours-to-check');
-  transit('wed_to_oysters','17:00','17:20','Westlight → Maison Premiere · walk','maisonPremiere','Allow approximately 20 minutes south towards Bedford Avenue.');
-  slot('wed_oysters','17:20',attendBAM?'18:05':'18:35','Maison Premiere · oysters and cocktails','maisonPremiere','298 Bedford Avenue. Oyster stop, not automatically a full dinner; check reservations. Published Wednesday service begins at noon.','food','hours-to-check');
+  slot('wed_westlight',vintage?'16:15':'16:05',vintage?'17:05':'17:00','Westlight · sunset skyline cocktails','westlight','111 North 12th Street. Opens from 16:00 on Wednesdays; seats, weather and holiday schedule unconfirmed. This is not a confirmed DJ night.','cocktail','hours-to-check');
+  transit('wed_to_oysters',vintage?'17:05':'17:00',vintage?'17:25':'17:20','Westlight → Maison Premiere · walk','maisonPremiere','Allow approximately 20 minutes south towards Bedford Avenue.');
+  slot('wed_oysters',vintage?'17:25':'17:20',attendBAM?'18:05':'18:35','Maison Premiere · oysters and cocktails','maisonPremiere','298 Bedford Avenue. Oyster stop, not automatically a full dinner; check reservations. Published Wednesday service begins at noon.','food','hours-to-check');
  }
  if(attendBAM){
   transit('wed_to_bam',mode==='manhattan'?'18:05':'18:05','19:12',
