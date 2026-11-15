@@ -122,11 +122,12 @@
    if(e.id==='dinner'){
     if(c.c1==='stcloud')return [assign(e,'osteriaDoge','Osteria al Doge · Venetian dinner','142 West 44th Street; warm Italian dinner before St. Cloud. Check seating directly with the venue; no reservation has been made.','food','proposed')];
     if(c.c1==='nubeluz')return [assign(e,'zaytinya','Zaytinya · José Andrés mezze dinner','1185 Broadway, in The Ritz-Carlton NoMad; shared Mediterranean plates downstairs from Nubeluz. Reservation not yet made.','food','proposed')];
-    return [assign(e,'modernBar','The Bar Room at The Modern · first-night dinner','9 West 53rd Street. Contemporary seasonal à-la-carte dining; Restaurant accepts reservations and walk-ins. Check seating for Monday; nothing is booked.','food','proposed')];
+    return [assign(e,'modernBar','The Bar Room at The Modern · first-night dinner','9 West 53rd Street. Contemporary seasonal à-la-carte dining; the restaurant accepts reservations and walk-ins. Check seating for Monday; nothing is booked.','food','proposed')];
    }
    if(e.id==='sleep')return [assign(e,'rockefeller','Rockefeller Center · Fifth Avenue night walk','Explore Rockefeller Plaza and the shopfronts on Fifth Avenue. The Christmas tree lighting is not assumed to have happened.','walk','proposed')];
   }
   if(day==='tue'){
+   if(e.id==='explore_tue_moma')return [assign(e,'moma','MoMA · Nilima Sheikh, The Surrealist Book & Brancusi','11 West 53rd Street. A focused highlights visit; verify exhibition access and museum entry before going.','museum','ticket-to-check')];
    if(e.id==='breakfast')return [breakfast(day,e,c)];
    if(e.id==='museum'&&c.c6==='chelsea'){
     const one=assign(e,'luhring','Luhring Augustine · Jason Moran: STACKS','531 West 24th Street; exhibition runs into December. Jazz, performance and contemporary art, Tuesday opening 10:00.','art','proposed');
@@ -148,6 +149,7 @@
    if(e.id==='music'&&c.c2==='rest')return [assign(e,'nines','The Nines · dinner, live piano and cocktails','9 Great Jones Street, NoHo. An elegant supper club with food and live piano, not a vague free evening. Reservations and possible cover to check.','food','proposed')];
   }
   if(day==='wed'){
+   if(e.id==='explore_wed_bamharvey')return [assign(e,'bamharvey','BAM · La Distance · 19:30 performance','651 Fulton Street in Fort Greene, Brooklyn. The performance is advertised; ticket not purchased.','theatre','ticket-to-check')];
    if(e.id==='late')return [breakfast(day,e,c)];
    if(e.id==='vintage'){
     const a=assign(e,'awoke','Awoke Vintage · 132 North 5th Street','Named Williamsburg thrift stop; the shop lists daily opening 10:00–21:00.','shopping','proposed');
