@@ -308,5 +308,5 @@ async function install(options){
  mount();
  return true;
 }
-window.NOUX_DEPARTURE={install,version:'2026.11.15-encrypted-v2'};
+window.NOUX_DEPARTURE={install,whenSaved:()=>SAVING,version:'2026.11.15-encrypted-v3'};
 })();
