@@ -21,6 +21,20 @@ This repository had earlier unencrypted revisions. Replacing the current branch 
 - Selecting a custom stop immediately updates the relevant day, changes the map and calendar export, estimates travel buffers and moves flexible stops when possible. Fixed appointments (especially the booked Monday cruise and Friday transfer pickup) never move; conflicts are clearly flagged. These are planning estimates, not certified travel times or validated venue opening hours.
 - Personal custom stops remain in the browser only; use export/import to move them between devices. Never enter access tokens or passwords in custom-stop fields.
 
+
+## Route-quality safeguards
+
+The public `choice-orchestrator.js` and `day-audit.js` layers run only **after** decryption and read the existing private itinerary; they do not embed private reservations or the passphrase.
+
+- Wednesday defaults to a Manhattan-first afternoon, with optional Williamsburg skyline/oysters/vintage alternatives; a theatre performance and an indoor house-music event are independent selections.
+- The optimiser uses tighter photo and focused-gallery durations, clusters nearby stops, inserts honest transfer buffers, and retains dismissed choices in the Explorer's Second Chances / Route Checks sections.
+- The arrival-day booked cruise keeps a 60-minute pier transfer and 30-minute boarding window free of speculative extras. Exact pier and actual travel times are read from the booking, not inferred.
+- Holiday closures are screened for selected museums. A relaxed parade viewing window is preserved; it does not promise early front-row viewing.
+- When an airport pickup remains the original unconfirmed noon placeholder, the planner proposes a later departure-day Midtown route and a provisional afternoon collection window. A confirmed pickup is **never** moved; verify the operator's time and boarding-pass arrival advice before relying on the draft.
+- Five-day synthetic regression tests are run in `scripts/test_day_audit.js`, alongside existing choice, venue, routing and subway tests, as part of the Pages deployment workflow.
+
+**Important:** transfer estimates and venue hours are not live guarantees. Protected bookings survive conflicts, which are flagged for human resolution. The client-only choice journal and personal custom stops are not automatically synchronised across devices.
+
 ## Activate the optional MTA Cloudflare Worker
 
 1. Create/authorise a Cloudflare Workers account.
