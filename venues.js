@@ -39,6 +39,9 @@
    stPatrick:loc("St. Patrick's Cathedral · Fifth Avenue",'5th Ave & E 50th St, New York, NY 10022, USA',40.7586,-73.9759,'sight','https://saintpatrickscathedral.org/','Midtown'),
    brooklynHeights:loc('Brooklyn Heights Promenade','Montague St & Columbia Heights, Brooklyn, NY 11201, USA',40.6956,-73.9961,'walk','https://www.nycgovparks.org/parks/brooklyn-heights-promenade','Brooklyn Heights')
  };
+ // Public venue metadata only; nothing below confirms a booking.
+ P.kru=loc('KRU · Thai Thanksgiving','190 N 14th St, Brooklyn, NY 11249, USA',40.7228,-73.9586,'restaurant','https://www.krubrooklyn.com/','Williamsburg');
+ P.pier57roof=loc('Pier 57 Rooftop Park','25 11th Ave, New York, NY 10011, USA',40.7432,-74.0105,'park','https://pier57nyc.com/rooftop/','Chelsea');
  const OPTIONS={
   c1:{title:'Monday · Which first-night dinner and skyline?',desc:'A named dinner venue for every option, followed by your chosen first-night view.',options:{
    rest:["The Bar Room at The Modern · dinner & Rockefeller Center","Contemporary à-la-carte dining near MoMA, then an illuminated Midtown walk. Table to book."],
@@ -63,7 +66,7 @@
    chelsea:["Luhring Augustine (Jason Moran) → Pace Gallery","Two named Chelsea galleries, both operating on Tuesday of Thanksgiving week."]
   }},
   c7:{title:'Thursday · choose the Thanksgiving table',desc:'Every evening route receives a specific restaurant; River Café is an optional splurge.',options:{
-   standard:["Specific dinner beside the chosen evening venue","The Standard Grill (Le Bain), Leuca (Williamsburg), or The Smith NoMad (Flatiron)."],
+   standard:["The Standard Grill / Leuca / KRU / The Smith","Thanksgiving dinner is linked to the dancefloor choice: Meatpacking, Williamsburg or NoMad. No reservation yet."],
    river:["The River Café · Thanksgiving menu ($255 pp)","Official holiday menu published; table and transport must still be arranged."]
   }},
   c8:{title:'Friday · a real last stop before the transfer',desc:'Nothing pre-paid without a confirmed airport pickup time.',options:{
@@ -94,7 +97,9 @@
   // Make the optimiser's flexible walks navigable and specific too.
   if(/^explore_walk_/.test(e.id)){
    if(e.place==='edge')return [assign(e,'hudsonYards','Hudson Yards plaza · Vessel exterior','Walk through the Hudson Yards public square for architecture and views.','walk','proposed')];
-   if(e.place==='lebain'||e.place==='littleisland'||e.place==='meatpacking'){
+   if(e.place==='littleisland'&&minutes(e.start)<20*60)
+      return [assign(e,'pier57roof','Pier 57 Rooftop Park · Hudson panorama','25 11th Avenue, close to Little Island. Public rooftop usually open daily 06:00–01:00; check weather.','walk','proposed')];
+    if(e.place==='lebain'||e.place==='littleisland'||e.place==='meatpacking'){
     if(minutes(e.start)<20*60)return [assign(e,'meatpacking','Gansevoort Plaza · Meatpacking streets','Explore Gansevoort Plaza and historic cobblestones beside the Standard Grill.','walk','proposed')];
     return [assign(e,'westVillage','West Village · Christopher Street and Bleecker','A named evening route along Christopher and Bleecker Streets after dinner.','walk','proposed')];
    }
@@ -115,9 +120,9 @@
     v.start='18:05';v.end=c.c1==='nubeluz'?'18:40':'18:55';return [v];
    }
    if(e.id==='dinner'){
-    if(c.c1==='stcloud')return [assign(e,'osteriaDoge','Osteria al Doge · Venetian dinner','142 West 44th Street; warm Italian dinner before St. Cloud. Monday evening tables were listed for two; not reserved.','food','proposed')];
+    if(c.c1==='stcloud')return [assign(e,'osteriaDoge','Osteria al Doge · Venetian dinner','142 West 44th Street; warm Italian dinner before St. Cloud. Check seating directly with the venue; no reservation has been made.','food','proposed')];
     if(c.c1==='nubeluz')return [assign(e,'zaytinya','Zaytinya · José Andrés mezze dinner','1185 Broadway, in The Ritz-Carlton NoMad; shared Mediterranean plates downstairs from Nubeluz. Reservation not yet made.','food','proposed')];
-    return [assign(e,'modernBar','The Bar Room at The Modern · first-night dinner','9 West 53rd Street. Contemporary seasonal à-la-carte dining; Monday 19:30–20:30 availability was identified for two. Book before relying on the slot.','food','proposed')];
+    return [assign(e,'modernBar','The Bar Room at The Modern · first-night dinner','9 West 53rd Street. Contemporary seasonal à-la-carte dining; Restaurant accepts reservations and walk-ins. Check seating for Monday; nothing is booked.','food','proposed')];
    }
    if(e.id==='sleep')return [assign(e,'rockefeller','Rockefeller Center · Fifth Avenue night walk','Explore Rockefeller Plaza and the shopfronts on Fifth Avenue. The Christmas tree lighting is not assumed to have happened.','walk','proposed')];
   }
@@ -183,7 +188,8 @@
    }
    if(e.id==='dinner'){
     if(c.c7==='river')return [assign(e,'river','The River Café · Thanksgiving prix fixe ($255 pp)','1 Water Street, Brooklyn. Official Thanksgiving 2026 menu published, 13:00–20:00 service; jacket and collared shirt required. Reservation not made.','dinner','proposed')];
-    if(['westmorales','morales'].includes(c.c4))return [assign(e,'leuca','Leuca · Thanksgiving dinner at The William Vale','111 North 12th Street, Williamsburg. Published Thanksgiving menu; easy pairing with Westlight and a later trip to Refuge. Reserve separately.','dinner','proposed')];
+    if(c.c4==='morales')return [assign(e,'kru','KRU · Thai Thanksgiving dinner ($55 pp)','190 North 14th Street, Williamsburg. Published $55 Thanksgiving offering 17:30–21:30. Reserve before visiting Refuge.','dinner','hours-to-check')];
+    if(c.c4==='westmorales')return [assign(e,'leuca','Leuca · Thanksgiving dinner at The William Vale','111 North 12th Street, Williamsburg. Published Thanksgiving menu; easy pairing with Westlight and later Refuge. Reserve separately.','dinner','hours-to-check')];
     if(c.c4==='boogie'){
      const v=assign(e,'smithNoMad','The Smith NoMad · Thanksgiving dinner ($88 pp)','1150 Broadway at 27th Street. Published three-course Thanksgiving menu, near 230 Fifth. Reservation not made.','dinner','proposed');
      v.start='17:20';return [v];
@@ -194,8 +200,8 @@
   }
   if(day==='fri'){
    if(e.id==='breakfast'){
-    const v=assign(e,'friedmans',"Friedman's Edison · breakfast before checkout",'228 West 47th Street. Grab a quick breakfast with bags already packed; hotel checkout and airport-transfer deadline take priority.','food','arranged');
-    return [v];
+    const v=assign(e,'friedmans',"Friedman's Edison · breakfast before checkout",'228 West 47th Street. Quick breakfast with bags packed; return for luggage and the operator-confirmed pickup. No table reserved.','food','proposed');
+    v.end=minutes(e.start)>9*60?'10:05':'09:25';return [v];
    }
    if(e.id==='walk'&&c.c8==='rest')return [assign(e,'cultureEspresso','Culture Espresso → Bryant Park','72 West 38th Street. Coffee and the park, then collect bags before the transfer.','walk','proposed')];
    if(e.id==='walk'&&c.c8==='rockefeller'){
@@ -234,6 +240,13 @@
     const out=[];
     orig.forEach(e=>{fix(day,e,ch).forEach(x=>out.push(x))});
     // The day-option originally called "free day" must stay fully planned in either pace.
+    if(day==='mon'&&ch.c1==='rest'&&!out.some(e=>e.id==='sleep')){
+     const event={id:'named_mon_rockefeller',start:'20:50',end:'21:35',place:'rockefeller',
+       title:'Rockefeller Center · illuminated Fifth Avenue walk',
+       detail:'Rockefeller Plaza, Channel Gardens and Fifth Avenue displays. A named outdoor walk, no ticket needed.',
+       kind:'walk',status:'proposed'};
+     if(out.every(e=>minutes(event.start)>=minutes(e.end)||minutes(event.end)<=minutes(e.start)))out.push(event);
+    }
     if(day==='thu'&&ch.c5==='rest'){
      const kept=out.filter(e=>!(e.id||'').startsWith('explore_thu_littleisland')&&!(e.id||'').startsWith('explore_walk_thu_'));
      out.length=0;kept.forEach(e=>out.push(e));
