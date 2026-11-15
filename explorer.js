@@ -264,6 +264,7 @@
   PLAN.day=function(day,choices){
    if(choices&&typeof choices==='object')lastChoices=Object.assign({},choices);
    if(getMode()!=='full'||!days.includes(day))return baseDay(day,choices);
+   try{
    // Optimise all five days together so the same wish is not added on multiple days.
    // Preserve places already in the private baseline on any other day.
    var original={},globalUsed=new Set(),result={};
@@ -274,6 +275,7 @@
     result[d].forEach(function(e){catalog.forEach(function(c){if(eventHas(e,c))globalUsed.add(c.id)})});
    });
    return result[day];
+   }catch(_){return baseDay(day,choices)}
   };
   READY=true;
   if(!(options&&options.headless)){
