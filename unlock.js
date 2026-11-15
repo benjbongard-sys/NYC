@@ -70,6 +70,7 @@
     if(name==='custom-stops.js'){
      if(window.NOUX_EXPLORER){try{window.NOUX_EXPLORER.install()}catch(_){/* Keep the private trip available. */}}
      if(window.NOUX_VENUES){try{window.NOUX_VENUES.install()}catch(_){/* Never block decryption on a display enhancement. */}}
+     if(window.NOUX_CHOICES){try{window.NOUX_CHOICES.install()}catch(_){/* Fallback: the existing encrypted schedule stays usable. */}}
     }
    }
    $('root').hidden=false;screen.style.display='none';
