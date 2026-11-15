@@ -44,11 +44,19 @@ function assertClean(day,c){
 const all={...defaults,c6:'all'};
 const tue=assertClean('tue',all),wed=assertClean('wed',all);
 for(const id of ['allart_butterflies','allart_guggenheim','allart_luhring','allart_pace'])assert(tue.some(x=>x.id===id),'Missing combined Tuesday '+id);
-for(const id of ['art_wed_moma','art_wed_library','art_wed_snfl','explore_wed_bamharvey'])assert(wed.some(x=>x.id===id),'Missing shifted Wednesday '+id);
+for(const id of ['art_wed_moma','art_wed_library','art_wed_snfl','wed_whitney','wed_dante'])assert(wed.some(x=>x.id===id),'Missing shifted Wednesday '+id);
+assert(!wed.some(x=>['vintage','vintage_stella','domino','hotel_view','explore_wed_bamharvey','wed_bam'].includes(x.id)),'Manhattan-first Wednesday must not force Williamsburg or an unbooked show');
 assert(!tue.some(x=>x.id==='allart_moma'),'MoMA must move to Wednesday when Chelsea included');
 assert(tue.some(x=>x.id==='music'&&x.start==='19:05'),'Evening concert must be preserved');
 assert(wed.some(x=>x.id==='night'&&x.end==='02:00'),'Night club must be preserved');
-assert(wed.some(x=>x.id==='art_wed_bam_transfer'&&x.end==='19:17'),'BAM buffer retained');
+assert(!wed.some(x=>x.id==='art_wed_bam_transfer'||x.id==='wed_to_bam'),'No BAM transfer when theatre is not selected');
+const brooklyn=assertClean('wed',{...all,c9:'williamsburg',c10:'bam'});
+for(const id of ['wed_domino','wed_westlight','wed_oysters','wed_to_bam','wed_bam','night'])assert(brooklyn.some(x=>x.id===id),'Missing explicitly selected Brooklyn+theatre '+id);
+assert(brooklyn.find(x=>x.id==='wed_domino').end==='15:25','Waterfront photographs should take 25 minutes');
+const vintage=assertClean('wed',{...all,c9:'williamsburg_vintage',c10:'skip'});
+for(const id of ['wed_awoke','wed_stella','wed_domino','wed_westlight'])assert(vintage.some(x=>x.id===id),'Missing requested fuller vintage afternoon '+id);
+const dj=assertClean('wed',{...all,c9:'williamsburg',c10:'skip',c3:'louievega'});
+assert(dj.some(x=>x.id==='night'&&x.place==='superiorIngredients'&&x.end==='00:45'),'Louie Vega is a selected indoor house show and not a rooftop');
 const single=assertClean('tue',defaults);
 assert(!single.some(x=>x.id==='allart_guggenheim'),'Single choice does not force other museum');
 assert(app.alternatives(defaults).some(x=>x.group==='c6'&&x.value==='guggenheim'),'Unselected choice persists');
@@ -68,7 +76,11 @@ base.wed.find(x=>x.id==='hotel_view').status='booked';
 const protectedWed=env.window.NYC_PLAN.day('wed',defaults);
 assert(protectedWed.some(x=>x.id==='hotel_view'&&x.status==='booked'),
   'A confirmed rooftop booking must never be silently removed');
-assert(!protectedWed.some(x=>x.id==='art_wed_bam_transfer'),
-  'Never schedule a synthetic transfer over a confirmed reservation');
+assert(!protectedWed.some(x=>x.id==='art_wed_bam_transfer'||x.id==='wed_to_bam'),
+  'No unselected BAM transfer should displace confirmed reservation');
+const bookedVsBam=env.window.NYC_PLAN.day('wed',{...all,c9:'williamsburg',c10:'bam'});
+assert(bookedVsBam.some(x=>x.id==='hotel_view'&&x.status==='booked'),'Confirmed rooftop booking must survive choice conflict');
+assert(!bookedVsBam.some(x=>x.id==='wed_to_bam'||x.id==='wed_bam'),'Never route to optional BAM when it overlaps confirmed rooftop');
+assert(app.alternatives({...all,c9:'williamsburg',c10:'bam'}).some(x=>/La Distance/.test(x.title)),'Postponed theatre remains visible in second chances');
 base.wed.find(x=>x.id==='hotel_view').status='proposed';
-console.log('Choice orchestrator PASS: all three, two-day travel, chronology, persistence and preserved concerts.');
+console.log('Choice orchestrator PASS: all art, Wednesday geography, BAM protection, skyline and music selection.');
