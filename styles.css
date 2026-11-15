@@ -333,7 +333,7 @@ body.noux-departure-open{overflow:hidden}
 .noux-departure-rules b{font-size:13px;color:#edd3a9}
 .noux-departure-rules p{font-size:12px;color:#c7c1b9;line-height:1.8}
 @media(max-width:760px){
- .noux-departure-launcher{display:block}
+ .noux-departure-launcher{display:block;bottom:calc(77px + env(safe-area-inset-bottom,0px));right:15px}
  .noux-departure-navtab{display:none!important}
  .noux-departure-shopgrid{grid-template-columns:1fr}
  .noux-departure-packrow,.noux-departure-legend{grid-template-columns:minmax(0,1fr) 48px 48px}
