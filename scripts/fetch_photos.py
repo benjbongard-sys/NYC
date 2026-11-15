@@ -27,7 +27,19 @@ for key,meta in sources.items():
   except Exception as e:
    print('RETRY',key,type(e).__name__,str(e)[:145]);time.sleep(.15)
  else:
-  failed.append(key);manifest[key]={"path":None,"source":meta.get('source'),'credit':meta['credit'],'exact':meta.get('exact',False),'label':meta['label']}
+  # A previously verified, locally bundled original photograph is preferred
+  # to a missing image if its remote publisher is temporarily unavailable.
+  backup=out/(key+'.jpg')
+  try:
+   if not backup.is_file(): raise FileNotFoundError('No bundled fallback')
+   with Image.open(backup) as cached: cached.verify()
+   with Image.open(backup) as cached: width,height=cached.size
+   if backup.stat().st_size>7*1024*1024 or min(width,height)<180:raise ValueError('Invalid fallback photograph')
+   success.append(key)
+   manifest[key]={"path":"assets/photos/"+key+".jpg","source":meta.get('source'),'credit':meta['credit'],'exact':meta.get('exact',False),'label':meta['label']}
+   print('OK verified bundled fallback',key,(width,height))
+  except Exception:
+   failed.append(key);manifest[key]={"path":None,"source":meta.get('source'),'credit':meta['credit'],'exact':meta.get('exact',False),'label':meta['label']}
 (ROOT/'assets/photo-index.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2))
 (ROOT/'assets/photo-index.js').write_text('window.NYC_PHOTO_INDEX = '+json.dumps(manifest,ensure_ascii=False,indent=2)+';\n')
 print('REAL PHOTOS:',len(success),'FAILED:',len(failed),failed)
