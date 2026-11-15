@@ -1,7 +1,7 @@
 from pathlib import Path
 import json
 root=Path('_site')
-required=['index.html','unlock.js','explorer.js','venues.js','styles.css','assets/private.vault.json','assets/photo-index.js','assets/photos/skyline.jpg']
+required=['index.html','unlock.js','explorer.js','venues.js','choice-orchestrator.js','day-audit.js','departure-kit.js','styles.css','assets/private.vault.json','assets/photo-index.js','assets/photos/skyline.jpg']
 for f in required:
  assert (root/f).is_file(),f'Missing required offline asset {f}'
 vault=json.loads((root/'assets/private.vault.json').read_text())
@@ -13,4 +13,8 @@ for f in [root/'index.html',root/'unlock.js']:
  text=f.read_text()
  for bad in ['132 W 47th','Sanctuary Hotel','2026-11-23','Ben & Lyna','River Café']:
   assert bad not in text, f'Private itinerary string leaked into {f.name}: {bad}'
+for f in [root/'day-audit.js',root/'departure-kit.js']:
+ text=f.read_text()
+ for bad in ['private.vault.json','NOUX_PASSPHRASE','Sanctuary Hotel','132 W 47th','AF007']:
+  assert bad not in text,f'Private booking detail leaked in {f.name}: {bad}'
 print('Security build PASS: first-party itinerary encrypted, no plain modules published, real venue photos local.')
