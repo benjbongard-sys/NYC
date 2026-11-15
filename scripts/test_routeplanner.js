@@ -1,0 +1,15 @@
+const assert=require('assert');
+const rt=require('../routeplanner.js');
+const network={stations:[['A','Origin',40.700,-73.990],['B','Transfer',40.706,-73.980],['C','Destination',40.720,-73.963],['D','Alternative',40.708,-73.985]],platforms:['AS','BS','CN','BN','DN','AN'],routes:[['A','A','2850ad'],['L','L','a7a9ac']],transfers:[[1,3,3],[3,1,3]]};
+const day={date:'2026-11-23',trips:[[0,'Uptown','t1'],[1,'Eastbound','t2']],connections:[[610,615,0,1,0,0,1],[620,628,1,2,1,3,2]]};
+const origin={name:'Hotel',lat:40.6999,lng:-73.9902},dest={name:'Club',lat:40.7201,lng:-73.9628};
+const p=rt.compute(network,day,origin,dest,602);
+console.log('planned',JSON.stringify({mode:p.mode,minutes:p.minutes,lines:p.lines,segments:p.segments.map(x=>x.mode)},null,2));
+assert.equal(p.mode,'transit');assert.deepEqual(p.lines,['A','L']);assert.equal(p.transferCount,1);assert(p.minutes>=25&&p.minutes<=45);
+const short=rt.compute(network,day,origin,{name:'Nearby',lat:40.7002,lng:-73.9903},602);
+assert.equal(short.mode,'walk');
+const future=rt.compute(network,day,origin,dest,790);
+assert(['walk','unavailable'].includes(future.mode));
+const a=rt.matchRT(p.segments,[{route:'A',tripId:'r1',stops:[{stop:'AS',dep:rt.nyTimestamp(day.date,611)},{stop:'BS',arr:rt.nyTimestamp(day.date,616)}]},{route:'L',tripId:'r2',stops:[{stop:'BN',dep:rt.nyTimestamp(day.date,624)},{stop:'CN',arr:rt.nyTimestamp(day.date,633)}]}],rt.nyTimestamp(day.date,602),day.date);
+assert.equal(a.liveLegs,2);assert(a.arrivalEpoch>rt.nyTimestamp(day.date,630));
+console.log('PASS station schedule + transfer + walking + realtime trip match');

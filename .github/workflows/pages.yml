@@ -41,6 +41,24 @@ jobs:
         run: |
           echo 'Testing deployed MTA proxy /health endpoint'
           curl -sS --location --max-time 25 -w '\nHTTP %{http_code}\n' 'https://noux-mta-live.benjbongard.workers.dev/health'
+      - name: Compile official MTA subway schedules for each NYC visit day
+        run: python scripts/build_mta_timetable.py
+      - name: Validate routing data and train-prediction parser
+        run: |
+          node scripts/test_routeplanner.js
+          node scripts/test_gtfsrt.js
+          python - <<'PY_CHECK'
+          import json,pathlib
+          p=pathlib.Path('assets/subway')
+          n=json.loads((p/'network.json').read_text())
+          assert len(n['stations'])>=400 and len(n['transfers'])>50
+          for d in range(23,28):
+            f=p/f'2026-11-{d:02d}.json'
+            z=p/(f.name+'.gz')
+            x=json.loads(f.read_text())
+            assert len(x['connections'])>100000 and z.stat().st_size>50000
+            print(f.name,len(x['trips']),len(x['connections']),'gzip',z.stat().st_size)
+          PY_CHECK
       - name: Construct publication package with encrypted itinerary ONLY
         env:
           MTA_PROXY_URL: ${{ vars.MTA_PROXY_URL || 'https://noux-mta-live.benjbongard.workers.dev' }}

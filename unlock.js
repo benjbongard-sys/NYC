@@ -32,7 +32,7 @@
    screen.classList.add('unlocked');
    await new Promise(resolve=>setTimeout(resolve,1050));
    // Execute vetted, encrypted first-party bundles in the required dependency order.
-   for(const name of ['data.js','itinerary.js','mta.js','photo-sources.js','custom-stops.js','app.js']){
+   for(const name of ['data.js','itinerary.js','mta.js','routeplanner.js','photo-sources.js','custom-stops.js','app.js']){
     if(!scripts[name])throw Error('Missing private module: '+name);
     const el=document.createElement('script');el.textContent=scripts[name]+`\n//# sourceURL=noux-private-${name}`;document.head.appendChild(el);
    }

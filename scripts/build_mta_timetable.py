@@ -4,7 +4,7 @@
 Only public route/stop/schedule data are emitted. Private itinerary content never enters these files.
 Each day's connections are sorted by departure time for an efficient connection scan.
 """
-import collections, csv, datetime as dt, io, json, os, pathlib, sys, time, urllib.request, zipfile
+import collections, csv, datetime as dt, gzip, io, json, os, pathlib, sys, time, urllib.request, zipfile
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 OUT = ROOT / 'assets' / 'subway'
@@ -131,8 +131,11 @@ def build(archive, out=OUT, dates=DATES):
             document={'date':date.isoformat(),'generated_utc':network['generated_utc'],
                 'service_ids':sorted(service_ids),'trips':trip_list,'connections':conn}
             target=out/(date.isoformat()+'.json')
-            target.write_text(json.dumps(document,separators=(',',':'),ensure_ascii=False))
-            print(date.isoformat(),'trips',len(trip_list),'connections',len(conn),'raw_bytes',target.stat().st_size,flush=True)
+            payload=json.dumps(document,separators=(',',':'),ensure_ascii=False).encode('utf-8')
+            target.write_bytes(payload)
+            zipped=gzip.compress(payload,compresslevel=9,mtime=0)
+            (out/(date.isoformat()+'.json.gz')).write_bytes(zipped)
+            print(date.isoformat(),'trips',len(trip_list),'connections',len(conn),'raw_bytes',len(payload),'gzip_bytes',len(zipped),flush=True)
         return network
 
 

@@ -1,0 +1,15 @@
+const assert=require('assert');global.window=global;global.NYC_DATA={STATIONS:{times:{label:'Times Sq',codes:['R16'],feeds:['nqrw']}}};
+require('../mta.js');const M=global.NYC_MTA;
+const v=n=>{let o=[];do{let x=n%128;n=Math.floor(n/128);o.push(n?x|128:x)}while(n);return Buffer.from(o)};
+const field=(i,val)=>Buffer.concat([v(i*8),v(val)]);
+const bytes=(i,buf)=>Buffer.concat([v(i*8+2),v(buf.length),buf]);
+const txt=(i,s)=>bytes(i,Buffer.from(s));
+const t=1790000000;
+const stop=(name,when)=>Buffer.concat([txt(4,name),bytes(2,field(2,when))]);
+const trip=Buffer.concat([txt(1,'official-trip-001'),txt(5,'A')]);
+const update=Buffer.concat([bytes(1,trip),bytes(2,stop('A27S',t+200)),bytes(2,stop('A31S',t+600))]);
+const entity=Buffer.concat([txt(1,'entity_1'),bytes(3,update)]);
+const head=Buffer.concat([txt(1,'2.0'),field(3,t)]);
+const msg=Buffer.concat([bytes(1,head),bytes(2,entity)]);
+const res=M.readTrips(msg);assert.equal(res.rows.length,1);assert.equal(res.rows[0].route,'A');assert.equal(res.rows[0].stops[0].stop,'A27S');assert.equal(res.rows[0].stops[1].arr,t+600);assert.equal(res.updated,t);
+console.log('PASS official GTFS-RT protobuf trip and stop predictions');
