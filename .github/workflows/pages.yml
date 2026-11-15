@@ -49,6 +49,8 @@ jobs:
           node scripts/test_gtfsrt.js
           node scripts/test_explorer.js
           node scripts/test_venues.js
+          node scripts/test_choices.js
+          node scripts/test_subway_map.js
           python - <<'PY_CHECK'
           import json,pathlib
           p=pathlib.Path('assets/subway')
