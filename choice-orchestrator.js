@@ -45,6 +45,8 @@ function activeArt(choices){
 }
 function guidance(c,v){
  if(c.id==='c6'&&ART.includes(v))return 'Can fit in the Tuesday art trail; MoMA moves to Wednesday when needed.';
+ if(c.id==='c9')return 'An alternate Wednesday geography, not an extra cross-river trip. Choosing it replaces the afternoon route.';
+ if(c.id==='c10')return 'Optional 19:30 Fort Greene theatre; allow travel and admission time. No ticket assumed.';
  if(c.id==='c5')return 'Saved as another area to consider. It needs an opening-hours and transport check.';
  if(['c2','c3','c4'].includes(c.id))return 'Date-specific show or club. Preserved as an option, not automatically moved to another date.';
  if(c.id==='c1')return 'An alternative restaurant or rooftop, kept for a later evening if available.';
@@ -60,7 +62,7 @@ function alternatives(choices){
   group:c.id,day:c.day,value:o[0],title:o[1],detail:o[2]||'',
   pinned:c.id==='c6'&&pinned(o[0]),actionable:c.id==='c6'&&ART.includes(o[0]),planned:c.id==='c6'&&activeArt(chosen).has(o[0]),
   note:guidance(c,o[0]),history:(journal().history[c.id]||[]).some(h=>h.value===o[0])
- })));
+ }))).concat(pending);
 }
 function e(id,start,end,title,place,detail,kind='experience',status='proposed'){
  return {id,start,end,title,place,detail,kind,status};
@@ -78,9 +80,9 @@ function planTuesday(orig,wanted,choices){
  const result=keepProtected(orig);
  if(hasB){
   result.push(e('allart_breakfast','08:55','09:25',"Zabar's Café · breakfast", 'zabars','2245 Broadway. Early Upper West Side start before the Butterfly Vivarium.','food'));
-  result.push(e('allart_oak','09:30','10:00','Oak Bridge · Central Park','oak','Morning walk and photographs near the American Museum of Natural History.','walk'));
-  result.push(e('allart_butterflies','10:15','11:25','AMNH · Davis Family Butterfly Vivarium','amnh','Original priority. Timed Vivarium entry and AMNH admission to book.','museum','ticket-to-check'));
-  result.push(e('allart_lunch','11:35','12:05','Daily Provisions · quick lunch','dailyProvisions','375 Amsterdam Avenue. Fast lunch; allow cross-town travel to the Guggenheim.','food'));
+  result.push(e('allart_oak','09:35','09:50','Oak Bridge · Central Park','oak','Morning walk and photographs near the American Museum of Natural History.','walk'));
+  result.push(e('allart_butterflies','10:15','11:15','AMNH · Davis Family Butterfly Vivarium','amnh','Original priority. Timed Vivarium entry and AMNH admission to book.','museum','ticket-to-check'));
+  result.push(e('allart_lunch','11:25','11:55','Daily Provisions · quick lunch','dailyProvisions','375 Amsterdam Avenue. Fast lunch; allow cross-town travel to the Guggenheim.','food'));
  }else if(hasG){
   result.push(e('allart_breakfast','09:35','10:15','Sant Ambroeus Madison · espresso breakfast','santAmbroeus','1000 Madison Avenue, convenient for the Guggenheim.','food'));
  }else{
@@ -88,24 +90,25 @@ function planTuesday(orig,wanted,choices){
  }
  if(hasG){
   result.push(e('allart_guggenheim',hasB?'12:40':'10:35',hasB?'13:35':'11:40','Guggenheim Museum · the spiral','guggenheim','1071 Fifth Avenue. Open from 10:30 on Tuesday; allow time to cross Central Park if arriving from the AMNH.','museum','ticket-to-check'));
-  result.push(e('allart_albertine',hasB?'13:45':'11:50',hasB?'14:10':'12:25','Albertine Books · celestial ceiling','albertine','972 Fifth Avenue. Original bookshop wish, a short walk from the Guggenheim.','culture'));
+  result.push(e('allart_albertine',hasB?'13:45':'11:50',hasB?'14:05':'12:25','Albertine Books · celestial ceiling','albertine','972 Fifth Avenue. Original bookshop wish, a short walk from the Guggenheim.','culture'));
   if(!hasB)result.push(e('allart_lunch','12:30','13:05','Via Quadronno · Italian café lunch','viaQuadronno','25 East 73rd Street. Quick lunch before the gallery trail.','food'));
  }else if(hasB){
   result.push(e('allart_albertine','12:45','13:20','Albertine Books · celestial ceiling','albertine','972 Fifth Avenue. Check bookshop opening hours.','culture'));
  }
  if(hasC){
-  result.push(e('allart_chelsea_transfer',hasG&&hasB?'14:10':'13:25','14:55','Across town to Chelsea · subway or taxi','chelsea','Allow 40–90 minutes depending on origin and service; live directions take precedence.','travel','proposed'));
-  result.push(e('allart_luhring','15:05','15:35','Luhring Augustine · Jason Moran: STACKS','luhring','531 West 24th Street. Named gallery, Tuesday hours 10:00–18:00.','art'));
-  result.push(e('allart_pace','15:43','16:16','Pace Gallery · exhibitions on West 25th','pace','540 West 25th Street. Two nearby galleries, no separate district transfer.','art'));
-  result.push(e('allart_highline','16:23','17:02','High Line · Chelsea architecture','highline','Outdoor gallery-to-park walking loop, daylight and weather permitting.','walk'));
+  result.push(e('allart_chelsea_transfer',hasG&&hasB?'14:05':'13:25','14:55','Across town to Chelsea · subway or taxi','chelsea','Allow 40–90 minutes depending on origin and service; live directions take precedence.','travel','proposed'));
+  result.push(e('allart_luhring','15:05','15:30','Luhring Augustine · Jason Moran: STACKS','luhring','531 West 24th Street. Named gallery, Tuesday hours 10:00–18:00.','art'));
+  result.push(e('allart_pace','15:40','16:08','Pace Gallery · exhibitions on West 25th','pace','540 West 25th Street. Two nearby galleries, no separate district transfer.','art'));
+  result.push(e('allart_highline','16:18','16:43','High Line · Chelsea architecture','highline','Outdoor gallery-to-park walking loop, daylight and weather permitting.','walk'));
  }else{
   result.push(e('allart_moma','15:15','16:38','MoMA · Nilima Sheikh, Surrealist Book & Brancusi','moma','11 West 53rd Street. Focused visit; the museum closes at 17:30 on Tuesday.','museum','ticket-to-check'));
   result.push(e('allart_rockefeller','16:45','17:18','Rockefeller Center · Fifth Avenue','rockefeller','A short Midtown walk after MoMA.','walk'));
  }
- const music=orig.filter(x=>!isProtected(x)&&x.id==='music');
- music.forEach(x=>result.push(x));
+ const music=orig.filter(x=>x.id==='music');
+ music.forEach(x=>{if(!result.some(y=>y.id===x.id))result.push(x)});
  if(music.length&&minutes(music[0].start)>=19*60){
-  result.push(e('allart_pizza','17:45','18:13',"Joe's Pizza · classic NYC slice",'joespizza','7 Carmine Street, West Village. A quick bite before the music; check travel to the chosen show.','food'));
+  result.push(e('allart_pizza','17:30','18:00',"Joe's Pizza · classic NYC slice",'joespizza','7 Carmine Street, West Village. A quick bite before the music; check travel to the chosen show.','food'));
+  if(choices.c2==='bluenote')result.push(e('allart_washington_sq','18:12','18:30','Washington Square · quick photographs','washingtonSquare','A short photo stop near the Blue Note, not a long sightseeing detour.','walk'));
  }
  // Other unrelated fixed events on this day remain untouched.
  orig.filter(x=>isProtected(x)&&!result.some(y=>y.id===x.id)).forEach(x=>result.push(x));
@@ -149,6 +152,8 @@ function wedPlaces(){
  const places={
   westlight:{name:'Westlight · Williamsburg rooftop',address:'111 N 12th St, Brooklyn, NY 11249, USA',area:'Williamsburg',lat:40.7222,lng:-73.9597,kind:'cocktail',url:'https://www.westlightnyc.com/'},
   superiorIngredients:{name:'Superior Ingredients · The Room',address:'74 Wythe Ave, Brooklyn, NY 11249, USA',area:'Williamsburg',lat:40.72232,lng:-73.95782,kind:'club',url:'https://www.si-bk.com/shows'},
+  washingtonSquare:{name:'Washington Square Park',address:'Washington Square, New York, NY 10012, USA',area:'Greenwich Village',lat:40.7308,lng:-73.9973,kind:'park',url:'https://www.nycgovparks.org/parks/washington-square-park'},
+  danteWest:{name:'Dante West Village · cocktails and dinner',address:'551 Hudson St, New York, NY 10014, USA',area:'West Village',lat:40.7356,lng:-74.0064,kind:'restaurant',url:'https://www.dante-nyc.com/location/dante-nyc/'},
   domino:{name:'Domino Park · waterfront',address:'15 River St, Brooklyn, NY 11249, USA',area:'Williamsburg',lat:40.7154,lng:-73.9682,kind:'walk',url:'https://www.dominopark.com/'}
  };
  Object.keys(places).forEach(k=>{if(!DATA.P[k])DATA.P[k]=places[k]});
@@ -208,8 +213,9 @@ function planWednesdayExperience(orig,choices){
  const transit=(id,start,end,title,place,detail)=>slot(id,start,end,title,place,detail+' Allow for NYC traffic, subway waits and station access; follow live MTA directions.','travel');
  if(mode==='manhattan'){
   slot('wed_whitney','14:25','15:40','Whitney Museum · art and the Meatpacking waterfront','whitney','99 Gansevoort Street. Reserve admission; adjust if you prefer another Manhattan gallery.','museum','ticket-to-check');
-  slot('wed_little_island','15:50','16:25','Little Island · Hudson River walk','littleIsland','Pier 55. Outdoor public park; weather-dependent.','walk');
-  slot('wed_west_village','16:40','17:20','West Village · Bleecker and Christopher Streets','westVillage','Neighbourhood walk and small independent shops; time for a relaxed evening.','walk');
+  slot('wed_little_island','15:52','16:17','Little Island · Hudson River walk','littleIsland','Pier 55. Outdoor public park; weather-dependent.','walk');
+  slot('wed_west_village','16:30','17:00','West Village · Bleecker and Christopher Streets','westVillage','Neighbourhood walk and small independent shops; time for a relaxed evening.','walk');
+  if(choices.c3!=='rest')slot('wed_dante','17:15',attendBAM?'17:55':'18:15','Dante West Village · dinner and cocktails','danteWest','551 Hudson Street, a named West Village restaurant near the afternoon trail. Suggested table; not reserved.','food','hours-to-check');
  }else{
   const vintage=mode==='williamsburg_vintage';
   if(vintage){
@@ -229,7 +235,7 @@ function planWednesdayExperience(orig,choices){
   slot('wed_oysters','17:20',attendBAM?'18:05':'18:35','Maison Premiere · oysters and cocktails','maisonPremiere','298 Bedford Avenue. Oyster stop, not automatically a full dinner; check reservations. Published Wednesday service begins at noon.','food','hours-to-check');
  }
  if(attendBAM){
-  transit('wed_to_bam',mode==='manhattan'?'18:00':'18:05','19:12',
+  transit('wed_to_bam',mode==='manhattan'?'18:05':'18:05','19:12',
    mode==='manhattan'?'Manhattan → BAM · theatre transfer':'Williamsburg → BAM · theatre transfer','bamharvey','Reach Fort Greene in time for the 19:30 curtain and admission.');
   if(!haveBookedBAM)slot('wed_bam','19:30','20:55','BAM · La Distance (French with English supertitles)','bamharvey','Harvey Theater, Fort Greene. Official running time 1h25. Tickets to purchase separately.','theatre','ticket-to-check');
  }
