@@ -62,4 +62,13 @@ assert.equal(env.window.NYC_PLAN.day('mon',defaults)[0].status,'booked','Unrelat
 for(const selection of ['all','butterflies','guggenheim','chelsea']){
  assertClean('tue',{...defaults,c6:selection});assertClean('wed',{...defaults,c6:selection});
 }
+// A user-confirmed booking must survive automatic conflict repair, even if an
+// alternative plan cannot be made collision-free and needs manual review.
+base.wed.find(x=>x.id==='hotel_view').status='booked';
+const protectedWed=env.window.NYC_PLAN.day('wed',defaults);
+assert(protectedWed.some(x=>x.id==='hotel_view'&&x.status==='booked'),
+  'A confirmed rooftop booking must never be silently removed');
+assert(!protectedWed.some(x=>x.id==='art_wed_bam_transfer'),
+  'Never schedule a synthetic transfer over a confirmed reservation');
+base.wed.find(x=>x.id==='hotel_view').status='proposed';
 console.log('Choice orchestrator PASS: all three, two-day travel, chronology, persistence and preserved concerts.');
