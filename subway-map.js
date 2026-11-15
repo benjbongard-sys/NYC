@@ -181,6 +181,7 @@ async function fetchLive(force=false){
  const proxy=getProxy(),st=stationInfo();if(!proxy){liveWarning='Live predictions unavailable; open the official MTA app.';redraw();return}
  inflight=true;lastRefresh=Date.now();setText('.noux-subway-fresh','Refreshing MTA predictions…');
  try{
+  if(typeof MTA.tripUpdates!=='function')throw Error('Live trip predictions require the current MTA client');
   const res=await MTA.tripUpdates(st.feeds||[],proxy);
   if(!panel)return;
   const now=Date.now()/1000,match=new Set(st.codes||[]);
@@ -233,9 +234,6 @@ function buildPanel(){
  const grid=ui('div','noux-subway-columns'),a=ui('div','noux-subway-card'),b=ui('div','noux-subway-card');
  a.append(ui('h3',null,'Trains at your station'));
  const filters=ui('div','noux-subway-filters');
- [['all','Both'],['N','Northbound'],['S','Southbound']].forEach(([key,label])=>filters.append(btn(label,()=>{direction=key;filters.querySelectorAll('button').forEach(n=>n.classList.toggle('active',n.dataset.direction===key));redraw()},'noux-subway-dir'+(key===direction?' active':'')).cloneNode(false)));
- // Set event listeners on actual buttons, not clones.
- filters.replaceChildren();
  [['all','Both'],['N','N / Uptown'],['S','S / Downtown']].forEach(([key,label])=>{
   const control=btn(label,()=>{direction=key;filters.querySelectorAll('button').forEach(n=>n.classList.toggle('active',n.dataset.direction===key));redraw()},'noux-subway-dir'+(key===direction?' active':''));
   control.dataset.direction=key;filters.append(control);
@@ -251,7 +249,8 @@ function buildPanel(){
 }
 async function mount(){
  if(panel&&panel.isConnected)return;
- const parent=document.querySelector('.live-page');
+ const active=Array.from(document.querySelectorAll('.topbar .mainnav button')).find(x=>x.classList.contains('current')&&/subway|MTA|arrival/i.test(x.textContent));
+ const parent=document.querySelector('.live-page')||(active&&document.querySelector('main.main'));
  if(!parent)return;
  try{map?.remove()}catch(_){}
  map=null;panel=null;network=null;
@@ -263,7 +262,8 @@ async function mount(){
 function locate(){
  if(!installed)return;
  if(panel&&!panel.isConnected){panel=null;try{map?.remove()}catch(_){}map=null;network=null}
- if(!panel&&document.querySelector('.live-page'))mount();
+ const current=Array.from(document.querySelectorAll('.topbar .mainnav button')).find(x=>x.classList.contains('current')&&/subway|MTA|arrival/i.test(x.textContent));
+ if(!panel&&(document.querySelector('.live-page')||current))mount();
 }
 function install(){
  if(installed)return true;
