@@ -47,6 +47,7 @@ function guidance(c,v){
  if(c.id==='c6'&&ART.includes(v))return 'Can fit in the Tuesday art trail; MoMA moves to Wednesday when needed.';
  if(c.id==='c9')return 'An alternate Wednesday geography, not an extra cross-river trip. Choosing it replaces the afternoon route.';
  if(c.id==='c10')return 'Optional 19:30 Fort Greene theatre; allow travel and admission time. No ticket assumed.';
+ if(c.id==='c11')return 'Alternative early-morning sunrise day. Only one morning is selected; never book both.';
  if(c.id==='c5')return 'Saved as another area to consider. It needs an opening-hours and transport check.';
  if(['c2','c3','c4'].includes(c.id))return 'Date-specific show or club. Preserved as an option, not automatically moved to another date.';
  if(c.id==='c1')return 'An alternative restaurant or rooftop, kept for a later evening if available.';
@@ -170,6 +171,12 @@ function wedChoices(){
    ['manhattan','Manhattan first · Whitney, Little Island and West Village','Keep the afternoon on Manhattan, with a museum and waterside walk. Williamsburg remains available for another visit.'],
    ['williamsburg','Williamsburg · waterfront → Westlight → oysters','Domino Park in daylight, rooftop at sunset, then Maison Premiere. Travel and opening times require checking.'],
    ['williamsburg_vintage','Williamsburg · vintage shops + skyline + oysters','Add Awoke and Stella Dallas to the sunset trail; this is a fuller, more demanding afternoon.']
+  ]);
+ insert('c11','wed','Brooklyn Bridge at sunrise · choose the morning',
+  'An unforgettable free sunrise with DUMBO photos and a Brooklyn → Manhattan bridge walk. Best fit: Wednesday, before the museums. No reservation needed.',[
+   ['wed','Wednesday sunrise · 06:54 · preferred','Leave Midtown around 06:00, photograph DUMBO at dawn, walk across the bridge back towards Manhattan and return by breakfast.'],
+   ['fri','Friday sunrise · 06:56 · alternative','Use only if you are rested after Thursday night; return for hotel breakfast and the last sightseeing day.'],
+   ['skip','Keep the morning relaxed','Do not wake early. Brooklyn Bridge remains available as a daytime visit.']
   ]);
  insert('c10','skip','Wednesday evening · BAM theatre?',
   'The 19:30 La Distance performance in Fort Greene is optional. Selecting it reserves travel time, not a theatre seat.',[
