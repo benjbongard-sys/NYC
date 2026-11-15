@@ -51,6 +51,7 @@ jobs:
           node scripts/test_venues.js
           node scripts/test_choices.js
           node scripts/test_day_audit.js
+          node scripts/test_unlock_recovery.js
           node scripts/test_departure.js
           node scripts/test_subway_map.js
           python - <<'PY_CHECK'
