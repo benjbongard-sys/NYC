@@ -222,13 +222,13 @@
     "exact": false
   },
   "morales": {
-    "label": "House music dancefloor atmosphere",
+    "label": "David Morales performing (historical event, not Refuge 2026)",
     "urls": [
-      "https://images.unsplash.com/photo-1571266028243-d220c6f790a7?w=1200&q=82"
+      "https://grooveodyssey.com/cdn/shop/articles/David_morales_2048x.jpg?v=1546989268"
     ],
-    "credit": "Unsplash contributor / representative music setting, not David Morales on 26 Nov",
-    "source": "https://unsplash.com/s/photos/dj-music",
-    "exact": false
+    "credit": "Groove Odyssey / David Morales performing (2018 archive)",
+    "source": "https://grooveodyssey.com/blogs/gallery/groove-odyssey-end-of-year-party",
+    "exact": true
   },
   "soul": {
     "label": "Soul and disco dancefloor atmosphere",
@@ -240,13 +240,13 @@
     "exact": false
   },
   "superior": {
-    "label": "Williamsburg nightclub atmosphere",
+    "label": "Superior Ingredients indoor dancefloor (venue, not 25/26 Nov set)",
     "urls": [
-      "https://images.unsplash.com/photo-1571266028243-d220c6f790a7?w=1200&q=82"
+      "https://cdn.sanity.io/images/pge26oqu/production/7a6e8720b5fca9d7ad273cbb442d708d0728bb4e-1800x1200.jpg?h=750&rect=300%2C0%2C1200%2C1200&w=750"
     ],
-    "credit": "Unsplash contributor / illustrative club scene, not Superior Ingredients",
-    "source": "https://unsplash.com/s/photos/dj-club",
-    "exact": false
+    "credit": "Gray Area / Superior Ingredients venue photography",
+    "source": "https://grayarea.co/venues/superior-ingredients/spotlight",
+    "exact": true
   },
   "jazz": {
     "label": "Live jazz",
@@ -294,13 +294,13 @@
     "exact": false
   },
   "chelsea": {
-    "label": "Chelsea New York atmosphere",
+    "label": "Chelsea gallery district and David Zwirner exterior",
     "urls": [
-      "https://images.unsplash.com/photo-1533002832-1721d16b4bb8?w=1200&q=82"
+      "https://images.ctfassets.net/1aemqu6a6t65/1ocMdzY5O9s4l8i2nn3juE/09d253b00272ce850de6a78e9f861668/chelseagalleries_davidzwirner_chelsea_manhattan_nyc_joebuglewicz_011"
     ],
-    "credit": "Unsplash contributor / city atmosphere",
-    "source": "https://unsplash.com/s/photos/chelsea-new-york",
-    "exact": false
+    "credit": "Joe Buglewicz / NYC Tourism + Conventions",
+    "source": "https://www.nyctourism.com/itineraries/what-to-do-in-chelsea-in-one-day/",
+    "exact": true
   },
   "highline": {
     "label": "High Line Park",
@@ -312,12 +312,12 @@
     "exact": false
   },
   "guggenheim": {
-    "label": "Guggenheim Museum",
+    "label": "Guggenheim Museum exterior",
     "urls": [
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Guggenheim_Museum_New_York.jpg/1200px-Guggenheim_Museum_New_York.jpg"
+      "https://upload.wikimedia.org/wikipedia/commons/7/74/Guggenheim_museum_exterior.jpg"
     ],
-    "credit": "Wikimedia Commons / New York Guggenheim (verify attribution before republishing)",
-    "source": "https://commons.wikimedia.org/wiki/Category:Solomon_R._Guggenheim_Museum",
+    "credit": "Finlay McWalter / edited by Soerfm, CC BY-SA 3.0, Wikimedia Commons",
+    "source": "https://commons.wikimedia.org/wiki/File:Guggenheim_museum_exterior.jpg",
     "exact": true
   },
   "met": {
