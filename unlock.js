@@ -102,7 +102,7 @@
    }
    $('root').hidden=false;screen.style.display='none';
    // First confirm that the unmodified React app has actually painted.
-   await new Promise(resolve=>setTimeout(resolve,250));
+   await new Promise(resolve=>setTimeout(resolve,700));
    if(!healthy()||visualError){
     recovery('The encrypted itinerary unlocked, but the visual planner did not finish opening. Try the basic itinerary; your personal data remains intact.');
    }else{
@@ -112,9 +112,8 @@
      try{window.NOUX_CHOICES?.install()}catch(_){}
      try{window.NOUX_DAY_AUDIT?.install()}catch(_){}
      try{window.NOUX_SUBWAY?.install()}catch(_){}
-     // React's state stays authoritative; request a regular view refresh only
-     // after the baseline UI is visible, not during component creation.
-     try{document.dispatchEvent(new CustomEvent('noux:replan',{detail:{kind:'unlock-ready'}}))}catch(_){}
+     // Do not force immediate React tab toggles during startup. Decisions refresh
+     // naturally when the visitor opens the itinerary or changes a selection.
     }
     // Encrypted checklist is a sibling of React's root, not a child of its nav.
     if(window.NOUX_DEPARTURE){try{await window.NOUX_DEPARTURE.install({key})}catch(_){}}
