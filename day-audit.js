@@ -28,6 +28,12 @@ function trim(e){if(personal(e))return e;const out={...e},t=String(e.title||'').
  return out}
 function monday(rows){const cruise=rows.find(e=>e.id==='cruise'||(/cruise/i.test(e.title||'')&&hard(e)));if(!cruise)return rows;
  const s=minute(cruise.start);if(!Number.isFinite(s)||s<60)return rows;
+ // Arrival-day transfers are the priority: never fit a speculative Midtown detour
+ // immediately before a time-specific booked cruise. Exact departure pier is on the ticket.
+ if(!rows.some(e=>e.id==='mon_cruise_transfer')){
+  const x=item('mon_cruise_transfer',time(s-105),time(s-45),'Head to the confirmed cruise departure pier',cruise.place,'60-minute planning buffer from Midtown, not a certified journey. If JFK arrival or hotel bag drop runs late, skip optional sightseeing and travel directly to the ticketed pier.','travel');
+  x.auditAnchor=true;propose(rows,x);
+ }
  if(!rows.some(e=>/boarding|check.?in.*pier|mon_cruise_boarding/i.test((e.id||'')+' '+(e.title||'')))){
   const e=item('mon_cruise_boarding',time(s-45),time(s-15),'Cruise pier · security and boarding buffer',cruise.place,'Arrive at the actual booked departure pier. Terminal and transfer are subject to the ticket; this is a buffer, not a second reservation.','logistics');
   e.auditAnchor=true;propose(rows,e)
@@ -55,7 +61,14 @@ function friday(rows){const pickup=rows.find(e=>e.id==='pickup'||(/airport trans
  if(!rows.some(e=>/check.?out|bag drop|store.*luggage/i.test((e.id||'')+' '+(e.title||''))))propose(rows,item('audited_checkout','10:15','10:35','Hotel checkout · leave bags at reception',hotel,'Checkout before 11:00. Confirm luggage storage with reception.','logistics'));
  propose(rows,item('audited_friday_lunch','12:05','12:40','Midtown lunch · Los Tacos No. 1',times,'229 West 43rd Street if choosing Los Tacos. Short lunch, not a seated 90-minute meal.','food'));
  propose(rows,item('audited_grand_central','13:20','13:50','Grand Central Terminal · architecture and photographs','auditGrandCentral','Main Concourse and celestial ceiling. 30 minutes is sufficient for a focused visit.','culture'));
- propose(rows,item('audited_bryant','14:10','14:35','Bryant Park · Winter Village and holiday shops','auditBryantPark','A compact holiday-market visit, then return west to collect luggage.','walk'));
+ // Friday's morning option may already include Bryant Park. Never walk there twice.
+ const alreadyBryant=rows.some(e=>/bryant park/i.test(String(e.title||'')));
+ if(alreadyBryant){
+  addPlace('auditStPatrick',{name:"St. Patrick's Cathedral",address:'5th Ave at East 50th Street, New York, NY 10022, USA',area:'Midtown',lat:40.7585,lng:-73.976,kind:'culture',url:'https://saintpatrickscathedral.org/'});
+  if(!rows.some(e=>/st. patrick|st patrick/i.test(String(e.title||''))))propose(rows,item('audited_stpatrick','14:10','14:35',"St. Patrick's Cathedral · focused visit",'auditStPatrick','Fifth Avenue interior or exterior depending on services; 25 minutes, then walk west to the hotel.','culture'));
+ }else{
+  propose(rows,item('audited_bryant','14:10','14:35','Bryant Park · Winter Village and holiday shops','auditBryantPark','A compact holiday-market visit, then return west to collect luggage.','walk'));
+ }
  propose(rows,item('audited_bags','15:15','15:40','Return to hotel · collect stored luggage',hotel,'Make sure bags are collected and everyone is ready before the confirmed airport transfer.','logistics'));
  return rows}
 function openOn(day,e){const p=String(e.place||'').toLowerCase(),t=String(e.title||'').toLowerCase();
@@ -90,5 +103,5 @@ function install(){if(installed)return true;DATA=window.NYC_DATA;PLAN=window.NYC
  BASE=PLAN.day.bind(PLAN);PLAN.day=function(day,choices){const original=BASE(day,choices);if(!Array.isArray(original))return original;
  try{const rows=original.map(x=>({...x}));if(day==='mon')monday(rows);if(day==='thu')thursday(rows);if(day==='fri')friday(rows);return resolve(day,rows)}catch(_){return original}
  };installed=true;return true}
-window.NOUX_DAY_AUDIT={install,version:'2026.11.15-audit',pending:()=>{try{return Object.values(JSON.parse(localStorage.getItem(KEY)||'{}')).flat().filter(Boolean)}catch(_){return []}}};
+window.NOUX_DAY_AUDIT={install,version:'2026.11.15-audit-v2',pending:()=>{try{return Object.values(JSON.parse(localStorage.getItem(KEY)||'{}')).flat().filter(Boolean)}catch(_){return []}}};
 })();
