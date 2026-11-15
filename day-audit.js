@@ -64,7 +64,7 @@ function sunrise(day,rows,choices){
   item('sunrise_'+day+'_photos','06:45','07:10','Brooklyn Bridge at sunrise · DUMBO photographs','auditDumboSunrise',sunriseNote+' Photograph the bridge, skyline and waterfront; no reservation is required.','walk'),
   item('sunrise_'+day+'_entrance','07:10','07:30','DUMBO → Brooklyn Bridge pedestrian entrance','auditBridgeWalk','Walk inland to the Brooklyn Bridge pedestrian access, allowing a photo stop at Washington Street.','travel'),
   item('sunrise_'+day+'_bridge','07:30','08:05','Walk Brooklyn Bridge towards Manhattan · photo stops','auditBridgeWalk','Walk from Brooklyn to Manhattan on the pedestrian deck. Sunrise is over by this point; enjoy the morning light.','walk'),
-  item('sunrise_'+day+'_return','08:05','08:55','Return to Midtown · subway / breakfast',home,'Reach the hotel or selected breakfast venue with enough margin for the day's first timed visit. Check live directions.','travel')
+  item('sunrise_'+day+'_return','08:05','08:55','Return to Midtown · subway / breakfast',home,'Reach the hotel or selected breakfast venue with enough margin for the day’s first timed visit. Check live directions.','travel')
  ];
  tasks.forEach(x=>propose(rows,x));
  return rows;
