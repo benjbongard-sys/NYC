@@ -16,6 +16,9 @@ const pathKey=path=>JSON.stringify(path);
 const parseKey=k=>{try{const p=JSON.parse(k);return Array.isArray(p)&&p.length>=1&&p.length<=15&&p.every(x=>typeof x==='string'&&x.length<=190&&!RESERVED.has(x))?p:null}catch(_){return null}};
 const hasName=k=>STORE.test(k)&&!PRIVATE.test(k)&&!/^noux_(?:sync|shared)[_-]/.test(k)&&k.length<=120;
 function flatten(value,path,flat,depth=0){
+ // Embedded photo blobs can exceed browser/Worker storage quotas. Keep those
+ // images local, but still sync the custom stop's text, position and choices.
+ if(typeof value==='string'&&value.length>180000)return;
  if(depth>10){flat[pathKey(path)]=value;return}
  if(Array.isArray(value)){
   // Empty collections represent an absence of local additions when a new
@@ -42,7 +45,7 @@ function scan(storage,checklist){
   if(!hasName(key))continue;
   let raw;try{raw=storage.getItem(key)}catch(_){continue}
   if(typeof raw!=='string')continue;
-  if(raw.length>2_500_000)continue;
+  if(raw.length>5_200_000)continue;
   try{
    const decoded=JSON.parse(raw);
    if(plain(decoded)||Array.isArray(decoded))flatten(decoded,[key],result);
