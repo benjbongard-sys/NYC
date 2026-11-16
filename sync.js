@@ -90,13 +90,23 @@ async function snapshot(){
  const packing=await window.NOUX_DEPARTURE?.getSharedSnapshot?.();
  return CORE.scan(localStorage,packing||{check:{},items:[]});
 }
-async function applyRecords(records){
+// Distinguish genuine remote itinerary changes from local self-synchronisation.
+function incomingItineraryChange(local,merged){
+ for(const [key,record] of Object.entries(merged||{})){
+  const path=CORE.parseKey(key);
+  if(!path||path[0]==='@noux-departure'||!record||typeof record!=='object')continue;
+  if(record.deleted){if(exists(local,key))return true}
+  else if(!exists(local,key)||JSON.stringify(local[key])!==JSON.stringify(record.value))return true;
+ }
+ return false;
+}
+async function applyRecords(records,notifyExternal=false){
  const packing=await window.NOUX_DEPARTURE?.getSharedSnapshot?.();
  const result=CORE.apply(localStorage,packing||{check:{},items:[]},records);
  if(result.checklistChanged&&window.NOUX_DEPARTURE?.applySharedSnapshot){
   await window.NOUX_DEPARTURE.applySharedSnapshot(result.checklist);
  }
- if(result.changedKeys.length){
+ if(notifyExternal&&result.changedKeys.length){
   IMPORT_CHANGED=true;
   // Preserve the current decrypted React app and make the fresh data visible
   // after a controlled reload. Never overwrite React state by clicking tabs.
@@ -186,7 +196,7 @@ async function refresh(){
     INFO='New local edit detected during sync; retrying safely.';
     return;
    }
-   await applyRecords(merged);
+   await applyRecords(merged,incomingItineraryChange(local,merged));
    CACHE={room:CONFIG.room,revision:remoteRevision,records:merged,baseline:await snapshot(),lastStamp:Math.max(Number(CACHE?.lastStamp||0),Date.now())};
    await persist();
    LAST_OK=Date.now();ERROR='';
@@ -337,5 +347,5 @@ async function install({key}={}){
  window.addEventListener('storage',ev=>{if(ev.key&&ev.key!==PAIR_KEY&&ev.key!==CACHE_KEY)queueRefresh()});
  return true;
 }
-window.NOUX_SYNC={install,refresh,version:'2026.11.16-3',serviceUrl};
+window.NOUX_SYNC={install,refresh,version:'2026.11.16-4',serviceUrl};
 })();
