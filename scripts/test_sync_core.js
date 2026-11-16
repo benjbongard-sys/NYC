@@ -28,6 +28,15 @@ const items=[{id:'cookies',name:'Cookies',bought:false,packed:false,recipient:''
 const bcheck={check:{'Benjamin:phone':false,'Lyna:phone':false},items};
 const lcheck=JSON.parse(JSON.stringify(bcheck));
 const f1=sync.scan(ben,bcheck),f2=sync.scan(lyna,lcheck);
+const freshDevice=db({nyc_lyna_trip_v6:JSON.stringify({choices:{},customStops:[]})});
+const empty=sync.scan(freshDevice,{check:{},items:[]});
+assert(!Object.keys(empty).some(k=>k.includes('customStops')||k.includes('choices')),
+ 'An empty new-device list cannot overwrite another phone’s nonempty stops and preferences');
+const freshMerged=sync.merge(sync.diff({},f1,{},'ben',()=>100),
+ sync.diff({},empty,{},'lyna',()=>101));
+sync.apply(freshDevice,{check:{},items:[]},freshMerged);
+assert(JSON.parse(freshDevice.getItem('nyc_lyna_trip_v6')).customStops.some(x=>x.id==='stop-a'),
+ 'Existing custom stops survive pairing with a fresh phone');
 assert(Object.keys(f1).some(k=>k.includes('stop-a')),'Custom stops split by stable id');
 const doc1=sync.diff({},f1,{},'ben',()=>100);
 const doc2=sync.diff({},f2,{},'lyna',()=>101);
