@@ -46,7 +46,7 @@ const api=async (url,request)=>{
 function browser(label,key){
  const storage=makeStorage({nyc_lyna_trip_v6:JSON.stringify({choices:{c6:'butterflies',c9:'manhattan'},customStops:[]})});
  const body=new Node('body');
- const doc={body,hidden:false,createElement:t=>new Node(t),addEventListener(){}};
+ const doc={body,hidden:false,createElement:t=>new Node(t),getElementById:id=>search(body).find(x=>x.id===id)||null,addEventListener(){}};
  let checklist={check:{'Benjamin:phone':false,'Lyna:phone':false},items:[{id:'cookies',name:'Cookies',bought:false,packed:false}]};
  const departure={whenSaved:async()=>{},getSharedSnapshot:async()=>JSON.parse(JSON.stringify(checklist)),applySharedSnapshot:async v=>{checklist=JSON.parse(JSON.stringify(v))}};
  const window={NOUX_DEPARTURE:departure,addEventListener(){},dispatchEvent(){}};
