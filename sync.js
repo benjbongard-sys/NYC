@@ -100,10 +100,15 @@ async function applyRecords(records){
   IMPORT_CHANGED=true;
   // Preserve the current decrypted React app and make the fresh data visible
   // after a controlled reload. Never overwrite React state by clicking tabs.
+  // React's active state may still hold the previous choice. Prevent
+  // another edit from unintentionally replacing the incoming shared choice.
+  // The packing checklist, mounted outside React, remains fully accessible.
+  const main=document.getElementById('root');if(main)main.inert=true;
+  const explore=document.querySelector('.noux-explorer-launch');if(explore)explore.disabled=true;
   let toast=document.getElementById('noux-sync-notice');
   if(!toast){
    toast=el('div','noux-sync-notice');toast.id='noux-sync-notice';
-   toast.append(el('span',null,'New trip changes received from the other phone.'));
+   toast.append(el('span',null,'New shared itinerary changes are saved. Reopen the itinerary before editing further to avoid overwriting them.'));
    toast.append(button('View latest itinerary',()=>location.reload(),'noux-sync-primary'));
    document.body.append(toast);
   }
@@ -263,7 +268,7 @@ function connectedScreen(){
  const summary=el('div','noux-sync-statusbox');
  summary.append(el('strong',null,ERROR?'Sync attention needed':'Shared trip connected'),el('p','noux-sync-status',statusText()));
  if(IMPORT_CHANGED){
-  const changed=el('p','noux-sync-new','Changes from the other device have been saved locally. The packing list updates immediately; reopen the itinerary to load the latest choices and stops.');
+  const changed=el('p','noux-sync-new','Changes from the other device have been saved locally. The packing list updates immediately; reopen the itinerary before further edits to prevent stale selections from overwriting them.');
   summary.append(changed,button('Reopen itinerary to view latest',()=>location.reload(),'noux-sync-secondary'));
  }
  body.append(summary);
