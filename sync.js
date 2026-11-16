@@ -12,7 +12,13 @@ const POLL_MS=6500;
 let KEY=null,CORE=null,CONFIG=null,CACHE=null,DEVICE='',RUNNING=false,READY=false,OPEN=false,DISPLAY_CODE=false;
 let PANEL=null,LAUNCHER=null,LAST_OK=0,ERROR='',INFO='',IMPORT_CHANGED=false,STORAGE_TIMER=0,POLL_TIMER=0,SPEND=0;
 const enc=new TextEncoder(),dec=new TextDecoder();
-const b64=x=>btoa(String.fromCharCode(...new Uint8Array(x)));
+const b64=x=>{
+ const bytes=new Uint8Array(x);let binary='';
+ // A full itinerary can be megabytes. Spreading all bytes into one function
+ // call crashes Safari/iPhone and Chrome with "too many arguments".
+ for(let i=0;i<bytes.length;i+=8192)binary+=String.fromCharCode(...bytes.subarray(i,i+8192));
+ return btoa(binary);
+};
 const unb64=x=>Uint8Array.from(atob(x),c=>c.charCodeAt(0));
 const clone=x=>JSON.parse(JSON.stringify(x));
 const exists=(o,k)=>Object.prototype.hasOwnProperty.call(o,k);
