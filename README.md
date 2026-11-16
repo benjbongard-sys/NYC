@@ -14,12 +14,12 @@ This repository had earlier unencrypted revisions. Replacing the current branch 
 - Complete dynamic daily schedule, choices and travel estimates, and independently recorded bookings.
 - Global search (Cmd/Ctrl+K) across all itinerary stops and wishes.
 - All-stops MapLibre vector map using OpenFreeMap, with selected visits, alternatives and custom pins. No requests to blocked OpenStreetMap volunteer tile servers.
-- Departure-day itinerary returns to the hotel for stored luggage; pickup time is editable and explicitly unconfirmed.
+- Departure-day itinerary returns to the hotel for stored luggage before the **arranged guided group coach at approximately 17:00 on Friday 27 November**. The exact lobby boarding time is subject to the travel organiser.
 - Official MTA subway GTFS-Realtime feed client, via a deployable Cloudflare Worker. Without an authorised Worker, no direct blocked browser requests or fabricated arrivals are shown.
 - Verified venue photographs bundled locally during GitHub Pages Actions builds.
 - Custom-stop editor: add, edit, remove and position a stop, search a NYC address with Photon after a button click, look up a relevant Wikipedia photograph and description, upload your own photo or provide an HTTPS image link.
 - Selecting a custom stop immediately updates the relevant day, changes the map and calendar export, estimates travel buffers and moves flexible stops when possible. Fixed appointments (especially the booked Monday cruise and Friday transfer pickup) never move; conflicts are clearly flagged. These are planning estimates, not certified travel times or validated venue opening hours.
-- Personal custom stops remain in the browser only; use export/import to move them between devices. Never enter access tokens or passwords in custom-stop fields.
+- Personal custom stops remain local until **Shared trip sync** is paired. Once enabled, custom stops and saved choices are end-to-end encrypted and automatically copied to the partner's paired browser. Offline edits remain local until connectivity returns. Never enter access tokens or passwords in custom-stop fields.
 
 
 ## Route-quality safeguards
@@ -33,15 +33,36 @@ The public `choice-orchestrator.js` and `day-audit.js` layers run only **after**
 - When an airport pickup remains the original unconfirmed noon placeholder, the planner proposes a later departure-day Midtown route and a provisional afternoon collection window. A confirmed pickup is **never** moved; verify the operator's time and boarding-pass arrival advice before relying on the draft.
 - Five-day synthetic regression tests are run in `scripts/test_day_audit.js`, alongside existing choice, venue, routing and subway tests, as part of the Pages deployment workflow.
 
-**Important:** transfer estimates and venue hours are not live guarantees. Protected bookings survive conflicts, which are flagged for human resolution. The client-only choice journal and personal custom stops are not automatically synchronised across devices.
+**Important:** transfer estimates and venue hours are not live guarantees. Protected bookings survive conflicts, which are flagged for human resolution. Choice history and personal stops sync only after both devices join the same encrypted shared room; before pairing, all data stays on each device.
 
 ## Final-day coach, sunrise and encrypted checklists
 
 - **Friday 27 November:** breakfast at the hotel from 07:00 to 10:00; check out **before 12:00**, leaving suitcases with hotel reception. The booked group transfer is by coach with a French-speaking guide, **approximately 17:00** from the hotel to JFK Terminal 1. The planner puts guests in the lobby by 16:45. This supersedes the earlier speculative noon/15:50 pickup. The private encrypted itinerary retains actual flight booking details.
 - **Brooklyn Bridge sunrise:** a non-ticketed photo-and-walking excursion can be selected for **Wednesday** (default, approximately 06:54 sunrise), **Friday** (approximately 06:56) or skipped. The proposed DUMBO waterfront photo session leads into a Brooklyn → Manhattan pedestrian bridge crossing; travel and dawn weather need rechecking.
 - After successful vault unlock, a final **Departure & gifts** navigation tab appears (mobile: visible fixed launcher). It provides **independent Lyna/Benjamin completion tickboxes**, an editable NYC shopping/bringing-home list, separate **Bought** / **Packed** markers, curated shop websites, Google Maps directions and a one-click current Google Maps shop search for any newly added item. The "Suggest best day" action uses an approximate neighbourhood match to the itinerary, **not live stock availability**.
-- All ticks and shopping notes are saved on the current device, **encrypted locally with AES-GCM** using the locally derived itinerary key. Changes persist after reload; encrypted JSON export/import can move them to another device with the same passphrase. **There is no automatic multi-device synchronisation** and no checklist plaintext is pushed to GitHub.
+- All ticks and shopping notes are saved **encrypted locally with AES-GCM**. After the two phones have been paired, changes also synchronise through encrypted Cloudflare Durable Object storage, preserving Benjamin's and Lyna's independent checkboxes. Encrypted export/import remains available as a separate backup.
 - The shopping suggestions and France customs caveats are informational. Store inventory, special holiday hours, carrier baggage conditions and customs exemptions need verification before purchase.
+
+## Shared trip: Ben + Lyna on separate phones
+
+The optional shared backend is an **independent** Cloudflare Worker (`cloudflare/sync-worker.js`) at `https://noux-sync.benjbongard.workers.dev`. It uses a SQLite-backed Durable Object with one strongly consistent document per randomly generated room. GitHub Actions deploys it automatically on changes to the Worker or its deploy workflow, provided the existing `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` Actions secrets allow creating/deploying Workers.
+
+**First verify** `https://noux-sync.benjbongard.workers.dev/health` returns `{"ok":true,...}`. The sync tab remains local/offline until this service is deployed. If deployment fails, check **Actions → Deploy NOUX encrypted sync**; do not paste any API token or pairing code into chat.
+
+1. On the first phone, open NOUX and unlock with the existing **private itinerary passphrase**. Select **Set up shared sync**, identify the device as Benjamin (or Lyna), then **Create our shared trip**. Wait for **Shared trip synced**.
+2. Click **Copy pairing code** and deliver it privately to the other person. It begins with `NOUX1.` and contains a 128-bit random room ID plus a 256-bit random capability. **The code is a secret**, not an ordinary public link. Do not put it in a GitHub issue, URL, website setting, public chat or screenshot.
+3. On the second phone, open the same NOUX URL, unlock with the **same itinerary passphrase**, choose **Lyna** (or Benjamin), paste the pairing code and choose **Join existing trip**.
+4. Both browsers poll roughly every 6.5 seconds, and also synchronise after relevant local actions, focus and reconnection. Personal stop additions, itinerary choices and all checkboxes/bring-home items merge **by field or stable ID**. Ben and Lyna's packing ticks are independent. An offline device retains its local edits and submits them on reconnect.
+5. Incoming checklist changes appear immediately in the open checklist. An already-open **React itinerary** cannot safely be rehydrated without its private source, so a small **View latest itinerary** prompt appears when another device changes choices or custom stops. Click to reload and enter the passphrase again. The new state is already stored locally before reload.
+
+### Privacy, conflicts and recovery
+
+- The Worker receives **only** authenticated AES-GCM ciphertext. The key is derived locally from the existing itinerary passphrase and vault salt; no passphrase, private itinerary plaintext, custom stop, gift or packing label is sent to Cloudflare. The random pairing token is sent over HTTPS solely as a bearer capability and is stored encrypted on each phone. Cloudflare retains a SHA-256 verifier of the capability, not the raw secret.
+- Room writes use a monotonic revision with conflict rejection, followed by field-wise merge and retry. Distinct choices, separately identified stops and individual Bought/Packed/checklist ticks are preserved independently. **When the exact same field is edited simultaneously**, the newer device timestamp wins. Keep your device clocks set automatically.
+- Browser storage is **not** replaced with a destructive remote snapshot. On initial pairing with an established room, shared fields win while locally unique custom stops and gifts are retained. If syncing fails, the website keeps working from its existing local copy.
+- Pairing and synchronisation cache are encrypted in each browser. If a phone is lost or browser data deleted, unlock NOUX on the replacement device and enter the pairing code again. If you lose the code on both devices, the existing room cannot be recovered from public GitHub data; create a new room using the latest device copy and pair again.
+- The shared room is **not a user-account login**: anyone with the pairing capability can read or replace its ciphertext, and anyone with **both** the pairing code and itinerary passphrase could decrypt the shared data. Share both separately and privately. No commercial-grade authentication, audit log, automatic revocation or guarantee against malicious authorised edits is claimed.
+- Public code and scripts are safe to read. The password-protected vault remains encrypted client-side, not inaccessible via HTTP. Do not store additional personal secrets in custom-stop fields.
 
 ## Activate the optional MTA Cloudflare Worker
 
