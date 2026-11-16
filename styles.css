@@ -348,3 +348,48 @@ body.noux-departure-open{overflow:hidden}
 }
 @media(max-width:390px){.noux-departure-head{flex-direction:column}.noux-departure-close{align-self:flex-end}.noux-departure-sections button{font-size:10px;padding:9px 6px}.noux-departure-shop{padding:13px}}
 @media(prefers-reduced-motion:reduce){.noux-departure-modal *{scroll-behavior:auto!important}}
+
+
+/* NOUX Shared Trip: isolated from React's managed navigation */
+body.noux-sync-open{overflow:hidden}
+.noux-sync-launcher{position:fixed;top:86px;right:194px;z-index:510;border-radius:24px;padding:12px 17px;min-height:46px;border:1px solid rgba(214,184,139,.65);background:#27303b;color:#f7dbb0;box-shadow:0 10px 28px #0006;font-size:12px;font-weight:750;max-width:175px;line-height:1.35}
+.noux-sync-launcher:hover,.noux-sync-close:hover{background:#3a4350}
+.noux-sync-modal{position:fixed;inset:0;z-index:1300;overflow-y:auto;overscroll-behavior:contain;background:radial-gradient(ellipse at 90% 5%,rgba(160,107,111,.22),transparent 55%),#101721;padding:clamp(18px,5vw,50px);color:#f2e8de}
+.noux-sync-modal[hidden]{display:none!important}
+.noux-sync-inner{max-width:800px;margin:0 auto 65px;min-height:35vh}
+.noux-sync-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin:10px 0 34px}
+.noux-sync-kicker{color:#d6b68d;font-size:10px;letter-spacing:.16em;font-weight:800}
+.noux-sync-head h2{font:400 clamp(30px,5vw,57px)/1.1 Georgia,serif;margin:12px 0;color:#f5e9d8}
+.noux-sync-head p{color:#c6c4c6;font-size:13px;margin:5px 0}
+.noux-sync-close{background:#232d39;color:#f1d2a5;border:1px solid #706053;border-radius:10px;min-height:44px;padding:10px 14px;white-space:nowrap}
+.noux-sync-body{display:flex;flex-direction:column;gap:17px}
+.noux-sync-copy{font-size:13px;line-height:1.8;color:#c9c7ca;max-width:680px;margin:0}
+.noux-sync-setup,.noux-sync-join,.noux-sync-statusbox,.noux-sync-share{border:1px solid rgba(227,195,154,.21);border-radius:14px;background:rgba(255,255,255,.035);padding:22px;display:flex;flex-direction:column;gap:15px}
+.noux-sync-join{margin-top:4px}
+.noux-sync-field{display:flex;flex-direction:column;gap:8px;min-width:0}
+.noux-sync-field span{font-size:11px;color:#e4c798;letter-spacing:.07em;font-weight:730}
+.noux-sync-field input,.noux-sync-field select,.noux-sync-share textarea{width:100%;background:#232d39;border:1px solid #636471;border-radius:8px;min-height:45px;font-size:15px;color:#fff;padding:12px;outline-offset:2px}
+.noux-sync-field input:focus,.noux-sync-field select:focus,.noux-sync-share textarea:focus{outline:2px solid #e1bc89}
+.noux-sync-share textarea{font:12px/1.7 ui-monospace,Menlo,monospace;resize:vertical;overflow-wrap:anywhere;min-height:82px}
+.noux-sync-share p,.noux-sync-fine{font-size:11px;line-height:1.7;color:#c8bdb8}
+.noux-sync-primary,.noux-sync-secondary,.noux-sync-danger{border-radius:9px;min-height:46px;font-weight:780;font-size:12px;padding:12px 16px}
+.noux-sync-primary{background:#e7c493;border:1px solid #e7c493;color:#1b2130}
+.noux-sync-secondary{background:#25303d;color:#f1d4ac;border:1px solid #635949}
+.noux-sync-danger{align-self:start;background:transparent;color:#e9b7ae;border:1px solid rgba(232,143,127,.4)}
+.noux-sync-actions{display:flex;gap:9px;flex-wrap:wrap}
+.noux-sync-statusbox strong{font-size:17px;color:#e5c99b}
+.noux-sync-status{color:#c7d7d0;font-size:13px;margin:0}
+.noux-sync-new{color:#e9d0a9;line-height:1.7;font-size:12px}
+.noux-sync-error{border:1px solid rgba(232,142,133,.45);border-radius:9px;background:rgba(211,78,74,.12);padding:12px 16px;color:#f3c2b7;font-size:12px}
+.noux-sync-launcher:focus-visible,.noux-sync-body button:focus-visible{outline:3px solid #f0cca1;outline-offset:3px}
+@media(max-width:760px){
+ .noux-sync-launcher{top:auto;bottom:calc(137px + env(safe-area-inset-bottom,0px));right:15px;min-height:44px;padding:10px 14px;font-size:11px}
+ .noux-sync-modal{padding:20px 14px calc(50px + env(safe-area-inset-bottom,0px))}
+ .noux-sync-head{flex-direction:column;gap:8px}
+ .noux-sync-close{align-self:flex-end;order:-1}
+ .noux-sync-setup,.noux-sync-join,.noux-sync-statusbox,.noux-sync-share{padding:16px}
+ .noux-sync-actions button{flex:1;min-width:130px}
+ .noux-sync-head h2{font-size:36px}
+}
+@media(max-width:370px){.noux-sync-launcher{max-width:150px;font-size:10px;right:12px}.noux-sync-head h2{font-size:30px}}
+@media(prefers-reduced-motion:reduce){.noux-sync-modal *{scroll-behavior:auto!important}}
