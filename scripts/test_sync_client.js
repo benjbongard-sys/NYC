@@ -67,7 +67,7 @@ const delay=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 async function until(fn,label){
  const started=Date.now();
  while(Date.now()-started<3500){
-  const value=fn();if(value)return value;
+  const value=await fn();if(value)return value;
   await delay(25);
  }
  throw Error('Timed out waiting for '+label);
@@ -91,6 +91,7 @@ async function run(){
  const join=search(l.doc.body).find(x=>x.tagName==='form');
  await join.listeners.submit({preventDefault(){}});
  await until(()=>l.storage.getItem('noux_sync_pair_aes_v1'),'second-device pairing');
+ await until(()=>l.storage.getItem('noux_sync_cache_aes_v1'),'second-device first sync');
  // Lyna adds a stop; Benjamin ticks separately.
  const le=JSON.parse(l.storage.getItem('nyc_lyna_trip_v6'));
  le.customStops.push({id:'lyna-art',title:'Local gallery'});
@@ -98,9 +99,11 @@ async function run(){
  let bp=b.checklist();bp.check['Benjamin:phone']=true; // synthetic mutable UI state
  // Update Ben's closure through the documented shared-state API.
  await b.window.NOUX_DEPARTURE.applySharedSnapshot(bp);
- await Promise.all([b.window.NOUX_SYNC.refresh(),l.window.NOUX_SYNC.refresh()]);
- await b.window.NOUX_SYNC.refresh();await l.window.NOUX_SYNC.refresh();
- await delay(15);
+ await until(async()=>{
+  await l.window.NOUX_SYNC.refresh();
+  await b.window.NOUX_SYNC.refresh();
+  return JSON.parse(b.storage.getItem('nyc_lyna_trip_v6')).customStops.some(x=>x.id==='lyna-art')&&l.checklist().check['Benjamin:phone'];
+ },'two-device bidirectional changes');
  assert(JSON.parse(b.storage.getItem('nyc_lyna_trip_v6')).customStops.some(x=>x.id==='lyna-art'),'Lyna custom stop reaches Ben');
  assert(l.checklist().check['Benjamin:phone'],'Benjamin checked item reaches Lyna');
  const srv=[...rooms.values()][0].encrypted;
