@@ -66,6 +66,7 @@ async function decodeBox(raw){
 function save(){
  if(!STATE||!KEY)return Promise.resolve();
  STATE.updatedAt=new Date().toISOString();
+ try{document.dispatchEvent(new CustomEvent('noux:local-change',{detail:{source:'departure'}}))}catch(_){}
  const snapshot=JSON.stringify(STATE);
  SAVING=SAVING.catch(()=>{}).then(async()=>{
   const iv=crypto.getRandomValues(new Uint8Array(12));
