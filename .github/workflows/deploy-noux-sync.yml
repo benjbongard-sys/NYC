@@ -33,6 +33,7 @@ jobs:
           node scripts/test_sync_core.js
           node scripts/test_sync_client.js
           node scripts/test_unlock_recovery.js
+          node scripts/test_departure.js
       - name: Deploy isolated encrypted sync Worker (not the MTA proxy)
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
