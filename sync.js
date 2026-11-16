@@ -60,7 +60,7 @@ function statusText(){
  return 'Pairing saved · waiting for Cloudflare';
 }
 function updateStatus(){
- if(LAUNCHER)LAUNCHER.textContent=CONFIG?'Shared trip · '+(ERROR?'offline':LAST_OK?'synced':'connecting'):'Set up shared sync';
+ if(LAUNCHER)LAUNCHER.textContent=CONFIG?(IMPORT_CHANGED?'New trip updates · review':'Shared trip · '+(ERROR?'offline':LAST_OK?'synced':'connecting')):'Set up shared sync';
  const text=PANEL&&PANEL.querySelector('.noux-sync-status');
  if(text)text.textContent=statusText();
 }
@@ -98,8 +98,15 @@ async function applyRecords(records){
  }
  if(result.changedKeys.length){
   IMPORT_CHANGED=true;
-  // Do not click React-controlled navigation or force a reload from a sync
-  // callback. New choices will load from browser storage on next unlock.
+  // Preserve the current decrypted React app and make the fresh data visible
+  // after a controlled reload. Never overwrite React state by clicking tabs.
+  let toast=document.getElementById('noux-sync-notice');
+  if(!toast){
+   toast=el('div','noux-sync-notice');toast.id='noux-sync-notice';
+   toast.append(el('span',null,'New trip changes received from the other phone.'));
+   toast.append(button('View latest itinerary',()=>location.reload(),'noux-sync-primary'));
+   document.body.append(toast);
+  }
   try{window.dispatchEvent(new CustomEvent('noux:sync-data-arrived',{detail:{keys:result.changedKeys.length}}))}catch(_){}
  }
  return result;
@@ -321,8 +328,9 @@ async function install({key}={}){
  window.addEventListener('focus',queueRefresh);
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)queueRefresh()});
  document.addEventListener('noux:local-change',queueRefresh);
+ document.addEventListener('noux:replan',queueRefresh);
  window.addEventListener('storage',ev=>{if(ev.key&&ev.key!==PAIR_KEY&&ev.key!==CACHE_KEY)queueRefresh()});
  return true;
 }
-window.NOUX_SYNC={install,refresh,version:'2026.11.16-2',serviceUrl};
+window.NOUX_SYNC={install,refresh,version:'2026.11.16-3',serviceUrl};
 })();
