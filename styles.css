@@ -393,3 +393,7 @@ body.noux-sync-open{overflow:hidden}
 }
 @media(max-width:370px){.noux-sync-launcher{max-width:150px;font-size:10px;right:12px}.noux-sync-head h2{font-size:30px}}
 @media(prefers-reduced-motion:reduce){.noux-sync-modal *{scroll-behavior:auto!important}}
+
+.noux-sync-notice{position:fixed;z-index:1250;left:50%;bottom:max(20px,env(safe-area-inset-bottom));transform:translateX(-50%);max-width:min(92vw,580px);width:max-content;background:#27333e;border:1px solid #dcb785;box-shadow:0 16px 55px rgba(0,0,0,.5);border-radius:12px;padding:13px 16px;display:flex;gap:12px;align-items:center;color:#f2e3ce;font-size:12px}
+.noux-sync-notice button{min-height:40px;padding:8px 11px;font-size:11px;white-space:nowrap}
+@media(max-width:600px){.noux-sync-notice{bottom:calc(190px + env(safe-area-inset-bottom));width:calc(100vw - 24px);flex-direction:column;text-align:center}}
