@@ -81,6 +81,7 @@ async function run(){
  find(b,'Create our shared trip').click();
  let code=await until(()=>search(b.doc.body).find(x=>x.tagName==='textarea')?.value,'first-device pairing code');
  assert.match(code,/^NOUX1\.[A-Za-z0-9_-]{22}\.[A-Za-z0-9_-]{43}$/,'Pairing code has high entropy');
+ await until(()=>rooms.size===1,'encrypted shared room upload');
  assert(rooms.size===1,'First phone creates encrypted server room');
  const localPair=b.storage.getItem('noux_sync_pair_aes_v1');
  assert(localPair&&!localPair.includes(code),'Pairing secret encrypted in local browser');
