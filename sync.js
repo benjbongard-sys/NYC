@@ -158,6 +158,16 @@ async function refresh(){
     if(put.status!==200)throw Error('Sync upload failed (HTTP '+put.status+'); local changes are still safe.');
     remoteRevision=put.data.revision;
    }
+   // A user may edit the itinerary while the network request is in flight.
+   // Never overwrite such a just-made local edit with a stale snapshot.
+   const latest=await snapshot();
+   if(JSON.stringify(latest)!==JSON.stringify(local)){
+    CACHE={room:CONFIG.room,revision:remoteRevision,records:merged,baseline:local,lastStamp:Math.max(Number(CACHE?.lastStamp||0),Date.now())};
+    await persist();
+    queueRefresh();
+    INFO='New local edit detected during sync; retrying safely.';
+    return;
+   }
    await applyRecords(merged);
    CACHE={room:CONFIG.room,revision:remoteRevision,records:merged,baseline:await snapshot(),lastStamp:Math.max(Number(CACHE?.lastStamp||0),Date.now())};
    await persist();
@@ -221,6 +231,7 @@ function selectPerson(defaultValue){
 }
 function initScreen(){
  const area=el('div','noux-sync-body');
+ if(ERROR)area.append(el('p','noux-sync-error',ERROR));
  const intro=el('p','noux-sync-copy','To activate cross-device saving, create one private pairing code on the first phone, then enter that code on the other phone after unlocking NOUX. No passwords or unencrypted trip details are uploaded.');
  const chooser=selectPerson('Benjamin'),form=el('div','noux-sync-setup');
  form.append(field('This phone belongs to',chooser));
@@ -307,5 +318,5 @@ async function install({key}={}){
  window.addEventListener('storage',ev=>{if(ev.key&&ev.key!==PAIR_KEY&&ev.key!==CACHE_KEY)queueRefresh()});
  return true;
 }
-window.NOUX_SYNC={install,refresh,version:'2026.11.16-1',serviceUrl};
+window.NOUX_SYNC={install,refresh,version:'2026.11.16-2',serviceUrl};
 })();
