@@ -64,6 +64,14 @@ function find(b,text,tag='button'){
  return search(b.doc.body).find(n=>n.tagName===tag&&(n.textContent||'')===text);
 }
 const delay=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+async function until(fn,label){
+ const started=Date.now();
+ while(Date.now()-started<3500){
+  const value=fn();if(value)return value;
+  await delay(25);
+ }
+ throw Error('Timed out waiting for '+label);
+}
 async function run(){
  const key=await webcrypto.subtle.generateKey({name:'AES-GCM',length:256},false,['encrypt','decrypt']);
  const b=browser('Ben',key),l=browser('Lyna',key);
@@ -71,8 +79,7 @@ async function run(){
  assert(await l.window.NOUX_SYNC.install({key}));
  find(b,'Set up shared sync').click();
  find(b,'Create our shared trip').click();
- await delay(180);
- let code=search(b.doc.body).find(x=>x.tagName==='textarea')?.value;
+ let code=await until(()=>search(b.doc.body).find(x=>x.tagName==='textarea')?.value,'first-device pairing code');
  assert.match(code,/^NOUX1\.[A-Za-z0-9_-]{22}\.[A-Za-z0-9_-]{43}$/,'Pairing code has high entropy');
  assert(rooms.size===1,'First phone creates encrypted server room');
  const localPair=b.storage.getItem('noux_sync_pair_aes_v1');
@@ -82,8 +89,7 @@ async function run(){
  const entry=search(l.doc.body).find(x=>x.tagName==='input');entry.value=code;
  const join=search(l.doc.body).find(x=>x.tagName==='form');
  await join.listeners.submit({preventDefault(){}});
- await delay(150);
- assert(l.storage.getItem('noux_sync_pair_aes_v1'),'Second phone stores encrypted pair');
+ await until(()=>l.storage.getItem('noux_sync_pair_aes_v1'),'second-device pairing');
  // Lyna adds a stop; Benjamin ticks separately.
  const le=JSON.parse(l.storage.getItem('nyc_lyna_trip_v6'));
  le.customStops.push({id:'lyna-art',title:'Local gallery'});
