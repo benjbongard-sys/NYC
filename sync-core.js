@@ -18,6 +18,9 @@ const hasName=k=>STORE.test(k)&&!PRIVATE.test(k)&&!/^noux_(?:sync|shared)[_-]/.t
 function flatten(value,path,flat,depth=0){
  if(depth>10){flat[pathKey(path)]=value;return}
  if(Array.isArray(value)){
+  // Empty collections represent an absence of local additions when a new
+  // device joins. Deletions are explicit per-item tombstones, never [] wipes.
+  if(value.length===0)return;
   if(value.length>0 && value.length<500&&value.every(v=>plain(v)&&ident(v.id))&&new Set(value.map(v=>String(v.id))).size===value.length){
    for(const v of value){
     const prefix=path.concat('#'+String(v.id));
@@ -27,8 +30,9 @@ function flatten(value,path,flat,depth=0){
   } else flat[pathKey(path)]=value;
  }else if(plain(value)){
   const entries=Object.entries(value).filter(([k])=>!RESERVED.has(k)&&!PRIVATE.test(k)).slice(0,700);
-  if(!entries.length)flat[pathKey(path)]={};
-  else for(const [k,v] of entries)flatten(v,path.concat(k),flat,depth+1);
+  // Empty objects are not whole-subtree replacement instructions.
+  if(!entries.length)return;
+  for(const [k,v] of entries)flatten(v,path.concat(k),flat,depth+1);
  } else flat[pathKey(path)]=value;
 }
 function scan(storage,checklist){
