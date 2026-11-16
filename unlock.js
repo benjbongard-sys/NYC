@@ -117,6 +117,9 @@
     }
     // Encrypted checklist is a sibling of React's root, not a child of its nav.
     if(window.NOUX_DEPARTURE){try{await window.NOUX_DEPARTURE.install({key})}catch(_){}}
+    // Nonessential sync attaches outside React. Connectivity failure can never
+    // prevent the private site from opening or clear saved local state.
+    if(window.NOUX_SYNC){try{await window.NOUX_SYNC.install({key})}catch(_){}}
     // Catch a delayed render failure and offer an intact basic fallback.
     setTimeout(()=>{if(!healthy())recovery('The interactive page stopped rendering. Reopen the basic itinerary; your saved plans and checklist remain intact.')},1200);
    }
