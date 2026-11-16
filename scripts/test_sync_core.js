@@ -28,6 +28,12 @@ const items=[{id:'cookies',name:'Cookies',bought:false,packed:false,recipient:''
 const bcheck={check:{'Benjamin:phone':false,'Lyna:phone':false},items};
 const lcheck=JSON.parse(JSON.stringify(bcheck));
 const f1=sync.scan(ben,bcheck),f2=sync.scan(lyna,lcheck);
+const largePhoto=db({nyc_lyna_trip_v6:JSON.stringify({customStops:[{id:'large-art',title:'Gallery with picture',photo:'data:image/jpeg;base64,'+'A'.repeat(210000)}]})});
+const photoFields=sync.scan(largePhoto,{check:{},items:[]});
+assert(Object.keys(photoFields).some(k=>k.includes('large-art')&&k.includes('title')),
+ 'Large picture does not suppress the custom stop metadata');
+assert(!Object.keys(photoFields).some(k=>k.includes('large-art')&&k.includes('photo')),
+ 'Large photo remains local rather than breaking all cloud syncing');
 const freshDevice=db({nyc_lyna_trip_v6:JSON.stringify({choices:{},customStops:[]})});
 const empty=sync.scan(freshDevice,{check:{},items:[]});
 assert(!Object.keys(empty).some(k=>k.includes('customStops')||k.includes('choices')),
