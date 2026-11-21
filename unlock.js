@@ -91,7 +91,8 @@
    for(const name of ['data.js','itinerary.js','mta.js','routeplanner.js','photo-sources.js','custom-stops.js','app.js']){
     if(!scripts[name])throw Error('Unable to open a part of our itinerary: '+name);
     const el=document.createElement('script');el.textContent=scripts[name]+`\n//# sourceURL=noux-private-${name}`;document.head.appendChild(el);
-    if(name==='itinerary.js')attachCentennialParade();
+    if(name==='data.js'){try{window.NOUX_FOOD_WISHLIST?.install()}catch(_){/* optional food additions must never break unlock */}}
+     if(name==='itinerary.js')attachCentennialParade();
     if(name==='custom-stops.js'&&!basicMode){
      // The stable venue/explorer layers can initialise here; choices, route
      // auditing and subway enhancements must not mutate state before React's
