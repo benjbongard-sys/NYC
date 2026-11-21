@@ -95,10 +95,8 @@ function render(){
  sync.append(el('small','noux-trip-tool-state',connected?state.text||'Paired shared trip':'Not paired yet'));
  sync.append(button(connected?'Manage shared sync':'Set up shared sync',()=>{
   close();
-  if(!window.NOUX_SYNC?.open?.()){
-   // If the service did not install, avoid inventing a successful connection.
-   alert('Shared sync is not available in this browser session. Reopen NOUX online.');
-  }
+  if(typeof window.NOUX_SYNC?.open==='function')window.NOUX_SYNC.open();
+  else alert('Shared sync is not available in this browser session. Reopen NOUX online.');
  },'noux-trip-tools-primary'));
  const cache=el('section','noux-trip-tool-row');
  cache.append(el('h3',null,'Offline essentials'),el('p',null,'Save public app files and the encrypted trip vault on each phone. Map tiles and real-time MTA arrivals still need internet.'));
