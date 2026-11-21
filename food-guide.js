@@ -154,8 +154,7 @@ function mount(){
  PANEL.setAttribute('role','dialog');PANEL.setAttribute('aria-modal','true');PANEL.setAttribute('aria-label','NYC food locations and hours');
  PANEL.append(el('div','noux-food-content'));
  document.body.append(PANEL);
- LAUNCHER=button('Food details & hours',()=>open(),'noux-food-launcher');LAUNCHER.hidden=true;
- document.body.append(LAUNCHER);
+ // No floating button. Click a food Wish card or use Explore to open details.
  document.addEventListener('click',selectCard,true);
  document.addEventListener('keydown',e=>{if(OPEN&&e.key==='Escape')close()});
  const root=document.getElementById('root');
@@ -173,5 +172,5 @@ function install(options){
  if(!options?.headless)mount();
  return true;
 }
-window.NOUX_FOOD_GUIDE={install,open,catalogue,version:'2026-11-21-2'};
+window.NOUX_FOOD_GUIDE={install,open,catalogue,version:'2026-11-21-slim1'};
 })();
