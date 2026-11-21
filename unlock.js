@@ -124,9 +124,11 @@
     // Informational Food guide is separate from the React root and never
     // mutates private itinerary, booked stops, or passphrase handling.
     if(window.NOUX_FOOD_GUIDE){try{window.NOUX_FOOD_GUIDE.install()}catch(_){}}
-    // Opt-in Travel Companion is a read-only sibling of the React app; a
-    // failure in tickets, weather or offline storage cannot block login.
-    if(window.NOUX_COMPANION){try{window.NOUX_COMPANION.install()}catch(_){}}
+    // Only contextual helpers remain, outside React and after first paint.
+    // Shared sync and offline are accessible through the existing Trip Settings;
+    // Lyna's optional guided choices are accessible through Explore.
+    if(window.NOUX_DECISION_GUIDE){try{window.NOUX_DECISION_GUIDE.install()}catch(_){}}
+    if(window.NOUX_TRIP_TOOLS){try{window.NOUX_TRIP_TOOLS.install()}catch(_){}}
     // Catch a delayed render failure and offer an intact basic fallback.
     setTimeout(()=>{if(!healthy())recovery('The interactive page stopped rendering. Reopen the basic itinerary; your saved plans and checklist remain intact.')},1200);
    }
