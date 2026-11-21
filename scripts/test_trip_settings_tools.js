@@ -5,7 +5,9 @@ const source=fs.readFileSync('trip-settings-tools.js','utf8');
 new vm.Script(source,{filename:'trip-settings-tools.js'});
 assert(!/NOUX_PASSPHRASE|private\.vault\.json|Sanctuary Hotel/.test(source),'No private booking information');
 class Node{
- constructor(tag){this.tagName=tag;this.className='';this.id='';this.hidden=false;this.textContent='';this.style={};this.children=[];this.attrs={};this.listeners={};this.classList={add(){},remove(){}}}
+ constructor(tag){this.tagName=tag;this.className='';this.id='';this.hidden=false;this._text='';this.style={};this.children=[];this.attrs={};this.listeners={};this.classList={add(){},remove(){}}}
+ set textContent(value){this._text=String(value)}
+ get textContent(){return this._text+this.children.map(x=>x.textContent||'').join('')}
  append(...items){this.children.push(...items)}
  appendChild(x){this.append(x);return x}
  replaceChildren(...items){this.children=[];this.append(...items)}
