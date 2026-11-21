@@ -121,6 +121,9 @@
     // Nonessential sync attaches outside React. Connectivity failure can never
     // prevent the private site from opening or clear saved local state.
     if(window.NOUX_SYNC){try{await window.NOUX_SYNC.install({key})}catch(_){}}
+    // Informational Food guide is separate from the React root and never
+    // mutates private itinerary, booked stops, or passphrase handling.
+    if(window.NOUX_FOOD_GUIDE){try{window.NOUX_FOOD_GUIDE.install()}catch(_){}}
     // Catch a delayed render failure and offer an intact basic fallback.
     setTimeout(()=>{if(!healthy())recovery('The interactive page stopped rendering. Reopen the basic itinerary; your saved plans and checklist remain intact.')},1200);
    }
