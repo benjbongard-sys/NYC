@@ -33,41 +33,23 @@ The enhancer does not modify the ciphertext, local or shared user preferences, b
 Restaurant hours are **not** live opening guarantees. Official holiday notices are preserved: Russ & Daughters and Lobster Place are closed on Thanksgiving 26 November, while Katz's advertises an early 18:00 closing. Levain's pop-up and Magnolia Bakery have differing published regular hours across official sources; the guide explicitly discloses this. An unknown personally added Food wish receives a labelled "location/hours not verified" fallback with a search link rather than invented details. The guide never changes the native four-element Wishlist row or app's day plans.
 
 
-## Travel Companion + Lyna's guided NOUX Passport (21 November 2026)
+## Simpler NOUX navigation · 21 November 2026
 
-A single **Travel Companion** button appears after successful encrypted unlock. It opens five compact panels: **Passport**, **GO**, **Tickets**, **Nearby** and **Offline**. The control sits **outside React's managed root**; opening or closing it must not reinitialise the private itinerary, change any booking or reveal the passphrase.
+After feedback on the growing UI, the duplicated **Travel Companion** has been removed from the published site. The separate GO, weather, Tickets and Nearby panels were duplicating capabilities already present in the main itinerary, Map/MTA, Wishlist and decision cards. There is no Travel Companion floating button, and the original React navigation and encrypted itinerary are unchanged.
 
-### 1. Passport · guided discovery, 11+ real decisions
+The deliberately small contextual structure is:
 
-Choose **Lyna** (default) or **Benjamin**. The tour builds its chapters dynamically from the *actual* entries in `NYC_DATA.CHOICES` rather than an independent list, and then introduces the food Wishlist, Map/MTA, custom-stop editor, next-stop navigation, booking readiness, offline pack, packing and shared-device sync. Every step shows the current saved option when known. Use **Choose** to navigate to and click the matching option in the existing native Decisions card; if that UI cannot be matched safely, the app opens the decision for manual selection instead of guessing. **Stamp as reviewed** and **Decide later** save separate per-person progress. These are review markers, **not reservations** and not changes to the current itinerary.
+- **Trip Settings → Shared / offline**: open the original settings gear in the NOUX header. A small portal-owned **Shared / offline** action appears next to its heading (on narrow phones it reads **Sync**). It opens a technical mini-section containing the real **Shared Trip** pairing/status controls, the previously existing **encrypted Offline Essentials** download/status/remove functionality, and a link to the existing **Departure & gifts** checklists. There is no permanent Shared Sync, Packing or Offline launcher while browsing. The native Settings React DOM is **not modified**.
+- **Explore → Guide our decisions**: a lightweight tour for Lyna (or Benjamin) that reads exactly the actual `NYC_DATA.CHOICES` list. It displays the current selection, delegates a choice to the original React **Decisions** card, and tracks independent reviewed/decide-later progress in the existing choice journal. The progress already syncs between paired devices. It does not duplicate GO, weather, maps, bookings or any separate itinerary state.
+- **Wishlist → Food card**: click the existing Food wish to see verified branches, addresses, published hours, holiday warnings and one-tap directions. The full Food guide is also accessible from **Explore**, but it has no permanent floating button.
+- **Itinerary / Map / MTA**: retain their already existing schedules, walking/subway directions, train predictions and booked/proposed statuses. No duplicate GO or forecast screen is loaded.
+- **Explore** is the remaining original floating shortcut. All other new features are contextual, so the visitor does not have to navigate a pile of overlapping buttons.
 
-The tour's small progress markers are stored in the existing choice journal at `noux_choice_journal_v2`. That journal is already covered by encrypted **cross-device sync** once the phones are paired; no personal ticket number, passphrase or booking reference is stored in those flags.
+### Offline pack and safety
 
-### 2. GO · one next move
+A service worker is still registered **after successful unlock and a healthy first React render**. To save offline content, open **Trip Settings → Shared / offline → Save offline pack** separately on each phone. It saves only public app assets and the **AES-256-GCM encrypted vault**; the passphrase, decrypted itinerary, pairing credentials and live MTA predictions are never stored in the pack. Reopen NOUX once in airplane mode on each device to validate locally. Google Maps routes, MTA real-time feeds and fresh hours require internet. Clearing this offline pack does not clear choices, shared pairing or the encrypted packing/souvenir list.
 
-Reads the already-decrypted private itinerary, New York local time and the latest choices from browser storage. During the trip it shows the current/next event, start time, nearby scheduled stops and one-tap **walking** and **public-transit** directions in Google Maps. Outside the trip dates it shows a selectable preview day. All timing and travel estimates remain planning information; offline maps and realtime train arrivals are **not** guaranteed.
-
-### 3. Tickets · booking readiness
-
-Combines real `booked`, `confirmed`, `arranged`, `ticket-to-check`, `unverified`, `hours-to-check` and `verify` statuses from the private itinerary with reminders to verify the cruise's **actual pier** and the operator's **airport-coach meeting point**. A tick means *reviewed by a person*, not that NOUX bought or confirmed a ticket. Review ticks are saved locally and synchronised when paired, without overwriting bookings.
-
-### 4. Nearby · useful food and indoor alternatives
-
-Groups the 13 verified Food Wishlist branches around **Midtown**, **Chelsea/Meatpacking**, **West Village**, **Lower East Side** or **Williamsburg**. The visitor may choose a neighbourhood manually or explicitly allow the browser to identify the nearest **approximate area**. Device GPS coordinates are not sent to our own backend, saved in the itinerary, or needed for normal use; Google Maps resolves the actual route on the user's own device.
-
-A **Check New York forecast** button requests a current and seven-day forecast from [Open-Meteo](https://open-meteo.com/en/docs) (no API key). The app labels rainfall/wind risks and suggests an indoor fallback **within the same area**. It never silently removes an outdoor stop, adjusts a confirmed booking or asserts holiday opening hours without verification.
-
-### 5. Offline Essentials · explicitly opt-in PWA pack
-
-The service worker `sw.js` is registered **after a healthy first React render**. Open **Offline → Save / update offline pack** on **each phone** while connected. The worker caches only the public website assets and the AES-GCM encrypted vault envelope. It does **not** store a passphrase, decrypted itinerary, live MTA predictions, sync token, personal browsing data or external map tiles. The worker does not intercept external APIs.
-
-After status reads **Offline pack ready**, test once by switching to airplane mode and reopening the exact same NOUX URL. The existing private passphrase is still required. Live MTA updates, Google Maps route generation, weather updates and remote synchronisation need connectivity; some embedded venue photos or map tiles may not be visible offline. Cache Storage may be deleted by the browser, so this is a best-effort backup rather than a guarantee of permanent storage.
-
-The **Clear offline pack** action removes *only* offline caches. It does not clear choices, tickets, shared-device pairing or encrypted packing/souvenir lists. On iPhone, do **not** clear website data.
-
-### Release safeguards
-
-The code was designed to load only after the main private app has painted; it does not add elements to React's navigation or change decrypted vault contents. The Pages workflow runs new **`scripts/test_travel_companion.js`** and **`scripts/test_offline_worker.js`** as mandatory regression gates, alongside the existing unlock, sync, route and food tests. Physical-device verification is still necessary before relying on the pack in an airplane or subway tunnel.
+The code intentionally uses **body-owned modals and settings-only overlay controls** rather than inserting children into React-owned headers or dialogs; this protects against the prior blank-screen regression. Dedicated `test_decision_guide.js` and `test_trip_settings_tools.js` tests replace the old redundant Travel Companion suite. The encrypted site, existing data keys, original Decision controls and return-coach commitments remain untouched.
 
 ## Route-quality safeguards
 
@@ -94,9 +76,9 @@ The public `choice-orchestrator.js` and `day-audit.js` layers run only **after**
 
 The optional shared backend is an **independent** Cloudflare Worker (`cloudflare/sync-worker.js`) at `https://noux-sync.benjbongard.workers.dev`. It uses a SQLite-backed Durable Object with one strongly consistent document per randomly generated room. GitHub Actions deploys it automatically on changes to the Worker or its deploy workflow, provided the existing `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` Actions secrets allow creating/deploying Workers.
 
-**First verify** `https://noux-sync.benjbongard.workers.dev/health` returns `{"ok":true,...}`. The sync tab remains local/offline until this service is deployed. If deployment fails, check **Actions → Deploy NOUX encrypted sync**; do not paste any API token or pairing code into chat.
+**First verify** `https://noux-sync.benjbongard.workers.dev/health` returns `{"ok":true,...}`. Pairing remains local/offline until this service is deployed. If deployment fails, check **Actions → Deploy NOUX encrypted sync**; do not paste any API token or pairing code into chat.
 
-1. On the first phone, open NOUX and unlock with the existing **private itinerary passphrase**. Select **Set up shared sync**, identify the device as Benjamin (or Lyna), then **Create our shared trip**. Wait for **Shared trip synced**.
+1. On the first phone, open NOUX and unlock with the existing **private itinerary passphrase**. Open **Trip Settings → Shared / offline → Manage shared sync**, identify the device as Benjamin (or Lyna), then **Create our shared trip**. Wait for **Shared trip synced**.
 2. Click **Copy pairing code** and deliver it privately to the other person. It begins with `NOUX1.` and contains a 128-bit random room ID plus a 256-bit random capability. **The code is a secret**, not an ordinary public link. Do not put it in a GitHub issue, URL, website setting, public chat or screenshot.
 3. On the second phone, open the same NOUX URL, unlock with the **same itinerary passphrase**, choose **Lyna** (or Benjamin), paste the pairing code and choose **Join existing trip**.
 4. Both browsers poll roughly every 6.5 seconds, and also synchronise after relevant local actions, focus and reconnection. Personal stop additions, itinerary choices and all checkboxes/bring-home items merge **by field or stable ID**. Ben and Lyna's packing ticks are independent. An offline device retains its local edits and submits them on reconnect.
