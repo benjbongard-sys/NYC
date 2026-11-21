@@ -9,7 +9,8 @@ new vm.Script(source,{filename:'departure-kit.js'});
 assert(!/private\.vault\.json|NOUX_PASSPHRASE|132 W 47th|Sanctuary Hotel|AF007/.test(source),'No private vault details or flight number published');
 assert(source.includes('AES-GCM')&&source.includes('additionalData:AAD'),'Saved state uses authenticated encryption');
 assert(!source.includes('nav.append(tab)'),'Departure controls must not modify React-managed navigation');
-assert(source.includes('document.body.append(LAUNCHER)'),'Standalone tab must mount outside the React app root');
+assert(source.includes('document.body.append(ROOT)')&&source.includes('NOUX_DEPARTURE={install,open,close'),'Checklist remains outside React and opens through Trip Settings');
+assert(!source.includes('document.body.append(LAUNCHER)'),'No duplicated floating Departure button');
 assert(source.includes('Export encrypted backup')&&source.includes('Import from another device'),'Portable encrypted backup available');
 const saved={};const storage={getItem:k=>Object.prototype.hasOwnProperty.call(saved,k)?saved[k]:null,setItem:(k,v)=>{saved[k]=v}};
 class FakeNode{
