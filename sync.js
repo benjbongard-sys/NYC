@@ -315,9 +315,7 @@ function mount(){
  PANEL.setAttribute('role','dialog');PANEL.setAttribute('aria-modal','true');PANEL.setAttribute('aria-label','Shared private trip synchronisation');
  const inner=el('div','noux-sync-inner');PANEL.append(inner);
  document.body.append(PANEL);
- LAUNCHER=button('Set up shared sync',open,'noux-sync-launcher');
- LAUNCHER.setAttribute('aria-controls','noux-sync-panel');
- document.body.append(LAUNCHER);
+ // Shared sync is accessed from native Trip Settings, not a permanent floating button.
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&OPEN)close()});
  updateStatus();
 }
@@ -347,5 +345,5 @@ async function install({key}={}){
  window.addEventListener('storage',ev=>{if(ev.key&&ev.key!==PAIR_KEY&&ev.key!==CACHE_KEY)queueRefresh()});
  return true;
 }
-window.NOUX_SYNC={install,refresh,version:'2026.11.16-4',serviceUrl};
+window.NOUX_SYNC={install,refresh,open,close,getStatus:()=>({paired:!!CONFIG,text:statusText(),importChanged:IMPORT_CHANGED,ready:READY}),version:'2026.11.21-settings',serviceUrl};
 })();
