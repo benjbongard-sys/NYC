@@ -67,7 +67,9 @@ assert(all(katz).some(x=>x.tagName==='a'&&x.href.startsWith('https://www.google.
 assert(all(katz).some(x=>x.tagName==='a'&&x.href==='https://katzsdelicatessen.com/location'),'Food card supplies source website');
 const thu=guide.querySelectorAll('.noux-food-day').find(x=>x.textContent==='Thu 26');
 assert(thu,'Thanksgiving filter is available');thu.listeners.click[0]();
-assert(guide.textContent.includes('suggested for Thursday 26')||guide.textContent.includes('No food picks for this filter'),'Thursday filter does not pretend regular hours are guaranteed');
+assert.equal(guide.querySelectorAll('.noux-food-card').length,13,'Thanksgiving filter shows all venues to reveal closures and uncertain holiday hours');
+assert(guide.textContent.includes('Closed on Thanksgiving (official)'),'Thursday clearly identifies official closures');
+assert(guide.textContent.includes('Thanksgiving hours not confirmed'),'Other Thursday venues retain uncertainty rather than false open-now claims');
 const allDays=guide.querySelectorAll('.noux-food-day').find(x=>x.textContent==='All days');allDays.listeners.click[0]();
 data.WISHES.push(['Unlisted Noodles Restaurant','food','','choice']);
 win.NOUX_FOOD_GUIDE.open();
