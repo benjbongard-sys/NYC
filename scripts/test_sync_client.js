@@ -77,7 +77,8 @@ async function run(){
  const b=browser('Ben',key),l=browser('Lyna',key);
  assert(await b.window.NOUX_SYNC.install({key}));
  assert(await l.window.NOUX_SYNC.install({key}));
- find(b,'Set up shared sync').click();
+ assert(!search(b.doc.body).some(n=>n.className==='noux-sync-launcher'),'Sync must not add a floating button');
+ b.window.NOUX_SYNC.open();
  find(b,'Create our shared trip').click();
  let code=await until(()=>search(b.doc.body).find(x=>x.tagName==='textarea')?.value,'first-device pairing code');
  assert.match(code,/^NOUX1\.[A-Za-z0-9_-]{22}\.[A-Za-z0-9_-]{43}$/,'Pairing code has high entropy');
@@ -86,7 +87,7 @@ async function run(){
  assert(!search(b.doc.body).some(x=>x.id==='noux-sync-notice'), 'Initial self-upload must not freeze the first phone');
  const localPair=b.storage.getItem('noux_sync_pair_aes_v1');
  assert(localPair&&!localPair.includes(code),'Pairing secret encrypted in local browser');
- find(l,'Set up shared sync').click();
+ l.window.NOUX_SYNC.open();
  const select=search(l.doc.body).find(x=>x.tagName==='select');select.value='Lyna';
  const entry=search(l.doc.body).find(x=>x.tagName==='input');entry.value=code;
  const join=search(l.doc.body).find(x=>x.tagName==='form');
