@@ -31,10 +31,11 @@ heading.getBoundingClientRect=()=>({left:480,right:580,top:100,bottom:138,width:
 native.getBoundingClientRect=()=>({left:455,right:755,top:70,bottom:800,width:300,height:730});
 let settingsVisible=false,syncOpened=0,departureOpened=0;
 const raf=[];
+const docListeners={};
 const doc={body,createElement:t=>new Node(t),
  getElementById:id=>id==='root'?root:flatten(body).find(x=>x.id===id)||null,
  querySelectorAll:selector=>selector==='.modal-overlay > .modal'&&settingsVisible?[native]:[],
- addEventListener(){}
+ addEventListener(k,f){(docListeners[k]??=[]).push(f)}
 };
 const w={NYC_DATA:{P:{}},innerWidth:1200,addEventListener(){},
  NOUX_SYNC:{getStatus:()=>({paired:true,text:'Shared trip synced'}),open:()=>{syncOpened++}},
@@ -50,7 +51,10 @@ assert(trigger&&trigger.hidden,'No new button on ordinary itinerary page');
 assert.equal(root.children.length,1,'React subtree is untouched');
 settingsVisible=true;
 assert(w.NOUX_TRIP_TOOLS.nativeSettings(),'Recognises original Trip Settings');
-w.NOUX_TRIP_TOOLS.open(); // a programmatic call simulates tapping contextual control
+for(const callback of docListeners.click||[])callback({target:{closest:selector=>selector==='.settings-button'?{}:null}});
+while(raf.length)raf.shift()();
+assert(!trigger.hidden,'Settings-only sync shortcut becomes visible when native gear opens');
+trigger.click(); // actual user interaction with the body-owned Settings accessory
 assert(!doc.getElementById('noux-trip-tools').hidden,'Settings tools open');
 assert.equal(root.children.length,1,'Settings portal does not mutate React');
 const panel=doc.getElementById('noux-trip-tools');
