@@ -138,7 +138,8 @@ function selectNativeChoice(choice,option){
   const target=rows.find(x=>normal(x.textContent||'').startsWith(title))||rows.find(x=>normal(x.textContent||'').includes(title));
   if(target&&typeof target.click==='function'){
    target.click();markPassport('choice:'+choice.id,'done');
-   TOAST='Chosen through the original Decisions card. Return to Passport to continue.';
+   STEP=Math.min(steps().length-1,STEP+1);
+   TOAST='Choice saved by the original Decisions card. Your Passport is ready for the next step.';
   }else{
    TOAST='Open this decision in the app and select your preference there. No choice was changed automatically.';
   }
