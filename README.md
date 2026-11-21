@@ -33,6 +33,42 @@ The enhancer does not modify the ciphertext, local or shared user preferences, b
 Restaurant hours are **not** live opening guarantees. Official holiday notices are preserved: Russ & Daughters and Lobster Place are closed on Thanksgiving 26 November, while Katz's advertises an early 18:00 closing. Levain's pop-up and Magnolia Bakery have differing published regular hours across official sources; the guide explicitly discloses this. An unknown personally added Food wish receives a labelled "location/hours not verified" fallback with a search link rather than invented details. The guide never changes the native four-element Wishlist row or app's day plans.
 
 
+## Travel Companion + Lyna's guided NOUX Passport (21 November 2026)
+
+A single **Travel Companion** button appears after successful encrypted unlock. It opens five compact panels: **Passport**, **GO**, **Tickets**, **Nearby** and **Offline**. The control sits **outside React's managed root**; opening or closing it must not reinitialise the private itinerary, change any booking or reveal the passphrase.
+
+### 1. Passport · guided discovery, 11+ real decisions
+
+Choose **Lyna** (default) or **Benjamin**. The tour builds its chapters dynamically from the *actual* entries in `NYC_DATA.CHOICES` rather than an independent list, and then introduces the food Wishlist, next-stop navigation, booking readiness, offline pack and packing/sync. Every step shows the current saved option when known. Use **Choose** to navigate to and click the matching option in the existing native Decisions card; if that UI cannot be matched safely, the app opens the decision for manual selection instead of guessing. **Stamp as reviewed** and **Decide later** save separate per-person progress. These are review markers, **not reservations** and not changes to the current itinerary.
+
+The tour's small progress markers are stored in the existing choice journal at `noux_choice_journal_v2`. That journal is already covered by encrypted **cross-device sync** once the phones are paired; no personal ticket number, passphrase or booking reference is stored in those flags.
+
+### 2. GO · one next move
+
+Reads the already-decrypted private itinerary, New York local time and the latest choices from browser storage. During the trip it shows the current/next event, start time, nearby scheduled stops and one-tap **walking** and **public-transit** directions in Google Maps. Outside the trip dates it shows a selectable preview day. All timing and travel estimates remain planning information; offline maps and realtime train arrivals are **not** guaranteed.
+
+### 3. Tickets · booking readiness
+
+Combines real `booked`, `confirmed`, `arranged`, `ticket-to-check`, `unverified`, `hours-to-check` and `verify` statuses from the private itinerary with reminders to verify the cruise's **actual pier** and the operator's **airport-coach meeting point**. A tick means *reviewed by a person*, not that NOUX bought or confirmed a ticket. Review ticks are saved locally and synchronised when paired, without overwriting bookings.
+
+### 4. Nearby · useful food and indoor alternatives
+
+Groups the 13 verified Food Wishlist branches around **Midtown**, **Chelsea/Meatpacking**, **West Village**, **Lower East Side** or **Williamsburg**. The visitor may choose a neighbourhood manually or explicitly allow the browser to identify the nearest **approximate area**. Device GPS coordinates are not sent to our own backend, saved in the itinerary, or needed for normal use; Google Maps resolves the actual route on the user's own device.
+
+A **Check New York forecast** button requests a current and seven-day forecast from [Open-Meteo](https://open-meteo.com/en/docs) (no API key). The app labels rainfall/wind risks and suggests an indoor fallback **within the same area**. It never silently removes an outdoor stop, adjusts a confirmed booking or asserts holiday opening hours without verification.
+
+### 5. Offline Essentials · explicitly opt-in PWA pack
+
+The service worker `sw.js` is registered **after a healthy first React render**. Open **Offline → Save / update offline pack** on **each phone** while connected. The worker caches only the public website assets and the AES-GCM encrypted vault envelope. It does **not** store a passphrase, decrypted itinerary, live MTA predictions, sync token, personal browsing data or external map tiles. The worker does not intercept external APIs.
+
+After status reads **Offline pack ready**, test once by switching to airplane mode and reopening the exact same NOUX URL. The existing private passphrase is still required. Live MTA updates, Google Maps route generation, weather updates and remote synchronisation need connectivity; some embedded venue photos or map tiles may not be visible offline. Cache Storage may be deleted by the browser, so this is a best-effort backup rather than a guarantee of permanent storage.
+
+The **Clear offline pack** action removes *only* offline caches. It does not clear choices, tickets, shared-device pairing or encrypted packing/souvenir lists. On iPhone, do **not** clear website data.
+
+### Release safeguards
+
+The code was designed to load only after the main private app has painted; it does not add elements to React's navigation or change decrypted vault contents. The Pages workflow runs new **`scripts/test_travel_companion.js`** and **`scripts/test_offline_worker.js`** as mandatory regression gates, alongside the existing unlock, sync, route and food tests. Physical-device verification is still necessary before relying on the pack in an airplane or subway tunnel.
+
 ## Route-quality safeguards
 
 The public `choice-orchestrator.js` and `day-audit.js` layers run only **after** decryption and read the existing private itinerary; they do not embed private reservations or the passphrase.
