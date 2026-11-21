@@ -455,85 +455,57 @@ body.noux-food-open{overflow:hidden}
 @media(prefers-reduced-motion:reduce){.noux-food-modal *{scroll-behavior:auto!important}}
 
 
-/* NOUX Travel Companion · single lightweight hub; never inserted into React #root */
-body.noux-companion-open{overflow:hidden}
-.noux-companion-launcher{position:fixed;z-index:600;left:16px;bottom:calc(80px + env(safe-area-inset-bottom,0px));min-height:46px;border:1px solid #e2bd83;border-radius:30px;padding:12px 17px;background:linear-gradient(135deg,#edce9a,#d2a66e);color:#17202a;box-shadow:0 12px 35px rgba(0,0,0,.45);font-size:12px;font-weight:830}
-.noux-companion-modal{position:fixed;inset:0;z-index:1800;overflow-y:auto;overscroll-behavior:contain;background:radial-gradient(ellipse at 90% 0%,rgba(159,99,114,.19),transparent 49%),#101720;color:#f1e8dc}
-.noux-companion-modal[hidden]{display:none!important}
-.noux-companion-inner{max-width:1000px;margin:0 auto;padding:clamp(20px,4vw,42px) clamp(15px,4vw,38px) 90px}
-.noux-companion-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:18px}
-.noux-companion-brand,.noux-passport-stamp{font-size:10px;font-weight:800;color:#e4c291;letter-spacing:.17em}
-.noux-companion-head h2{font:400 clamp(34px,4.8vw,56px)/1.05 Georgia,serif;margin:10px 0 10px;color:#f8e8d2}
-.noux-companion-head p{font-size:12px;color:#afb9c2;margin:0}
-.noux-companion-close{background:#25303d;color:#f4d5a8;border:1px solid #76634e;min-height:43px;border-radius:10px;padding:10px 14px;white-space:nowrap}
-.noux-companion-tabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:22px 0}
-.noux-companion-tab{min-height:44px;border-radius:10px;border:1px solid #49505d;background:#232a34;color:#c6c8c9;font-size:12px;font-weight:750;padding:10px 6px}
-.noux-companion-tab.active{color:#ffedcd;border-color:#d8b581;background:#493d37}
-.noux-companion-stack{display:flex;flex-direction:column;gap:14px;min-width:0}
-.noux-companion-heading{font:400 clamp(28px,3.2vw,39px)/1.16 Georgia,serif;color:#f7e7ce;margin:5px 0}
-.noux-companion-help{font-size:12px;line-height:1.75;color:#c3c3c7;margin:0}
-.noux-companion-kicker{font-size:10px;color:#e4bd82;letter-spacing:.12em;text-transform:uppercase;font-weight:770;margin:3px 0}
-.noux-companion-actions{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin:8px 0}
-.noux-companion-primary,.noux-companion-secondary{min-height:44px;border-radius:9px;padding:12px 15px;font-size:11px;font-weight:780;line-height:1.4}
-.noux-companion-primary{background:#e2bf88;color:#141e28;border:1px solid #e2bf88}
-.noux-companion-secondary{background:#293544;color:#f4d9b0;border:1px solid #716355}
-.noux-companion-link{font-size:12px;font-weight:750;color:#f0c997;display:inline-flex;align-items:center;min-height:38px}
-.noux-companion-section{font:400 23px Georgia,serif;color:#ecd0a8;margin:13px 0 1px}
-.noux-companion-status{border:1px solid rgba(198,169,133,.3);border-radius:11px;padding:12px;color:#e9cfa7;font-size:11px}
-.noux-companion-error{border:1px solid rgba(242,154,149,.42);background:rgba(203,76,76,.1);color:#f5bdb8;padding:12px;border-radius:10px;font-size:12px}
-.noux-companion-daychips{display:flex;gap:7px;flex-wrap:wrap}
-.noux-companion-day{background:#26303b;color:#cfd2d5;border:1px solid #52535a;border-radius:18px;padding:9px 12px;min-height:38px;font-size:11px;font-weight:700}
-.noux-companion-day.active{border-color:#e3ba84;color:#ffeacc;background:#49392f}
-.noux-companion-next{border:1px solid rgba(230,195,149,.26);background:linear-gradient(125deg,#2a2934,#202f3d);border-radius:17px;padding:23px}
-.noux-companion-next small{font-size:10px;letter-spacing:.14em;color:#d6b482;font-weight:800}
-.noux-companion-next h4{font:400 28px/1.22 Georgia,serif;margin:12px 0;color:#f7e2c4}
-.noux-companion-next p{font-size:12px;line-height:1.8;color:#c6cdd3}
-.noux-companion-follow{display:grid;grid-template-columns:65px 1fr;gap:13px;padding:12px 8px;border-bottom:1px solid rgba(255,255,255,.1);font-size:12px}
-.noux-companion-follow strong{color:#debb82}
-.noux-companion-task,.noux-companion-food,.noux-companion-forecast{display:flex;gap:14px;align-items:start;border:1px solid rgba(231,218,202,.14);padding:16px;border-radius:12px;background:rgba(255,255,255,.025);min-width:0}
-.noux-companion-task input{width:20px;height:20px;accent-color:#d8ba86;flex:0 0 20px;margin-top:3px}
-.noux-companion-taskinfo{display:flex;flex-direction:column;gap:6px;min-width:0}
-.noux-companion-taskinfo strong,.noux-companion-food strong{font-size:13px;line-height:1.5;color:#f1e1c8}
-.noux-companion-taskinfo small,.noux-companion-food small{font-size:10px;color:#d1b68d}
-.noux-companion-taskinfo p,.noux-companion-food p{font-size:11px;line-height:1.65;color:#b8c1c8;margin:0}
-.noux-companion-food,.noux-companion-forecast{flex-direction:column;gap:7px}
-.noux-companion-forecast span{font-size:12px;color:#d7d2c8}
-.noux-companion-forecast small{font-size:11px;color:#c4ab83}
-.noux-passport-top{display:flex;align-items:center;justify-content:space-between;gap:9px}
-.noux-passport-stamp{display:inline-flex;align-items:center;border:1px solid #c69f73;border-radius:24px;padding:9px 12px;background:rgba(220,187,140,.08)}
-.noux-companion-select{border:1px solid #625b62;border-radius:9px;min-height:41px;background:#27313e;color:#f7e5ca;padding:9px 12px;font-size:12px}
-.noux-passport-meter{height:7px;border-radius:20px;background:#333b46;overflow:hidden;margin:6px 0 10px}
-.noux-passport-meter span{display:block;height:100%;border-radius:20px;background:#d5b080;transition:width .28s}
-.noux-passport-options{display:grid;gap:9px}
-.noux-passport-option{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#232c38;border:1px solid #424650;border-radius:12px;padding:13px}
-.noux-passport-option-copy{display:grid;gap:5px;min-width:0}
-.noux-passport-option-copy strong{font-size:13px;color:#f3e5d2}
-.noux-passport-option-copy small{font-size:11px;line-height:1.55;color:#b5bac0}
-.noux-passport-current{font-size:10px;color:#a8dcc6;font-weight:800}
-.noux-passport-review{font-size:11px;color:#d7b98c}
-.noux-passport-days{display:flex;flex-wrap:wrap;gap:8px}
-.noux-passport-days span{padding:10px 14px;border:1px solid #706053;border-radius:12px;background:#2b2d37;color:#eacb9f;font-size:11px}
-.noux-passport-finish{padding:15px 18px;color:#bbdfc6;background:rgba(86,141,112,.14);border:1px solid rgba(153,200,168,.28);border-radius:12px}
-.noux-passport-pending{display:flex;flex-wrap:wrap;gap:8px;border-top:1px solid rgba(255,255,255,.13);padding-top:16px;margin-top:8px}
-.noux-passport-pending>strong{width:100%;font-size:12px;color:#e3c49c}
-.noux-passport-jump{color:#e6d3b9;background:#2e343e;border:1px solid #5b5356;border-radius:15px;font-size:11px;padding:9px 11px}
-@media(max-width:770px){
- .noux-companion-launcher{left:12px;bottom:calc(72px + env(safe-area-inset-bottom,0px));padding:10px 13px;min-height:42px;font-size:11px}
- .noux-companion-modal{padding-bottom:max(12px,env(safe-area-inset-bottom,0px))}
- .noux-companion-inner{padding:22px 12px 90px}
- .noux-companion-tabs{gap:4px}
- .noux-companion-tab{font-size:10px;padding:10px 1px}
- .noux-companion-next{padding:15px}
- .noux-companion-next h4{font-size:24px}
- .noux-passport-option{align-items:flex-start}
- .noux-passport-option .noux-companion-secondary{flex:0 0 80px;padding:9px}
+
+
+/* NOUX · simplified settings-only tools and Decisions tour */
+.noux-trip-tools-trigger{position:fixed;z-index:690;min-height:38px;max-width:118px;border:1px solid rgba(220,190,148,.5);border-radius:18px;background:#343039;color:#f3d3a7;padding:8px 11px;font-size:10px;font-weight:750;box-shadow:0 4px 18px #0003;white-space:nowrap}
+.noux-trip-tools-trigger[hidden]{display:none!important}
+body.noux-settings-open,body.noux-guide-open{overflow:hidden}
+.noux-trip-tools-modal,.noux-guide-modal{position:fixed;inset:0;z-index:1480;overflow-y:auto;overscroll-behavior:contain;background:radial-gradient(ellipse at 90% 0%,rgba(127,84,107,.2),transparent 52%),#101720;color:#f4e8dc}
+.noux-trip-tools-modal[hidden],.noux-guide-modal[hidden]{display:none!important}
+.noux-trip-tools-content,.noux-guide-content{max-width:760px;margin:0 auto;padding:clamp(22px,4vw,42px) clamp(14px,4vw,35px) calc(75px + env(safe-area-inset-bottom,0px))}
+.noux-trip-tools-head,.noux-guide-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:22px}
+.noux-trip-tools-eyebrow,.noux-guide-eyebrow{font-size:10px;color:#dfb87c;font-weight:800;letter-spacing:.16em}
+.noux-trip-tools-head h2,.noux-guide-head h2{font:400 clamp(32px,5vw,52px)/1.1 Georgia,serif;color:#f8e7d1;margin:9px 0 11px}
+.noux-trip-tools-head p,.noux-guide-head p{font-size:12px;line-height:1.7;color:#c6c2c5;margin:0}
+.noux-trip-tools-close,.noux-guide-secondary{border:1px solid rgba(210,182,151,.36);border-radius:9px;background:#2a3140;color:#f1d2a7;padding:11px 14px;font-weight:740;font-size:11px;min-height:43px}
+.noux-trip-tools-close{white-space:nowrap}
+.noux-trip-tool-row{border:1px solid rgba(218,188,150,.22);background:rgba(255,255,255,.027);border-radius:14px;padding:18px 20px;margin:12px 0 15px;display:flex;flex-direction:column;gap:10px}
+.noux-trip-tool-row h3{font:400 24px Georgia,serif;margin:1px 0;color:#f0d8b6}
+.noux-trip-tool-row p{font-size:12px;color:#c8c4c2;line-height:1.7;margin:0}
+.noux-trip-tool-state{font-size:11px;color:#a8d2c2;line-height:1.5}
+.noux-trip-tools-primary,.noux-guide-primary{border:1px solid #e6c294;border-radius:9px;background:#dfba85;color:#1a202b;min-height:43px;font-size:11px;font-weight:800;padding:11px 14px}
+.noux-trip-tools-secondary{border:1px solid #65564b;border-radius:9px;background:#30313b;color:#ecd1a7;min-height:43px;font-size:11px;font-weight:750;padding:11px 14px}
+.noux-trip-tools-actions,.noux-guide-actions{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.noux-trip-tools-fine{font-size:11px;line-height:1.7;color:#adb8c0;padding-top:12px}
+.noux-trip-tools-error{border:1px solid #a56f67;border-radius:9px;background:rgba(161,73,75,.13);color:#f8c4b4;padding:12px;font-size:11px}
+.noux-guide-top{display:flex;gap:10px;align-items:center;margin:8px 0 12px;font-size:11px;color:#e1c7a6}
+.noux-guide-select{border:1px solid #6b5d57;border-radius:9px;background:#283240;color:#f6e1c7;padding:9px 12px;min-height:42px;font-size:13px}
+.noux-guide-progress{height:7px;background:#3c414c;border-radius:99px;overflow:hidden;margin:10px 0 26px}
+.noux-guide-progress span{display:block;height:100%;background:#d8b47e;border-radius:99px}
+.noux-guide-counter{font-size:10px;color:#d1aa79;letter-spacing:.12em;font-weight:800}
+.noux-guide-body h3{font:400 clamp(25px,4vw,39px)/1.15 Georgia,serif;color:#f6e2c8;margin:9px 0}
+.noux-guide-description,.noux-guide-hint{color:#bfc5cb;line-height:1.7;font-size:12px;margin:10px 0 17px}
+.noux-guide-options{display:grid;gap:9px;margin:17px 0 20px}
+.noux-guide-option{display:flex;gap:12px;align-items:center;justify-content:space-between;border:1px solid rgba(217,186,146,.19);border-radius:12px;padding:14px;background:rgba(255,255,255,.035)}
+.noux-guide-option>div{display:flex;flex-direction:column;gap:5px;min-width:0}
+.noux-guide-option strong{font-size:13px;color:#f7ead9;line-height:1.5}
+.noux-guide-option small{font-size:11px;color:#b6bfc7;line-height:1.55}
+.noux-guide-option em{font-size:10px;font-style:normal;color:#a5d2bb}
+.noux-guide-pending{display:flex;flex-wrap:wrap;gap:7px;margin-top:24px;padding-top:17px;border-top:1px solid rgba(255,255,255,.1)}
+.noux-guide-pending>strong{width:100%;font-size:12px;color:#e6c093}
+.noux-guide-chip{border:1px solid #5e5554;background:#302c32;color:#f0dbc0;border-radius:25px;min-height:36px;padding:8px 11px;font-size:11px}
+@media(max-width:620px){
+ .noux-trip-tools-content,.noux-guide-content{padding:20px 13px calc(70px + env(safe-area-inset-bottom,0px))}
+ .noux-trip-tools-head,.noux-guide-head{flex-direction:column;gap:9px}
+ .noux-trip-tools-close,.noux-guide-head>.noux-guide-secondary{order:-1;align-self:flex-end}
+ .noux-trip-tools-head h2,.noux-guide-head h2{font-size:34px}
+ .noux-trip-tool-row{padding:15px}
+ .noux-guide-option{align-items:flex-start}
+ .noux-guide-option>.noux-guide-primary{min-width:73px;padding:9px}
 }
-@media(max-width:395px){
- .noux-companion-head{flex-direction:column;gap:8px}
- .noux-companion-close{align-self:flex-end;order:-1}
- .noux-companion-tabs{grid-template-columns:repeat(5,minmax(0,1fr))}
- .noux-companion-tab{font-size:9px}
- .noux-passport-option{flex-direction:column}
- .noux-passport-option .noux-companion-secondary{flex:initial;align-self:flex-end}
+@media(max-width:365px){
+ .noux-trip-tools-trigger{max-width:65px;padding:7px;font-size:10px}
+ .noux-guide-option{flex-direction:column}
+ .noux-guide-option>.noux-guide-primary{align-self:flex-end}
 }
-@media(prefers-reduced-motion:reduce){.noux-passport-meter span{transition:none}}
