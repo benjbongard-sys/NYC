@@ -113,11 +113,15 @@ function steps(){
   sections.push({id:'choice:'+c.id,type:'choice',phase:LABELS[c.day]||'Decisions',title:c.title||'Your next decision',detail:c.desc||'Choose what feels most memorable.',choice:c});
  });
  sections.push(
-  {id:'wishlist',type:'feature',phase:'Explore',title:'Food and hidden favourites',detail:'Use the Food guide to see real addresses, hours and route-fit days. A wishlist idea is not an automatic stop.',tab:'nearby'},
-  {id:'go',type:'feature',phase:'Explore',title:'Never miss the next move',detail:'GO shows the next scheduled stop, expected start time and one-tap Maps directions. Always prioritise booked activities.',tab:'go'},
+  {id:'wishlist',type:'feature',phase:'Explore',title:'Your Wishlist and favourite bites',detail:'The native Wishlist keeps your ideas together, while the Food guide adds verified branches, published hours and useful neighbourhoods. Choosing a wishlist item does not automatically book a visit.',tab:'wishlist'},
+  {id:'map',type:'feature',phase:'Explore',title:'Map, subway and live arrivals',detail:'See chosen stops geographically. Follow the actual subway line and its terminal sign to avoid the wrong direction; live train predictions require internet.',tab:'map'},
+  {id:'custom',type:'feature',phase:'Explore',title:'Add your own secret stop',detail:'Found a beautiful gallery, a bagel shop or a photo location? Add it using the original Add a stop tool, and it can appear in the shared trip.',tab:'custom'},
+  {id:'go',type:'feature',phase:'Explore',title:'Never miss the next move',detail:'GO shows your next scheduled stop, its expected start time and one-tap Maps directions. Always prioritise booked activities.',tab:'go'},
   {id:'bookings',type:'feature',phase:'Be ready',title:'Tickets and reservations',detail:'Tickets keeps unconfirmed experiences visible, without mislabelling a preference as booked.',tab:'bookings'},
   {id:'offline',type:'feature',phase:'Be ready',title:'Save our offline essentials',detail:'Download public website files plus the encrypted itinerary. Keep the passphrase; live subway arrivals still need internet.',tab:'offline'},
-  {id:'packing',type:'feature',phase:'Be ready',title:'Packing, presents and shared sync',detail:'Benjamin and Lyna have separate packing ticks; gifts and choices sync on paired phones. Use Departure & gifts for the final sweep.',tab:'departure'}
+  {id:'packing',type:'feature',phase:'Be ready',title:'Packing and presents',detail:'Benjamin and Lyna have separate packing ticks, and you can add gifts or souvenirs during the stay. Use Departure & gifts for the final sweep.',tab:'departure'},
+  {id:'sync',type:'feature',phase:'Be ready',title:'One trip, two phones',detail:'Shared trip sync brings your checked items, choices and personal stops together. New itinerary choices may require a safe reload on the other phone.',tab:'sync'}
+
  );
  return sections;
 }
@@ -173,9 +177,16 @@ function renderPassport(){
   out.append(list);
   out.append(note('Choose uses the original NOUX Decisions card, so your shared itinerary remains the single source of truth. An option is not a reservation.'));
  }else if(step.type==='feature'){
-  const action=step.tab==='departure'
-   ?btn('Open packing & gifts',()=>{close();document.querySelector('.noux-departure-launcher')?.click()},'noux-companion-primary')
-   :btn('Explore this section',()=>{TAB=step.tab;render()},'noux-companion-primary');
+  let action;
+  if(step.tab==='departure')action=btn('Open packing & gifts',()=>{close();document.querySelector('.noux-departure-launcher')?.click()},'noux-companion-primary');
+  else if(step.tab==='sync')action=btn('Open shared trip',()=>{close();document.querySelector('.noux-sync-launcher')?.click()},'noux-companion-primary');
+  else if(step.tab==='custom')action=btn('Add a stop',()=>{close();document.querySelector('.top-add-stop')?.click()},'noux-companion-primary');
+  else if(step.tab==='wishlist'||step.tab==='map')action=btn(step.tab==='wishlist'?'Open Wish List':'Open Map / MTA',()=>{
+   const nav=Array.from(document.querySelectorAll('.topbar .mainnav button')).find(x=>step.tab==='wishlist'?/wish list/i.test(x.textContent||''):/map/i.test(x.textContent||''));
+   close();if(nav)nav.click();
+   if(step.tab==='map')setTimeout(()=>document.getElementById('noux-subway-companion')?.scrollIntoView({behavior:'smooth',block:'start'}),180);
+  },'noux-companion-primary');
+  else action=btn('Explore this section',()=>{TAB=step.tab;render()},'noux-companion-primary');
   out.append(action);
  }else{
   const dates=el('div','noux-passport-days');
