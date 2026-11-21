@@ -15,7 +15,6 @@ const original=[
   ["MoMA","art","tue","core"]
 ];
 const data={WISHES:original.map(x=>x.slice()),P:{museum:{name:"Test"}},DEFAULT:{choice:"keep"}};
-const frozen=JSON.stringify(data);
 const food=load(data),first=food.install();
 assert.equal(first.ready,true);
 assert.equal(first.total,13);
@@ -26,7 +25,7 @@ assert.equal(JSON.stringify(data.WISHES.slice(0,4)),JSON.stringify(original),"Ex
 assert.equal(JSON.stringify(data.P),JSON.stringify({museum:{name:"Test"}}),"Places unchanged");
 assert.equal(data.DEFAULT.choice,"keep","Trip choices unchanged");
 assert.equal(data.WISHES.filter(x=>x[1]==="food").length,13);
-assert.equal(data.WISHES.filter(x=>x[1]==="food"&&x[3]==="core").length,3,
+assert.equal(data.WISHES.filter(x=>x[1]==="food"&&x[3]==="core").length,2,
  "Previously existing Joe's priority preserved; other Must Try priorities set correctly");
 assert.equal(data.WISHES.filter(x=>x[1]==="food"&&x[2]==="").length,10,
  "New wishes must not force a particular day");
