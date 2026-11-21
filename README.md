@@ -22,6 +22,12 @@ This repository had earlier unencrypted revisions. Replacing the current branch 
 - Personal custom stops remain local until **Shared trip sync** is paired. Once enabled, custom stops and saved choices are end-to-end encrypted and automatically copied to the partner's paired browser. Offline edits remain local until connectivity returns. Never enter access tokens or passwords in custom-stop fields.
 
 
+## Food wishlist additions (21 November 2026)
+
+The public `food-wishlist.js` extension adds up to 13 curated NYC food suggestions to the **existing** native `food` wishlist category **only after the encrypted itinerary unlocks**. It retains existing wishlist entries and their priorities, recognises common naming variants to avoid duplicates, and marks four newly introduced classics as core: Katz's, Shake Shack, Joe's Pizza and L'Industrie. Other new food entries are optional, with no preselected day.
+
+The enhancer does not modify the ciphertext, local or shared user preferences, booked events, or the route planner. Both devices receive the same public list with the latest deployed code. The additions are not reservations, and menus, pricing and Thanksgiving hours must be checked before visiting.
+
 ## Route-quality safeguards
 
 The public `choice-orchestrator.js` and `day-audit.js` layers run only **after** decryption and read the existing private itinerary; they do not embed private reservations or the passphrase.
