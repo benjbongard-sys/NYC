@@ -149,5 +149,5 @@ function install(){
  scheduleAnchor();
  return true;
 }
-window.NOUX_TRIP_TOOLS={install,open:show,nativeSettings,version:'2026.11.21-slim2'};
+window.NOUX_TRIP_TOOLS={install,open:show,nativeSettings,version:'2026.11.21-slim3'};
 })();
