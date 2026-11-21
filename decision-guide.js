@@ -138,5 +138,5 @@ function install(){
  document.addEventListener('keydown',e=>{if(OPEN&&e.key==='Escape')close()});
  READY=true;return true;
 }
-window.NOUX_DECISION_GUIDE={install,open,decisions,version:'2026.11.21-slim2'};
+window.NOUX_DECISION_GUIDE={install,open,decisions,version:'2026.11.21-slim3'};
 })();
