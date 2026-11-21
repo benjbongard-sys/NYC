@@ -288,6 +288,7 @@
    var controls=element('div','noux-explorer-actions');
    controls.append(press('noux-explorer-primary','Open wish list',function(){var b=Array.from(document.querySelectorAll('.topbar .mainnav button')).find(function(x){return /wish list/i.test(x.textContent)});if(b)b.click();open=false;drawer.hidden=true}),press('noux-explorer-secondary','Add a stop',function(){var b=document.querySelector('.top-add-stop');if(b)b.click();open=false;drawer.hidden=true}));
    if(window.NOUX_FOOD_GUIDE&&typeof window.NOUX_FOOD_GUIDE.open==='function')controls.append(press('noux-explorer-secondary','Food locations & hours',function(){window.NOUX_FOOD_GUIDE.open()}));
+   if(window.NOUX_COMPANION&&typeof window.NOUX_COMPANION.open==='function')controls.append(press('noux-explorer-primary','Travel Companion · guided tour',function(){open=false;drawer.hidden=true;window.NOUX_COMPANION.open('passport')}));
    drawer.replaceChildren(head,intro,live,modes,summary,track,help,daysHead,dayGrid,wishHead,radar,second,controls);
   }
   var root=document.getElementById('root');
