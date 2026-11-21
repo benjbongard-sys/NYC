@@ -11,7 +11,9 @@ const button=(title,action,cls)=>{const b=el('button',cls||'',title);b.type='but
 function nativeSettings(){
  const dialogs=Array.from(document.querySelectorAll('.modal-overlay > .modal')||[]);
  return dialogs.find(modal=>{
-  if(!modal||modal.getAttribute('aria-hidden')==='true')return false;
+  if(!modal||modal.hidden||modal.getAttribute('aria-hidden')==='true')return false;
+  const bounds=modal.getBoundingClientRect?.();
+  if(bounds&&(!bounds.width||!bounds.height))return false;
   const heading=modal.querySelector('.modal-head h2')?.textContent||'';
   return !!modal.querySelector('.advanced-settings')||/\b(trip\s+)?settings\b|pr[eé]f[eé]rences/i.test(heading);
  })||null;
