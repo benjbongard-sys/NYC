@@ -73,4 +73,18 @@ assert(!Object.keys(sync.scan(ben,state.checklist)).some(k=>k.includes('sync_aut
 const selectionKey=JSON.stringify(['nyc_lyna_trip_v6','choices','c9']);
 const sameField=sync.merge({[selectionKey]:{value:'manhattan',t:400,device:'ben'}},{[selectionKey]:{value:'williamsburg',t:401,device:'lyna'}});
 assert.equal(sameField[selectionKey].value,'williamsburg','Same selection uses last edit');
+// The interactive travel Passport and booking-readiness flags share the existing
+// choice journal. Progress for each traveller must remain independent.
+const reviewA=db({noux_choice_journal_v2:JSON.stringify({nouxPassport:{Lyna:{reviewed:{'choice:c1':123},deferred:{'choice:c6':124}}},nouxReadiness:{'mon:cruise':{handled:true,at:125}}})});
+const reviewB=db({noux_choice_journal_v2:JSON.stringify({nouxPassport:{Benjamin:{reviewed:{'choice:c2':126},deferred:{}}},nouxReadiness:{'tue:museum':{handled:true,at:127}}})});
+const jA=sync.diff({},sync.scan(reviewA,{check:{},items:[]}),{},'lyna',()=>400);
+const jB=sync.diff({},sync.scan(reviewB,{check:{},items:[]}),{},'ben',()=>401);
+const together=sync.merge(jA,jB);
+sync.apply(reviewA,{check:{},items:[]},together);
+const journal=JSON.parse(reviewA.getItem('noux_choice_journal_v2'));
+assert(journal.nouxPassport.Lyna.reviewed['choice:c1']===123,'Lyna Passport stamp retained');
+assert(journal.nouxPassport.Benjamin.reviewed['choice:c2']===126,'Benjamin Passport stamp retained');
+assert(journal.nouxPassport.Lyna.deferred['choice:c6']===124,'Deferred decisions retained');
+assert(journal.nouxReadiness['mon:cruise'].handled&&journal.nouxReadiness['tue:museum'].handled,
+ 'Ticket-readiness reviews merge without overwriting each other');
 console.log('NO UX sync-core PASS: separate choices, per-person ticks, bought/packed, custom-stop add/delete, credential exclusion.');
