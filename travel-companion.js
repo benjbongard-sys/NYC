@@ -444,5 +444,5 @@ function install(){
  }else OFFLINE_ERROR='Offline support is not available in this browser.';
  return true;
 }
-window.NOUX_COMPANION={install,open,goData,bookingTasks,steps,nearestArea,foodByArea,version:'2026.11.21-toolkit1'};
+window.NOUX_COMPANION={install,open,goData,bookingTasks,steps,nearestArea,foodByArea,version:'2026.11.21-toolkit2'};
 })();
