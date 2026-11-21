@@ -113,14 +113,14 @@ function drawList(){
  const list=PANEL?.querySelector('#noux-food-results-list'),counter=PANEL?.querySelector('#noux-food-results');
  if(!list)return;
  const q=normal(QUERY),all=catalogue();
- const filtered=all.filter(p=>(DAY==='all'||p.days.includes(DAY)||p.preferred===DAY)&&(!q||normal([p.name,p.venue,p.area,p.address,p.note].join(' ')).includes(q)));
+ const filtered=all.filter(p=>(DAY==='all'||DAY==='thu'||p.days.includes(DAY)||p.preferred===DAY)&&(!q||normal([p.name,p.venue,p.area,p.address,p.note].join(' ')).includes(q)));
  filtered.sort((a,b)=>{
   if(SELECTED===a.id&&SELECTED!==b.id)return -1;
   if(SELECTED===b.id&&SELECTED!==a.id)return 1;
   return Number(b.priority==='core')-Number(a.priority==='core')||a.venue.localeCompare(b.venue);
  });
  list.replaceChildren(...filtered.map(renderCard));
- counter.textContent=filtered.length+' of '+all.length+' food wishes · '+(DAY==='all'?'flexible recommendations':'suggested for '+dname[DAY]);
+ counter.textContent=filtered.length+' of '+all.length+' food wishes · '+(DAY==='all'?'flexible recommendations':DAY==='thu'?'Thanksgiving status · regular hours are not a guarantee':'suggested for '+dname[DAY]);
  if(!filtered.length)list.append(el('p','noux-food-empty','No food picks for this filter. Choose All days or search another dish.'));
 }
 function open(id){
@@ -173,5 +173,5 @@ function install(options){
  if(!options?.headless)mount();
  return true;
 }
-window.NOUX_FOOD_GUIDE={install,open,catalogue,version:'2026-11-21-1'};
+window.NOUX_FOOD_GUIDE={install,open,catalogue,version:'2026-11-21-2'};
 })();
