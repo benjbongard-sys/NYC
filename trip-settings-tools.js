@@ -134,9 +134,16 @@ function install(){
   OBS.observe(root,{childList:true,subtree:true});
  }
  document.addEventListener('click',event=>{
-  if(event.target?.closest?.('.settings-button'))setTimeout(scheduleAnchor,70);
+  // Also observe the native modal's close/outside-click actions. The React
+  // Settings dialog can be portalled directly to body, outside our root observer.
+  if(event.target?.closest?.('.settings-button')||!TRIGGER.hidden)setTimeout(scheduleAnchor,70);
  });
- document.addEventListener('keydown',e=>{if(e.key==='Escape'&&OPEN)close()});
+ document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+   if(OPEN)close();
+   else setTimeout(scheduleAnchor,70);
+  }
+ });
  window.addEventListener('resize',scheduleAnchor);
  window.addEventListener('scroll',scheduleAnchor,true);
  scheduleAnchor();
