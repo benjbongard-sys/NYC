@@ -63,6 +63,7 @@ assert.equal(root.children.length,1,'Never modifies React root');
 assert.equal(fetches,0,'No forecast or external calls during startup');
 const api=win.NOUX_COMPANION;
 assert.equal(api.steps().filter(s=>s.type==='choice').length,2,'Passport generated from actual Decisions');
+for(const id of ['wishlist','map','custom','go','bookings','offline','packing','sync'])assert(api.steps().some(s=>s.id===id),'Guided Passport covers native app feature: '+id);
 assert(api.bookingTasks().some(x=>x.title==='Verify cruise pier & boarding instructions'),'Cruise pier readiness is included');
 assert(api.bookingTasks().some(x=>x.status==='ticket-to-check'),'Timed tickets flagged');
 assert.equal(api.goData('tue').rows[0].title,'AMNH Butterfly Vivarium','GO reads private planner, not duplicate hard-coded schedule');
