@@ -53,8 +53,8 @@ assert(win.NOUX_FOOD_GUIDE.install(),'Guide attaches after unlock');
 const guide=doc.getElementById('noux-food-guide');
 assert(guide&&guide.hidden,'Guide mounted outside private React subtree');
 assert.equal(root.children.length,1,'React-owned root unchanged');
-const launcher=all(body).find(x=>x.className==='noux-food-launcher');
-assert(launcher&&!launcher.hidden,'Contextual Food button appears while viewing Wishlist');
+assert(!all(body).some(x=>x.className==='noux-food-launcher'),
+ 'Food details should live on Wishlist cards, not another floating button');
 const click=doc.listeners.click?.[0];assert(click,'Delegated click is installed');
 click({target:food});
 assert.equal(guide.hidden,false,'Native Food card opens the independent information guide');
