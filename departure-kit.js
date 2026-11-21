@@ -272,7 +272,7 @@ function mount(){
   file.value='';
  });
  document.body.append(file);
- LAUNCHER=btn('Departure & gifts',open,'noux-departure-launcher');LAUNCHER.setAttribute('aria-controls',ROOT.id);document.body.append(LAUNCHER);
+ // Packing & gifts is reachable from Trip Settings; no permanent floating control.
  // Render the launcher outside React's managed #root subtree. Modifying
  // .mainnav directly can break React reconciliation during its first update.
  // The launcher remains visible on both desktop and mobile.
@@ -322,5 +322,5 @@ async function install(options){
  mount();
  return true;
 }
-window.NOUX_DEPARTURE={install,whenSaved:()=>SAVING,getSharedSnapshot,applySharedSnapshot,version:'2026.11.16-cross-device'};
+window.NOUX_DEPARTURE={install,open,close,whenSaved:()=>SAVING,getSharedSnapshot,applySharedSnapshot,version:'2026.11.21-settings'};
 })();
