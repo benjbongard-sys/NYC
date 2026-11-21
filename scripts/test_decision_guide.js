@@ -5,7 +5,9 @@ const code=fs.readFileSync('decision-guide.js','utf8');
 new vm.Script(code,{filename:'decision-guide.js'});
 assert(!/NOUX_PASSPHRASE|private\.vault\.json|Sanctuary Hotel/.test(code),'No private data in public guide');
 class Node{
- constructor(tag){this.tagName=tag;this.className='';this.id='';this.textContent='';this.children=[];this.listeners={};this.style={};this.attrs={};this.hidden=false;this.value='';this.classList={add(){},remove(){}}}
+ constructor(tag){this.tagName=tag;this.className='';this.id='';this._text='';this.children=[];this.listeners={};this.style={};this.attrs={};this.hidden=false;this.value='';this.classList={add(){},remove(){}}}
+ set textContent(value){this._text=String(value)}
+ get textContent(){return this._text+this.children.map(x=>x.textContent||'').join('')}
  append(...v){this.children.push(...v)}
  appendChild(v){this.append(v);return v}
  replaceChildren(...v){this.children=[];this.append(...v)}
