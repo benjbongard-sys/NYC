@@ -39,6 +39,7 @@ async function instance(key){
  const ctx={window,document,localStorage:storage,crypto:webcrypto,TextEncoder,TextDecoder,btoa:encode,atob:s=>Buffer.from(s,'base64').toString('binary'),Uint8Array,Array,Object,JSON,Math,Date,Number,String,Set,Promise,Blob,URL,setTimeout,requestAnimationFrame:fn=>fn()};
  vm.runInNewContext(source,ctx,{filename:'departure-kit.js'});
  assert(await window.NOUX_DEPARTURE.install({key}),'Checklist installs only with valid AES key');
+ assert(!nodes(document.body).some(n=>n.className==='noux-departure-launcher'),'No permanent packing launcher');
  return {window,document};
 }
 async function plaintext(key){
@@ -55,7 +56,7 @@ async function main(){
  assert(start.items.length>=10,'Curated suggestions available');
  assert(start.items.some(x=>x.id==='nypltote'&&/EARLY CLOSURE/.test(x.note)),'NYPL early closure explicitly flagged');
  assert(start.items.some(x=>x.id==='levainfresh'&&x.day==='fri'),'Friday nearby Levain option exists');
- a.document.body.children.find(n=>n.className==='noux-departure-launcher').click();
+ a.window.NOUX_DEPARTURE.open();
  const lyna=nodes(a.document.body).find(n=>n.tagName==='input'&&n.attrs['aria-label']==='Lyna · Passport, ESTA and entry papers');
  const ben=nodes(a.document.body).find(n=>n.tagName==='input'&&n.attrs['aria-label']==='Benjamin · Passport, ESTA and entry papers');
  assert(lyna&&ben,'Separate labelled traveller tickboxes exist');
@@ -83,7 +84,7 @@ async function main(){
  assert(updated.items.some(x=>x.name==='Unique New York souvenir'&&x.custom),'New gift added and saved encrypted');
  assert(!saved.noux_departure_checklists_aes_v1.includes('Unique New York souvenir'),'Custom gift text encrypted');
  a=await instance(key);
- a.document.body.children.find(n=>n.className==='noux-departure-launcher').click();
+ a.window.NOUX_DEPARTURE.open();
  assert(nodes(a.document.body).some(x=>x.attrs&&x.attrs['aria-label']==='Benjamin · Passport, ESTA and entry papers'&&x.checked),'Reload restores Benjamin checkbox state');
  assert((await plaintext(key)).check['Benjamin:documents'],'Reopening after reload preserves tick');
  console.log('Departure kit PASS: AES-GCM local state, independent travellers, custom gift, holiday caveats and persisted reload.');
