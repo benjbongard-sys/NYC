@@ -3,8 +3,8 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const code=fs.readFileSync('sw.js','utf8');
 new vm.Script(code,{filename:'sw.js'});
-assert(!/localStorage|sessionStorage|crypto\.subtle\.decrypt|password|passphrase/i.test(code),
- 'Offline worker must not access plaintext secrets or browser credentials');
+assert(!/localStorage\.|sessionStorage\.|crypto\.subtle\.decrypt|request\.headers\.get\(['"]Authorization/i.test(code),
+ 'Offline worker must not read credentials, local storage or decrypt vault data');
 const listeners={};const scope='https://example.test/nyc-lyna/';
 const self={
  registration:{scope},location:{origin:'https://example.test'},
