@@ -28,6 +28,11 @@ The public `food-wishlist.js` extension adds up to 13 curated NYC food suggestio
 
 The enhancer does not modify the ciphertext, local or shared user preferences, booked events, or the route planner. Both devices receive the same public list with the latest deployed code. The additions are not reservations, and menus, pricing and Thanksgiving hours must be checked before visiting.
 
+**Food place details (21 November 2026).** `food-wishlist.js` now carries branch-specific public metadata for all 13 picks: full street address, official site, published standard hours, known holiday exception, best-fit itinerary day, approximate visit duration and concise geographical advice. `food-guide.js` renders those details in a responsive panel **outside React's managed root**. Open it via the **Food details & hours** control while the native Wishlist is visible, by clicking a recognised Food wishlist card, or through **Explore → Food locations & hours**. Each listing offers directions and a current Google Maps hours search. No client API keys, background requests or new reservations are involved.
+
+Restaurant hours are **not** live opening guarantees. Official holiday notices are preserved: Russ & Daughters and Lobster Place are closed on Thanksgiving 26 November, while Katz's advertises an early 18:00 closing. Levain's pop-up and Magnolia Bakery have differing published regular hours across official sources; the guide explicitly discloses this. An unknown personally added Food wish receives a labelled "location/hours not verified" fallback with a search link rather than invented details. The guide never changes the native four-element Wishlist row or app's day plans.
+
+
 ## Route-quality safeguards
 
 The public `choice-orchestrator.js` and `day-audit.js` layers run only **after** decryption and read the existing private itinerary; they do not embed private reservations or the passphrase.
