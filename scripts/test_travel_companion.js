@@ -14,6 +14,7 @@ class N{
  querySelector(sel){return walk(this).find(x=>sel[0]==='.'?x.className.split(' ').includes(sel.slice(1)):sel[0]==='#'?x.id===sel.slice(1):x.tagName===sel)||null}
  querySelectorAll(sel){return walk(this).filter(x=>sel[0]==='.'?x.className.split(' ').includes(sel.slice(1)):sel[0]==='#'?x.id===sel.slice(1):x.tagName===sel)}
  focus(){}
+ scrollIntoView(){}
  click(){this.listeners.click?.()}
 }
 const walk=n=>[n,...n.children.flatMap(walk)];
@@ -34,8 +35,20 @@ const plans={
 };
 const store={nyc_lyna_trip_v6:JSON.stringify({choices:{c1:'view'}}),getItem(k){return this[k]??null},setItem(k,v){this[k]=v}};
 const body=new N('body'),root=new N('main'),existing=new N('article');existing.textContent='Private React app';root.append(existing);root.id='root';
-let changeCount=0;
-const document={body,createElement:t=>new N(t),getElementById:id=>id==='root'?root:walk(body).find(x=>x.id===id)||null,addEventListener(){},dispatchEvent(){changeCount++}};
+let changeCount=0,nativeChoiceClicks=0;
+const nativeCard=new N('div');nativeCard.id='decision-c1';
+const nativeChoice=new N('button');nativeChoice.className='choice-row';
+nativeChoice.textContent='Skyline dinner More views';
+nativeChoice.addEventListener('click',()=>{
+ nativeChoiceClicks++;
+ store.setItem('nyc_lyna_trip_v6',JSON.stringify({choices:{c1:'view'}}));
+});
+nativeCard.append(nativeChoice);
+const realDecisionsNav=new N('button');realDecisionsNav.textContent='Decisions';
+const document={body,createElement:t=>new N(t),
+ getElementById:id=>id==='root'?root:id==='decision-c1'?nativeCard:walk(body).find(x=>x.id===id)||null,
+ querySelectorAll:q=>q==='.topbar .mainnav button'?[realDecisionsNav]:[],
+ addEventListener(){},dispatchEvent(){changeCount++}};
 const win={NYC_DATA:data,NYC_PLAN:{day:d=>plans[d].map(x=>({...x}))},
  NOUX_FOOD_WISHLIST:{catalogue:()=>[
  {id:'shake',venue:'Shake Shack',area:'Theater District',regular:'10:00–23:00',address:'Midtown USA',note:'Quick burger'},
@@ -79,5 +92,15 @@ const tick=()=>new Promise(r=>setTimeout(r,10));
  api.open('offline');
  assert(body.querySelectorAll('.noux-companion-tab').length===5,'Offline section does not disable native planner');
  assert.equal(root.children.length,1,'React root untouched across all sections');
+ // Guided choice uses a real native Decisions button. It must not create a
+ // duplicate itinerary setting or select a different option by position.
+ api.open('passport');
+ const nativeButtons=walk(body).filter(x=>x.tagName==='button'&&x.textContent==='Choose');
+ assert.equal(nativeButtons.length,2,'The real options are visible in the Passport');
+ nativeButtons[1].click();
+ await new Promise(resolve=>setTimeout(resolve,180));
+ assert.equal(nativeChoiceClicks,1,'Passport routes a choice through the actual Decisions control');
+ assert(JSON.parse(store.getItem('noux_choice_journal_v2')).nouxPassport.Lyna.reviewed['choice:c1'],
+   'A successful native choice marks Lyna\'s Passport step reviewed');
  console.log('Travel Companion PASS: 5 sections, real decisions, saved Lyna progress, booking checks, GO, neighbourhood food and opt-in weather.');
 })().catch(e=>{console.error(e);process.exitCode=1});
